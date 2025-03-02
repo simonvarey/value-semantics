@@ -10,7 +10,7 @@
 
 import { CLONE_EXCLUDE_PROPS, CLONE_INCLUDE_PROPS, Constructor, ClassDecorator, CLONE_METHOD, 
   TYPED_ARRAYS, PropKey, getAllKeys, getKeys, getMeta, META_NOT_FOUND, CloneMethodFunc, setMeta, 
-  CONSTRUCTOR_PROPS, ValueSemanticsError, CloneVisited } from "./common.js";
+  CONSTRUCTOR_PROPS, ValueSemanticsError, CloneVisited } from "./common";
 
 // Symbols
 

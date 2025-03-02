@@ -4,11 +4,11 @@
 
 // * Value-Semantics: The JavaScript/TypeScript Value Semantics Toolkit *
 
-import { customizeClone } from '../lib/clone.js';
-import { customizeEquals } from '../lib/equals.js';
+import { customizeClone } from './clone';
+import { customizeEquals } from './equals';
 
-export { clone } from '../lib/clone.js';
-export { equals } from '../lib/equals.js';
+export { clone } from './clone';
+export { equals } from './equals';
 
 export namespace customize {
   export const clone = customizeClone;

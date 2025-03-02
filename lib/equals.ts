@@ -8,7 +8,7 @@
 
 import { Constructor, EQUALS_EXCLUDE_PROPS, EQUALS_INCLUDE_PROPS, ClassDecorator, EqualsVisited, 
   EQUALS_METHOD, TYPED_ARRAYS, getAllKeys, getKeys, PropKey, EqualMethodFunc, setMeta, getMeta, 
-  META_NOT_FOUND } from "./common.js";
+  META_NOT_FOUND } from "./common";
 
 // * Helpers *
 
