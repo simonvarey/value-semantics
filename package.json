@@ -1,0 +1,72 @@
+{
+  "name": "value-semantics",
+  "version": "0.0.0",
+  "description": "Mimic value semantics for JavaScript objects with deep cloning and equality functions",
+  "keywords": [
+    "value-semantics",
+    "value-object",
+    "value-type",
+    "value",
+    "semantics",
+    "object",
+    "deep-clone",
+    "deep-copy",
+    "recursive-clone",
+    "recursive-copy",
+    "structural-clone",
+    "structural-copy",
+    "clone",
+    "copy",
+    "value-equality",
+    "value-equals",
+    "value-equal",
+    "deep-equality",
+    "deep-equals",
+    "deep-equal",
+    "recursive-equality",
+    "recursive-equals",
+    "recursive-equal",
+    "structural-equality",
+    "structural-equals",
+    "structural-equal",
+    "equality",
+    "equals",
+    "equal",
+    "deep",
+    "recursive",
+    "structural"
+  ],
+  "homepage": "https://github.com/simonvarey/value-semantics#readme",
+  "bugs": {
+    "url": "https://github.com/simonvarey/value-semantics/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/simonvarey/value-semantics.git"
+  },
+  "license": "MIT",
+  "author": "Simon Varey",
+  "type": "module",
+  "main": "dist/value-semantics.js",
+  "files": [
+    "dist"
+  ],
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "build": "tsc && vite build && api-extractor run --local --verbose",
+    "coverage": "vitest run --coverage",
+    "test": "vitest",
+    "pubalpha": "npm version prerelease --preid alpha && npm publish --tag alpha",
+    "pubpatch": "npm version patch && npm publish",
+    "pubminor": "npm version minor && npm publish",
+    "pubmajor": "npm version major && npm publish"
+  },
+  "devDependencies": {
+    "@microsoft/api-extractor": "^7.51.1",
+    "@vitest/coverage-v8": "^3.0.7",
+    "typescript": "^5.8.2",
+    "vite": "^6.2.0"
+  }
+}
