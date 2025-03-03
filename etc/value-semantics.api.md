@@ -7,7 +7,7 @@
 // @public
 export function clone<T>(source: T): T;
 
-// @public (undocumented)
+// @public
 export namespace clone {
     // (undocumented)
     export function constructorParam<C, V>(_target: undefined, context: ClassFieldDecoratorContext<C, V>): void;
@@ -17,7 +17,7 @@ export namespace clone {
     export function include<C, V>(_target: undefined, context: ClassFieldDecoratorContext<C, V>): void;
 }
 
-// @public (undocumented)
+// @public
 export namespace customize {
     const // Warning: (ae-forgotten-export) The symbol "customizeClone" needs to be exported by the entry point main.d.ts
     //
@@ -32,7 +32,7 @@ export namespace customize {
 // @public
 export function equals(lhs: unknown, rhs: unknown): boolean;
 
-// @public (undocumented)
+// @public
 export namespace equals {
     // (undocumented)
     export function exclude<C, V>(_target: undefined, context: ClassFieldDecoratorContext<C, V>): void;

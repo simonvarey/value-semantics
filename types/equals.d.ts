@@ -2,9 +2,10 @@ import { ClassDecorator, EqualsVisited } from "./common";
 export declare const REF_EQUALS: unique symbol;
 /**
  * Compares two values for value-equality.
- * @param lhs The first value to compare.
- * @param rhs The second value to compare.
+ * @param lhs - The first value to compare.
+ * @param rhs - The second value to compare.
  * @returns Whether the two values are value-equal.
+ * @public
  */
 export declare function equals(lhs: unknown, rhs: unknown): boolean;
 export declare function equalscyc(lhs: unknown, rhs: unknown, visited: EqualsVisited): boolean;
@@ -15,6 +16,10 @@ export type CustomizeEqualsOptions = {
 export declare function customizeEquals<I extends object>(options?: CustomizeEqualsOptions): ClassDecorator<I>;
 export declare function customizeEquals<I extends object>(semantics: 'value', options?: CustomizeEqualsOptions): ClassDecorator<I>;
 export declare function customizeEquals<I extends object>(semantics: 'ref'): ClassDecorator<I>;
+/**
+ * Class field decorators which allow the class' `equals` implementations to be customized.
+ * @public
+ */
 export declare namespace equals {
     function include<C, V>(_target: undefined, context: ClassFieldDecoratorContext<C, V>): void;
     function exclude<C, V>(_target: undefined, context: ClassFieldDecoratorContext<C, V>): void;

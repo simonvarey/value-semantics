@@ -163,8 +163,9 @@ defineErrorOnClone(WeakRef);
 
 /**
  * Creates a deep clone of a provided value. 
- * @param source The value to be cloned.
+ * @param source - The value to be cloned.
  * @returns The cloned value.
+ * @public
  */
 export function clone<T>(source: T): T {
   return clonecyc(source, new Map());
@@ -268,6 +269,10 @@ export function customizeClone<I extends object>(
 
 // Field Decorators
 
+/**
+ * Class field decorators which allow the class' `clone` implementations to be customized.
+ * @public
+ */
 export namespace clone {
 
   export function include<C, V>(

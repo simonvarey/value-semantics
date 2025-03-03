@@ -10,6 +10,10 @@ import { customizeEquals } from './equals';
 export { clone } from './clone';
 export { equals } from './equals';
 
+/**
+ * Class decorators which allow the class' `equals` and `clone` implementations to be customized.
+ * @public
+ */
 export namespace customize {
   export const clone = customizeClone;
   export const equals = customizeEquals;

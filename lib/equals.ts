@@ -285,9 +285,10 @@ defineRefEquals(WeakMap);
 
 /**
  * Compares two values for value-equality.
- * @param lhs The first value to compare.
- * @param rhs The second value to compare.
+ * @param lhs - The first value to compare.
+ * @param rhs - The second value to compare.
  * @returns Whether the two values are value-equal.
+ * @public
  */
 export function equals(lhs: unknown, rhs: unknown): boolean {
   return equalscyc(lhs, rhs, new Map());
@@ -424,6 +425,10 @@ export function customizeEquals<I extends object>(
 
 // Property Decorators
 
+/**
+ * Class field decorators which allow the class' `equals` implementations to be customized.
+ * @public
+ */
 export namespace equals {
 
   export function include<C, V>(_target: undefined, context: ClassFieldDecoratorContext<C, V>): void {
