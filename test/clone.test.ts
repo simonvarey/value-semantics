@@ -211,7 +211,7 @@ test('includes a class field in cloning', () => {
   expect(instanceClone.includeField).toBe('incl');
 })
 
-test('excludes all properties', () => {
+test('excludes all properties in cloning', () => {
   @customize.clone({ propDefault: 'exclude' })
   class ExcludeAllExample {
     public excludeField: string;
