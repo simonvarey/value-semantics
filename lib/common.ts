@@ -51,7 +51,7 @@ export type CloneVisited = Map<any, any>;
 export type EqualsVisited = Map<object, Map<object, boolean>>;
 
 export type CloneMethodFunc<T> = (this: T, visited: CloneVisited) => T;
-export type EqualMethodFunc<T> = (this: T, other: any, visited: EqualsVisited) => boolean;
+export type EqualMethodFunc<T> = (this: T, other: object, visited: EqualsVisited) => boolean;
 
 // * Customization: Class Fields *
 
