@@ -8,7 +8,7 @@
 
 // Imports
 
-import { CLONE_EXCLUDE_PROPS, CLONE_INCLUDE_PROPS, Constructor, ClassDecorator, CLONE_METHOD, 
+import { CLONE_EXCLUDE_PROPS, CLONE_INCLUDE_PROPS, Constructor, ClassDecorator_, CLONE_METHOD, 
   TYPED_ARRAYS, PropKey, getAllKeys, getKeys, getMeta, META_NOT_FOUND, CloneMethodFunc, setMeta, 
   CONSTRUCTOR_PROPS, ValueSemanticsError, CloneVisited } from "./common";
 
@@ -216,16 +216,16 @@ export type CustomizeCloneOptions = {
 
 // Class Decorator
 
-export function customizeClone<I extends object>(options?: CustomizeCloneOptions): ClassDecorator<I>
+export function customizeClone<I extends object>(options?: CustomizeCloneOptions): ClassDecorator_<I>
 export function customizeClone<I extends object>(
   semantics: 'deep', options?: CustomizeCloneOptions
-): ClassDecorator<I>
+): ClassDecorator_<I>
 export function customizeClone<I extends object>(
   semantics: 'returnOriginal' | 'errorOnClone'
-): ClassDecorator<I>
+): ClassDecorator_<I>
 export function customizeClone<I extends object>(
   semanticsOrOpts?: CloneSemantics | CustomizeCloneOptions, options?: CustomizeCloneOptions
-): ClassDecorator<I> {
+): ClassDecorator_<I> {
   const semantics: CloneSemantics = typeof semanticsOrOpts === 'string' ? semanticsOrOpts : 'deep';
   
   if (!options) {

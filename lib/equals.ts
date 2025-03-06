@@ -6,7 +6,7 @@
 
 // * Imports *
 
-import { Constructor, EQUALS_EXCLUDE_PROPS, EQUALS_INCLUDE_PROPS, ClassDecorator, EqualsVisited, 
+import { Constructor, EQUALS_EXCLUDE_PROPS, EQUALS_INCLUDE_PROPS, ClassDecorator_, EqualsVisited, 
   EQUALS_METHOD, TYPED_ARRAYS, getAllKeys, getKeys, PropKey, EqualMethodFunc, setMeta, getMeta, 
   META_NOT_FOUND } from "./common";
 
@@ -382,14 +382,14 @@ function checkExactSamePrototype<I>(lhs: I, rhs: unknown): rhs is I {
 
 // Class Decorator
 
-export function customizeEquals<I extends object>(options?: CustomizeEqualsOptions): ClassDecorator<I>
+export function customizeEquals<I extends object>(options?: CustomizeEqualsOptions): ClassDecorator_<I>
 export function customizeEquals<I extends object>(
   semantics: 'value', options?: CustomizeEqualsOptions
-): ClassDecorator<I>
-export function customizeEquals<I extends object>(semantics: 'ref'): ClassDecorator<I>
+): ClassDecorator_<I>
+export function customizeEquals<I extends object>(semantics: 'ref'): ClassDecorator_<I>
 export function customizeEquals<I extends object>(
   semanticsOrOpts?: EqualsSemantics | CustomizeEqualsOptions, options?: CustomizeEqualsOptions
-): ClassDecorator<I> {
+): ClassDecorator_<I> {
   const semantics: EqualsSemantics = typeof semanticsOrOpts === 'string' ? semanticsOrOpts : 'value';
   
   if (!options) {
