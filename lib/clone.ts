@@ -206,7 +206,8 @@ export function clonecyc<T>(source: T, visited: CloneVisited): T {
 
 // Helpers
 
-export type CloneSemantics = 'deep' | 'returnOriginal' | 'errorOnClone';
+export const CLONE_SEMANTICS = ['deep', 'returnOriginal', 'errorOnClone'] as const;
+export type CloneSemantics = typeof CLONE_SEMANTICS[number];
 
 export type CustomizeCloneOptions = {
   runConstructor?: boolean,

@@ -115,7 +115,8 @@ function checkSetMembers(lhs: Set<unknown>, rhs: Set<unknown>, visited: EqualsVi
 
 function checkMapMembers(
   lhs: Map<unknown, unknown>, rhs: Map<unknown, unknown>, visited: EqualsVisited
-): boolean {  outer: for (const lKey of lhs.keys()) {
+): boolean {  
+  outer: for (const lKey of lhs.keys()) {
     for (const rKey of rhs.keys()) {
       if (equalscyc(lKey, rKey, visited)) {
         if (!(equalscyc(lhs.get(lKey), rhs.get(rKey), visited))) {
@@ -366,7 +367,8 @@ export function equalscyc(lhs: unknown, rhs: unknown, visited: EqualsVisited): b
 
 // Types
 
-export type EqualsSemantics = 'value' | 'ref';
+export const EQUALS_SEMANTICS = ['value', 'ref'] as const;
+export type EqualsSemantics = typeof EQUALS_SEMANTICS[number];
 
 export type CustomizeEqualsOptions = {
   propDefault?: 'include' | 'exclude'

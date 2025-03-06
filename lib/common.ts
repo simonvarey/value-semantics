@@ -23,7 +23,7 @@ export function getMeta<T>(target: object, key: PropKey): T | typeof META_NOT_FO
 }
 
 export function setMeta(
-  target: Constructor<any> | BigIntConstructor | SymbolConstructor, key: PropKey, value: any
+  target: Constructor<unknown> | BigIntConstructor | SymbolConstructor, key: PropKey, value: unknown
 ): void {
   target[Symbol.metadata] ??= {};
   target[Symbol.metadata]![key] = value;
