@@ -4,9 +4,9 @@
 
 // * Value-Semantics: The JavaScript/TypeScript Value Semantics Toolkit *
 
-import { CLONE_SEMANTICS, CloneSemantics, customizeClone, CustomizeCloneOptions } from './clone';
+import { CLONE_SEMANTICS, CloneSemantics, customizeClone, CustomizeCloneOptions, clone } from './clone';
 import { ClassDecorator_, Constructor } from './common';
-import { customizeEquals, CustomizeEqualsOptions, EQUALS_SEMANTICS, EqualsSemantics } from './equals';
+import { customizeEquals, CustomizeEqualsOptions, EQUALS_SEMANTICS, EqualsSemantics, equals } from './equals';
 
 export { clone } from './clone';
 export { equals } from './equals';
@@ -122,4 +122,22 @@ export namespace customize {
       }
     }
   }
+}
+
+export namespace value {
+
+  export function include<C, V>(
+    target: undefined, context: ClassFieldDecoratorContext<C, V>
+  ): void {
+    clone.include(target, context);
+    equals.include(target, context);
+  }
+
+  export function exclude<C, V>(
+    target: undefined, context: ClassFieldDecoratorContext<C, V>
+  ): void {
+    clone.exclude(target, context);
+    equals.exclude(target, context);
+  }
+
 }
