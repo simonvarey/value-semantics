@@ -5,6 +5,7 @@
 *All the functions you need to program as if objects in JavaScript had value semantics, including comprehensive and highly customisible deep cloning and equality functions*
 
 <span class="badge-npmversion"><a href="https://npmjs.org/package/value-semantics" title="View this project on NPM"><img src="https://img.shields.io/npm/v/value-semantics.svg" alt="NPM version" /></a></span>
+<span class="badge-licence"><a href="https://opensource.org/license/mit" title="View this project's license"><img src="https://img.shields.io/npm/l/value-semantics.svg" alt="License" /></a></span>
 
 - [Value-Semantics](#value-semantics)
   - [What is `value-semantics`?](#what-is-value-semantics)
@@ -48,7 +49,8 @@ console.assert(equals(vector1, { x: 2, y: 3 }));
 
 // Customize `equals` and `clone` implementations on user-defined classes using 
 //   decorators
-@customize.value({ runConstructor: true }) // Customize `equals` and `clone` implementations simultaneously using the `@customize.value` decorator
+@customize.value({ runConstructor: true }) // Customize `equals` and `clone` implementations
+//   simultaneously using the `@customize.value` decorator
 class Rectangle {
   @clone.constructorParam private height: number; // Specify which properties 
   //   should be used as parameters for the cloning constructor
@@ -269,8 +271,8 @@ On a class with `'value'` equals semantics and `propDefault: include`, decoratin
 
 ```ts 
 @customize.value(
-  cloneSemantics?: CloneSemantics = 'deep' // cloneSemantics and equalsSemantics can be in either order
-  equalsSemantics?: EqualsSemantics = 'value'
+  cloneSemantics?: CloneSemantics = 'deep' // cloneSemantics and equalsSemantics can be
+  equalsSemantics?: EqualsSemantics = 'value' //    in either order
   options: CustomizeValueOptions = {}
 )
 ```
