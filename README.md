@@ -6,6 +6,7 @@
 
 <span class="badge-npmversion"><a href="https://npmjs.org/package/value-semantics" title="View this project on NPM"><img src="https://img.shields.io/npm/v/value-semantics.svg" alt="NPM version" /></a></span>
 <span class="badge-licence"><a href="https://opensource.org/license/mit" title="View this project's license"><img src="https://img.shields.io/npm/l/value-semantics.svg" alt="License" /></a></span>
+![Statements](https://img.shields.io/badge/statements-99.71%25-brightgreen.svg?style=flat)
 
 - [Value-Semantics](#value-semantics)
   - [What is `value-semantics`?](#what-is-value-semantics)

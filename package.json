@@ -55,6 +55,7 @@
     "lib": "lib"
   },
   "scripts": {
+    "make-badges": "istanbul-badges-readme",
     "build": "tsc && vite build && api-extractor run --local --verbose",
     "coverage": "vitest run --coverage",
     "test": "vitest",
@@ -66,6 +67,7 @@
   "devDependencies": {
     "@microsoft/api-extractor": "^7.51.1",
     "@vitest/coverage-v8": "^3.0.7",
+    "istanbul-badges-readme": "^1.9.0",
     "typescript": "^5.8.2",
     "vite": "^6.2.0"
   }
