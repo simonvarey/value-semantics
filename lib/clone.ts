@@ -206,13 +206,20 @@ export function clonecyc<T>(source: T, visited: CloneVisited): T {
 
 // Helpers
 
-export const CLONE_SEMANTICS = ['deep', 'returnOriginal', 'errorOnClone'] as const;
+export const CLONE_SEMANTICS = ['deep', 'iterate', 'returnOriginal', 'errorOnClone'] as const;
 export type CloneSemantics = typeof CLONE_SEMANTICS[number];
 
 export type CustomizeCloneOptions = {
   runConstructor?: boolean,
   propDefault?: 'include' | 'exclude'
 }
+
+export type IterateCloneOptions = {
+  addMethod: PropKey,
+  runConstructor?: boolean
+}
+
+type IterateClonable<I, M, A extends PropKey> = I & Iterable<M> & { [Property in A]: (member: M) => void; }
 
 // Class Decorator
 
@@ -221,13 +228,16 @@ export function customizeClone<I extends object>(
   semantics: 'deep', options?: CustomizeCloneOptions
 ): ClassDecorator_<I>
 export function customizeClone<I extends object>(
+  semantics: 'iterate', options: IterateCloneOptions
+): ClassDecorator_<I>
+export function customizeClone<I extends object>(
   semantics: 'returnOriginal' | 'errorOnClone'
 ): ClassDecorator_<I>
 export function customizeClone<I extends object>(
-  semanticsOrOpts?: CloneSemantics | CustomizeCloneOptions, options?: CustomizeCloneOptions
+  semanticsOrOpts?: CloneSemantics | CustomizeCloneOptions, options?: CustomizeCloneOptions | IterateCloneOptions
 ): ClassDecorator_<I> {
   const semantics: CloneSemantics = typeof semanticsOrOpts === 'string' ? semanticsOrOpts : 'deep';
-  
+
   if (!options) {
     if (typeof semanticsOrOpts === 'object') {
       options = semanticsOrOpts;
@@ -252,8 +262,24 @@ export function customizeClone<I extends object>(
     return this;
   }
 
+  function returnIterateMethBuilder(
+    addMethod: PropKey, runConstructor?: boolean
+  ): (visited: CloneVisited) => I {
+    return function<M>(this: IterateClonable<I, M, typeof addMethod>, visited: CloneVisited): I {
+      const target = runConstructor ? constructTarget(this) : createTarget(this);
+      visited.set(this, target);
+      for (const member of this) {
+        this[addMethod](clonecyc(member, visited));
+      }
+      return target;
+    }
+  }
+
   return function(_constructor: Constructor<I>, context: ClassDecoratorContext): void {
-    if (semantics === 'returnOriginal') {
+    if (semantics === 'iterate') {
+      const opts = options as IterateCloneOptions;
+      context.metadata[CLONE_METHOD] = returnIterateMethBuilder(opts.addMethod, opts.runConstructor);
+    } else if (semantics === 'returnOriginal') {
       context.metadata[CLONE_METHOD] = returnOriginalMeth;
     } else if (semantics === 'errorOnClone') {
       context.metadata[ERROR_ON_CLONE] = context.name ?? '(Anonymous class)';
