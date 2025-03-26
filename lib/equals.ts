@@ -18,6 +18,8 @@ export const REF_EQUALS = Symbol.for('ref-equals');
 
 const WrappedPrimitives = [Boolean, Number, BigInt, String, Symbol];
 
+type IterateEquatable<I, M> = I & Iterable<M>
+
 // Utility Functions
 
 function zip<TL, TR>(lArray: TL[], rArray: TR[]): [TL, TR][] {
@@ -367,7 +369,7 @@ export function equalscyc(lhs: unknown, rhs: unknown, visited: EqualsVisited): b
 
 // Types
 
-export const EQUALS_SEMANTICS = ['value', 'ref'] as const;
+export const EQUALS_SEMANTICS = ['value', 'ref', 'iterate'] as const;
 export type EqualsSemantics = typeof EQUALS_SEMANTICS[number];
 
 export type CustomizeEqualsOptions = {
@@ -387,6 +389,7 @@ export function customizeEquals<I extends object>(
   semantics: 'value', options?: CustomizeEqualsOptions
 ): ClassDecorator_<I>
 export function customizeEquals<I extends object>(semantics: 'ref'): ClassDecorator_<I>
+export function customizeEquals<I extends object>(semantics: 'iterate'): ClassDecorator_<I>
 export function customizeEquals<I extends object>(
   semanticsOrOpts?: EqualsSemantics | CustomizeEqualsOptions, options?: CustomizeEqualsOptions
 ): ClassDecorator_<I> {
@@ -407,18 +410,54 @@ export function customizeEquals<I extends object>(
       return;
     };
 
-    context.metadata[EQUALS_METHOD] = function(this: I, other: object, visited: EqualsVisited): boolean {
+    const valueEqualsMeth = function(this: I, other: object, visited: EqualsVisited): boolean {
+      setVisited(this, other, visited, true);
       if (!checkExactSamePrototype(this, other)) {
+        setVisited(this, other, visited, false);
         return false;
       }
       const equalsProps = getKeys(this, opts.propDefault, 'equals');
       for (const key of equalsProps) {
         if (!(equalscyc(this[key as keyof I], other[key as keyof I], visited))) {
+          setVisited(this, other, visited, false);
           return false;
         }
       }
       return true;
     };
+
+    const iterateEqualsMeth = function<M>(
+      this: IterateEquatable<I, M>, other: object, visited: EqualsVisited
+    ): boolean {
+      setVisited(this, other, visited, true);
+      if (!checkExactSamePrototype(this, other)) {
+        setVisited(this, other, visited, false);
+        return false;
+      }
+      const thisIterator = this[Symbol.iterator]();
+      const otherIterator = other[Symbol.iterator]();
+      let thisResult: IteratorResult<M>;
+      let otherResult: IteratorResult<M>;
+      do {
+        thisResult = thisIterator.next();
+        otherResult = otherIterator.next();
+        if (thisResult.done !== otherResult.done) {
+          setVisited(this, other, visited, false);
+          return false;
+        }
+        if (!equalscyc(thisResult.value, otherResult.value, visited)) {
+          setVisited(this, other, visited, false);
+          return false;
+        }
+      } while (!thisResult.done)
+      return true;
+    };
+
+    if (semantics === 'iterate') {
+      context.metadata[EQUALS_METHOD] = iterateEqualsMeth;
+    } else {
+      context.metadata[EQUALS_METHOD] = valueEqualsMeth;
+    }
   }
 }
 

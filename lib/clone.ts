@@ -262,7 +262,7 @@ export function customizeClone<I extends object>(
     return this;
   }
 
-  function returnIterateMethBuilder(
+  function iterateMethBuilder(
     addMethod: PropKey, runConstructor?: boolean
   ): (visited: CloneVisited) => I {
     return function<M>(this: IterateClonable<I, M, typeof addMethod>, visited: CloneVisited): I {
@@ -278,7 +278,7 @@ export function customizeClone<I extends object>(
   return function(_constructor: Constructor<I>, context: ClassDecoratorContext): void {
     if (semantics === 'iterate') {
       const opts = options as IterateCloneOptions;
-      context.metadata[CLONE_METHOD] = returnIterateMethBuilder(opts.addMethod, opts.runConstructor);
+      context.metadata[CLONE_METHOD] = iterateMethBuilder(opts.addMethod, opts.runConstructor);
     } else if (semantics === 'returnOriginal') {
       context.metadata[CLONE_METHOD] = returnOriginalMeth;
     } else if (semantics === 'errorOnClone') {
