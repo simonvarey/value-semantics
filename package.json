@@ -57,7 +57,7 @@
   "scripts": {
     "make-badges": "istanbul-badges-readme",
     "build": "tsc && vite build && api-extractor run --local --verbose",
-    "playground": "tsc ./dev/playground.cts && node ./dev/playground.cjs",
+    "playground": "tsc --project ./dev && node ./dev/playground.cjs",
     "coverage": "vitest run --coverage",
     "test": "vitest",
     "pubalpha": "npm version prerelease --preid alpha && npm publish --tag alpha",
