@@ -133,4 +133,4 @@ dist
 temp
 
 # Development
-dev/playground.cjs
+dev/build
