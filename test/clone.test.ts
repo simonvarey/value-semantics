@@ -341,9 +341,16 @@ test('constructorParams are implictly excluded', () => {
 
 
 test('class with iterate semantics', () => {
-  @customize.clone('iterate', { addMethod: 'add' })
+  @customize.clone('iterate', { runConstructor: true, addMethod: 'add' })
   class IterateExample {
-    constructor(public members: string[]) { }
+    public members: string[];
+
+    constructor(members?: string[]) { 
+      this.members = [];
+      if (members) {
+        this.members = members;
+      }
+    }
 
     [Symbol.iterator](): Iterator<string> {
       return this.members[Symbol.iterator]();

@@ -269,7 +269,7 @@ export function customizeClone<I extends object>(
       const target = runConstructor ? constructTarget(this) : createTarget(this);
       visited.set(this, target);
       for (const member of this) {
-        this[addMethod](clonecyc(member, visited));
+        target[addMethod](clonecyc(member, visited));
       }
       return target;
     }
