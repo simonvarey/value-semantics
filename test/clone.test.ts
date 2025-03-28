@@ -339,6 +339,26 @@ test('constructorParams are implictly excluded', () => {
   expect(instanceClone.constructorField2).toBe(11);
 })
 
+
+test('class with iterate semantics', () => {
+  @customize.clone('iterate', { addMethod: 'add' })
+  class IterateExample {
+    constructor(public members: string[]) { }
+
+    [Symbol.iterator](): Iterator<string> {
+      return this.members[Symbol.iterator]();
+    }
+
+    add(member: string): void {
+      this.members.push(member);
+    }
+  }
+  const instance = new IterateExample(['a', 'b']);
+  const instanceClone = clone(instance);
+  expect(instanceClone instanceof IterateExample).toBeTruthy();
+  expect(instanceClone.members[0]).toBe('a');
+})
+
 // * Reference Cycles *
 
 test('clones an object literal containing a reference cycle', () => {
