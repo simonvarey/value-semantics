@@ -13,6 +13,9 @@ export { equals } from './equals';
 
 type CustomizeValueOptions = CustomizeCloneOptions;
 
+type CloneSemanticsWOIterate = 'deep' | 'returnOriginal' | 'errorOnClone';
+type EqualsSemanticsWOIterate = 'value' | 'ref';
+
 /**
  * Class decorators which allow the class' `equals` and `clone` implementations to be customized.
  * @public
@@ -64,32 +67,32 @@ export namespace customize {
     equalsSemantics: 'ref', cloneSemantics: 'returnOriginal' | 'errorOnClone', 
   ): ClassDecorator_<I>
   export function value<I extends object>( // Overload
-    first?: CloneSemantics | EqualsSemantics | CustomizeValueOptions, 
-    second?: CloneSemantics | EqualsSemantics | CustomizeValueOptions,
+    first?: CloneSemanticsWOIterate | EqualsSemanticsWOIterate | CustomizeValueOptions, 
+    second?: CloneSemanticsWOIterate | EqualsSemanticsWOIterate | CustomizeValueOptions,
     third?: CustomizeValueOptions
   ): ClassDecorator_<I> {
     return function(constructor: Constructor<I>, context: ClassDecoratorContext): void {
-      let cloneSemantics: CloneSemantics = 'deep';
-      let equalsSemantics: EqualsSemantics = 'value';
+      let cloneSemantics: CloneSemanticsWOIterate = 'deep';
+      let equalsSemantics: EqualsSemanticsWOIterate = 'value';
       let opts: CustomizeValueOptions = {};
 
       if (typeof first === 'string') {
-        if (CLONE_SEMANTICS.includes(first as CloneSemantics)) {
-          cloneSemantics = first as CloneSemantics;
+        if (CLONE_SEMANTICS.includes(first as CloneSemanticsWOIterate)) {
+          cloneSemantics = first as CloneSemanticsWOIterate;
         }
-        if (EQUALS_SEMANTICS.includes(first as EqualsSemantics)) {
-          equalsSemantics = first as EqualsSemantics;
+        if (EQUALS_SEMANTICS.includes(first as EqualsSemanticsWOIterate)) {
+          equalsSemantics = first as EqualsSemanticsWOIterate;
         }
       } else if (first) {
         opts = first;
       }
 
       if (typeof second === 'string') {
-        if (CLONE_SEMANTICS.includes(second as CloneSemantics)) {
-          cloneSemantics = second as CloneSemantics;
+        if (CLONE_SEMANTICS.includes(second as CloneSemanticsWOIterate)) {
+          cloneSemantics = second as CloneSemanticsWOIterate;
         }
-        if (EQUALS_SEMANTICS.includes(second as EqualsSemantics)) {
-          equalsSemantics = second as EqualsSemantics;
+        if (EQUALS_SEMANTICS.includes(second as EqualsSemanticsWOIterate)) {
+          equalsSemantics = second as EqualsSemanticsWOIterate;
         }
       } else if (second) {
         opts = second;
