@@ -8,10 +8,9 @@
 
 // Imports
 
-import { CLONE_EXCLUDE_PROPS, CLONE_INCLUDE_PROPS, Constructor, CLONE_METHOD, TYPED_ARRAYS, PropKey, 
+import { CLONE_EXCLUDE_PROPS, CLONE_INCLUDE_PROPS, CLONE_METHOD, TYPED_ARRAYS, PropKey, 
   getAllKeys, getKeys, getMeta, META_NOT_FOUND, CloneMethodFunc, setMeta, CONSTRUCTOR_PROPS, 
-  ValueSemanticsError, CloneVisited, ClassDecorator_,
-  ConstructorFunc} from "./common";
+  ValueSemanticsError, CloneVisited, ClassDecorator_, Constructor } from "./common";
 
 // Symbols
 
@@ -21,8 +20,10 @@ export const ERROR_ON_CLONE = Symbol.for('error-on-clone');
 
 // Object Construction
 
+type ConstructorOf<Instance> = { new(...args: any[]): Instance; };
+
 function constructTarget<T extends object>(source: T): T {
-  const constructor = source.constructor as Constructor<T>;
+  const constructor = source.constructor as ConstructorOf<T>;
   let constructorKeys = getMeta(source, CONSTRUCTOR_PROPS);
   if (constructorKeys === META_NOT_FOUND) {
     constructorKeys = [];
@@ -62,7 +63,7 @@ export function copyProps<T extends Object>(
 
 // * Clone Methods on Built-ins *
 
-const defineCloneMethod = <C extends ConstructorFunc>(
+const defineCloneMethod = <C extends Constructor>(
   target: C, value: CloneMethodFunc<InstanceType<C>>
 ) => {
   setMeta(target, CLONE_METHOD, value);
@@ -132,7 +133,7 @@ for (const TypedArray of TYPED_ARRAYS) {
   );
 }
 
-function defineCloneReturnOriginal<C extends ConstructorFunc>(proto: C) {
+function defineCloneReturnOriginal<C extends Constructor>(proto: C) {
   defineCloneMethod(proto, function(this: InstanceType<C>, visited: CloneVisited): InstanceType<C> {
     visited.set(this, this);
     return this;
@@ -152,7 +153,7 @@ setMeta(Symbol, CLONE_METHOD, function(this: Symbol, visited: CloneVisited): Sym
   return this;
 })
 
-function defineErrorOnClone(proto: ConstructorFunc): void {
+function defineErrorOnClone(proto: Constructor): void {
   setMeta(proto, ERROR_ON_CLONE, proto.name);
 }
 
@@ -222,17 +223,17 @@ export type IterateCloneOptions = {
 
 // Class Decorator
 
-export function customizeClone<C extends ConstructorFunc>(options?: CustomizeCloneOptions): ClassDecorator_<C>
-export function customizeClone<C extends ConstructorFunc>(
+export function customizeClone<C extends Constructor>(options?: CustomizeCloneOptions): ClassDecorator_<C>
+export function customizeClone<C extends Constructor>(
   semantics: 'deep', options?: CustomizeCloneOptions
 ): ClassDecorator_<C>
-export function customizeClone<C extends ConstructorFunc>(
+export function customizeClone<C extends Constructor>(
   semantics: 'iterate', options: IterateCloneOptions
 ): ClassDecorator_<C>
-export function customizeClone<C extends ConstructorFunc>(
+export function customizeClone<C extends Constructor>(
   semantics: 'returnOriginal' | 'errorOnClone'
 ): ClassDecorator_<C>
-export function customizeClone<C extends ConstructorFunc>(
+export function customizeClone<C extends Constructor>(
   semanticsOrOpts?: CloneSemantics | CustomizeCloneOptions, options?: CustomizeCloneOptions | IterateCloneOptions
 ): ClassDecorator_<C> {
   type I = InstanceType<C>;

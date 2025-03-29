@@ -5,7 +5,7 @@
 // * Value-Semantics: The JavaScript/TypeScript Value Semantics Toolkit *
 
 import { CLONE_SEMANTICS, CloneSemantics, customizeClone, CustomizeCloneOptions, clone } from './clone';
-import { ClassDecorator_, ConstructorFunc } from './common';
+import { ClassDecorator_, Constructor } from './common';
 import { customizeEquals, CustomizeEqualsOptions, EQUALS_SEMANTICS, EqualsSemantics, equals } from './equals';
 
 export { clone } from './clone';
@@ -24,49 +24,49 @@ export namespace customize {
   export const clone = customizeClone;
   export const equals = customizeEquals;
 
-  export function value<C extends ConstructorFunc>(options?: CustomizeValueOptions): ClassDecorator_<C> // No Semantics
-  export function value<C extends ConstructorFunc>( // Clone Semantics
+  export function value<C extends Constructor>(options?: CustomizeValueOptions): ClassDecorator_<C> // No Semantics
+  export function value<C extends Constructor>( // Clone Semantics
     cloneSemantics: 'deep', options?: CustomizeValueOptions
   ): ClassDecorator_<C>
-  export function value<C extends ConstructorFunc>(
+  export function value<C extends Constructor>(
     cloneSemantics: 'returnOriginal' | 'errorOnClone', options?: CustomizeEqualsOptions
   ): ClassDecorator_<C>
-  export function value<C extends ConstructorFunc>( // Equals Semantics
+  export function value<C extends Constructor>( // Equals Semantics
     equalsSemantics: 'value', options?: CustomizeValueOptions
   ): ClassDecorator_<C>
-  export function value<C extends ConstructorFunc>(
+  export function value<C extends Constructor>(
     equalsSemantics: 'ref', options?: CustomizeCloneOptions
   ): ClassDecorator_<C>
-  export function value<C extends ConstructorFunc>( // Clone then Equals Semantics
+  export function value<C extends Constructor>( // Clone then Equals Semantics
     cloneSemantics: 'deep', equalsSemantics: 'value', options?: CustomizeValueOptions
   ): ClassDecorator_<C>
-  export function value<C extends ConstructorFunc>(
+  export function value<C extends Constructor>(
     cloneSemantics: 'deep', equalsSemantics: 'ref', options?: CustomizeCloneOptions
   ): ClassDecorator_<C>
-  export function value<C extends ConstructorFunc>(
+  export function value<C extends Constructor>(
     cloneSemantics: 'returnOriginal' | 'errorOnClone', 
     equalsSemantics: 'value', 
     options?: CustomizeEqualsOptions
   ): ClassDecorator_<C>
-  export function value<C extends ConstructorFunc>(
+  export function value<C extends Constructor>(
     cloneSemantics: 'returnOriginal' | 'errorOnClone', 
     equalsSemantics: 'ref'
   ): ClassDecorator_<C>
-  export function value<C extends ConstructorFunc>( // Equals then Clone Semantics
+  export function value<C extends Constructor>( // Equals then Clone Semantics
     equalsSemantics: 'value', cloneSemantics: 'deep', options?: CustomizeValueOptions
   ): ClassDecorator_<C>
-  export function value<C extends ConstructorFunc>(
+  export function value<C extends Constructor>(
     equalsSemantics: 'value', 
     cloneSemantics: 'returnOriginal' | 'errorOnClone', 
     options?: CustomizeEqualsOptions
   ): ClassDecorator_<C>
-  export function value<C extends ConstructorFunc>(
+  export function value<C extends Constructor>(
     equalsSemantics: 'ref', cloneSemantics: 'deep', options?: CustomizeCloneOptions
   ): ClassDecorator_<C>
-  export function value<C extends ConstructorFunc>(
+  export function value<C extends Constructor>(
     equalsSemantics: 'ref', cloneSemantics: 'returnOriginal' | 'errorOnClone', 
   ): ClassDecorator_<C>
-  export function value<C extends ConstructorFunc>( // Overload
+  export function value<C extends Constructor>( // Overload
     first?: CloneSemanticsWOIterate | EqualsSemanticsWOIterate | CustomizeValueOptions, 
     second?: CloneSemanticsWOIterate | EqualsSemanticsWOIterate | CustomizeValueOptions,
     third?: CustomizeValueOptions
