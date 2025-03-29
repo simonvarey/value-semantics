@@ -1,4 +1,4 @@
-import { ClassDecorator_, EqualsVisited } from "./common";
+import { EqualsVisited, ConstructorFunc, ClassDecorator_ } from "./common";
 export declare const REF_EQUALS: unique symbol;
 /**
  * Compares two values for value-equality.
@@ -14,10 +14,10 @@ export type EqualsSemantics = typeof EQUALS_SEMANTICS[number];
 export type CustomizeEqualsOptions = {
     propDefault?: 'include' | 'exclude';
 };
-export declare function customizeEquals<I extends object>(options?: CustomizeEqualsOptions): ClassDecorator_<I>;
-export declare function customizeEquals<I extends object>(semantics: 'value', options?: CustomizeEqualsOptions): ClassDecorator_<I>;
-export declare function customizeEquals<I extends object>(semantics: 'ref'): ClassDecorator_<I>;
-export declare function customizeEquals<I extends object>(semantics: 'iterate'): ClassDecorator_<I>;
+export declare function customizeEquals<C extends ConstructorFunc>(options?: CustomizeEqualsOptions): ClassDecorator_<C>;
+export declare function customizeEquals<C extends ConstructorFunc>(semantics: 'value', options?: CustomizeEqualsOptions): ClassDecorator_<C>;
+export declare function customizeEquals<C extends ConstructorFunc>(semantics: 'ref'): ClassDecorator_<C>;
+export declare function customizeEquals<C extends ConstructorFunc>(semantics: 'iterate'): ClassDecorator_<C>;
 /**
  * Class field decorators which allow the class' `equals` implementations to be customized.
  * @public

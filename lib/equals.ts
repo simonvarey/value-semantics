@@ -6,9 +6,9 @@
 
 // * Imports *
 
-import { Constructor, EQUALS_EXCLUDE_PROPS, EQUALS_INCLUDE_PROPS, ClassDecoratorInst, EqualsVisited, 
-  EQUALS_METHOD, TYPED_ARRAYS, getAllKeys, getKeys, PropKey, EqualMethodFunc, setMeta, getMeta, 
-  META_NOT_FOUND } from "./common";
+import { EQUALS_EXCLUDE_PROPS, EQUALS_INCLUDE_PROPS, EqualsVisited, EQUALS_METHOD, TYPED_ARRAYS, 
+  getAllKeys, getKeys, PropKey, EqualMethodFunc, setMeta, getMeta, META_NOT_FOUND, ConstructorFunc, 
+  ClassDecorator_ } from "./common";
 
 // * Helpers *
 
@@ -76,19 +76,19 @@ function setVisited(fst: object, snd: object, visited: EqualsVisited, res: boole
 
 // Definition Helpers
 
-const defineEqualsMethod = <C extends Constructor<unknown>>(
+const defineEqualsMethod = <C extends ConstructorFunc>(
   target: C, value: EqualMethodFunc<InstanceType<C>>
 ) => {
   setMeta(target, EQUALS_METHOD, value);
 };
 
-const defineRefEquals = (target: Constructor<unknown>) => {
+const defineRefEquals = (target: ConstructorFunc) => {
   setMeta(target, REF_EQUALS, true);
 };
 
 // Equality Helpers
 
-function checkExactPrototype<C extends Constructor<unknown>>(
+function checkExactPrototype<C extends ConstructorFunc>(
   subject: unknown, constructor: C
 ): subject is InstanceType<C> {
   return Object.getPrototypeOf(subject) === constructor.prototype;
@@ -384,15 +384,19 @@ function checkExactSamePrototype<I>(lhs: I, rhs: unknown): rhs is I {
 
 // Class Decorator
 
-export function customizeEquals<I extends object>(options?: CustomizeEqualsOptions): ClassDecoratorInst<I>
-export function customizeEquals<I extends object>(
+export function customizeEquals<C extends ConstructorFunc>(
+  options?: CustomizeEqualsOptions
+): ClassDecorator_<C>
+export function customizeEquals<C extends ConstructorFunc>(
   semantics: 'value', options?: CustomizeEqualsOptions
-): ClassDecoratorInst<I>
-export function customizeEquals<I extends object>(semantics: 'ref'): ClassDecoratorInst<I>
-export function customizeEquals<I extends object>(semantics: 'iterate'): ClassDecoratorInst<I>
-export function customizeEquals<I extends object>(
+): ClassDecorator_<C>
+export function customizeEquals<C extends ConstructorFunc>(semantics: 'ref'): ClassDecorator_<C>
+export function customizeEquals<C extends ConstructorFunc>(semantics: 'iterate'): ClassDecorator_<C>
+export function customizeEquals<C extends ConstructorFunc>(
   semanticsOrOpts?: EqualsSemantics | CustomizeEqualsOptions, options?: CustomizeEqualsOptions
-): ClassDecoratorInst<I> {
+): ClassDecorator_<C> {
+  type I = InstanceType<C>;
+
   const semantics: EqualsSemantics = typeof semanticsOrOpts === 'string' ? semanticsOrOpts : 'value';
   
   if (!options) {
@@ -404,7 +408,7 @@ export function customizeEquals<I extends object>(
   }
   const opts: Required<CustomizeEqualsOptions> = { propDefault: 'include', ...options };
 
-  return function(_constructor: Constructor<I>, context: ClassDecoratorContext): void {
+  return function(_constructor: C, context: ClassDecoratorContext): void {
     if (semantics === 'ref') {
       context.metadata[REF_EQUALS] = true;
       return;

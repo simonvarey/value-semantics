@@ -23,7 +23,7 @@ export function getMeta<T>(target: object, key: PropKey): T | typeof META_NOT_FO
 }
 
 export function setMeta(
-  target: Constructor<unknown> | BigIntConstructor | SymbolConstructor, key: PropKey, value: unknown
+  target: ConstructorFunc | BigIntConstructor | SymbolConstructor, key: PropKey, value: unknown
 ): void {
   target[Symbol.metadata] ??= {};
   target[Symbol.metadata]![key] = value;
@@ -108,9 +108,7 @@ export function getKeys(
 
 export type Constructor<Instance> = { new(...args: any[]): Instance; };
 
-export type ClassDecoratorInst<I> = (
-  constructor: Constructor<I>, context: ClassDecoratorContext
-) => Constructor<I> | void;
+export type ConstructorFunc = abstract new (...args: any) => any;
 
 export type ClassDecorator_<C> = (
   constructor: C, context: ClassDecoratorContext

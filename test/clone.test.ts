@@ -1,6 +1,5 @@
 import { expect, test } from 'vitest'
 import { clone, customize } from '../lib/main'
-import { Constructor } from '../lib/common';
 
 // * Primitives *
 

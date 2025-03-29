@@ -10,7 +10,8 @@
 
 import { CLONE_EXCLUDE_PROPS, CLONE_INCLUDE_PROPS, Constructor, CLONE_METHOD, TYPED_ARRAYS, PropKey, 
   getAllKeys, getKeys, getMeta, META_NOT_FOUND, CloneMethodFunc, setMeta, CONSTRUCTOR_PROPS, 
-  ValueSemanticsError, CloneVisited, ClassDecorator_} from "./common";
+  ValueSemanticsError, CloneVisited, ClassDecorator_,
+  ConstructorFunc} from "./common";
 
 // Symbols
 
@@ -61,7 +62,7 @@ export function copyProps<T extends Object>(
 
 // * Clone Methods on Built-ins *
 
-const defineCloneMethod = <C extends Constructor<unknown>>(
+const defineCloneMethod = <C extends ConstructorFunc>(
   target: C, value: CloneMethodFunc<InstanceType<C>>
 ) => {
   setMeta(target, CLONE_METHOD, value);
@@ -131,7 +132,7 @@ for (const TypedArray of TYPED_ARRAYS) {
   );
 }
 
-function defineCloneReturnOriginal<C extends Constructor<unknown>>(proto: C) {
+function defineCloneReturnOriginal<C extends ConstructorFunc>(proto: C) {
   defineCloneMethod(proto, function(this: InstanceType<C>, visited: CloneVisited): InstanceType<C> {
     visited.set(this, this);
     return this;
@@ -151,7 +152,7 @@ setMeta(Symbol, CLONE_METHOD, function(this: Symbol, visited: CloneVisited): Sym
   return this;
 })
 
-function defineErrorOnClone(proto: Constructor<unknown>) {
+function defineErrorOnClone(proto: ConstructorFunc): void {
   setMeta(proto, ERROR_ON_CLONE, proto.name);
 }
 
@@ -206,8 +207,6 @@ export function clonecyc<T>(source: T, visited: CloneVisited): T {
 
 // Helpers
 
-type ConstructorFunc = abstract new (...args: any) => any;
-
 export const CLONE_SEMANTICS = ['deep', 'iterate', 'returnOriginal', 'errorOnClone'] as const;
 export type CloneSemantics = typeof CLONE_SEMANTICS[number];
 
@@ -220,9 +219,6 @@ export type IterateCloneOptions = {
   addMethod: PropKey,
   runConstructor?: boolean
 }
-
-type IterateClonable<I, M, A extends PropKey> = I & Iterable<M> & { [Property in A]: (member: M) => void; }
-
 
 // Class Decorator
 
@@ -270,7 +266,7 @@ export function customizeClone<C extends ConstructorFunc>(
   function iterateMethBuilder(
     addMethod: PropKey, runConstructor?: boolean
   ): (visited: CloneVisited) => I {
-    return function<M>(this: I & Iterable<M>, visited: CloneVisited): I {
+    return function<M>(this: I, visited: CloneVisited): I {
       const target = runConstructor ? constructTarget(this) : createTarget(this);
       visited.set(this, target);
       for (const member of (this as Iterable<M>)) {
