@@ -340,7 +340,7 @@ test('constructorParams are implictly excluded', () => {
 })
 
 
-test('class with iterate semantics', () => {
+test('clone class instance with iterate semantics', () => {
   @customize.clone('iterate', { runConstructor: true, addMethod: 'push' })
   class ArraySuperExample<M> extends Array<M> { }
   const arr = new ArraySuperExample(1, 2);
