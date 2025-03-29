@@ -8,9 +8,9 @@
 
 // Imports
 
-import { CLONE_EXCLUDE_PROPS, CLONE_INCLUDE_PROPS, Constructor, ClassDecorator_, CLONE_METHOD, 
-  TYPED_ARRAYS, PropKey, getAllKeys, getKeys, getMeta, META_NOT_FOUND, CloneMethodFunc, setMeta, 
-  CONSTRUCTOR_PROPS, ValueSemanticsError, CloneVisited } from "./common";
+import { CLONE_EXCLUDE_PROPS, CLONE_INCLUDE_PROPS, Constructor, CLONE_METHOD, TYPED_ARRAYS, PropKey, 
+  getAllKeys, getKeys, getMeta, META_NOT_FOUND, CloneMethodFunc, setMeta, CONSTRUCTOR_PROPS, 
+  ValueSemanticsError, CloneVisited, ClassDecorator_} from "./common";
 
 // Symbols
 
@@ -206,6 +206,8 @@ export function clonecyc<T>(source: T, visited: CloneVisited): T {
 
 // Helpers
 
+type ConstructorFunc = abstract new (...args: any) => any;
+
 export const CLONE_SEMANTICS = ['deep', 'iterate', 'returnOriginal', 'errorOnClone'] as const;
 export type CloneSemantics = typeof CLONE_SEMANTICS[number];
 
@@ -221,21 +223,24 @@ export type IterateCloneOptions = {
 
 type IterateClonable<I, M, A extends PropKey> = I & Iterable<M> & { [Property in A]: (member: M) => void; }
 
+
 // Class Decorator
 
-export function customizeClone<I extends object>(options?: CustomizeCloneOptions): ClassDecorator_<I>
-export function customizeClone<I extends object>(
+export function customizeClone<C extends ConstructorFunc>(options?: CustomizeCloneOptions): ClassDecorator_<C>
+export function customizeClone<C extends ConstructorFunc>(
   semantics: 'deep', options?: CustomizeCloneOptions
-): ClassDecorator_<I>
-export function customizeClone<I extends object>(
+): ClassDecorator_<C>
+export function customizeClone<C extends ConstructorFunc>(
   semantics: 'iterate', options: IterateCloneOptions
-): ClassDecorator_<I>
-export function customizeClone<I extends object>(
+): ClassDecorator_<C>
+export function customizeClone<C extends ConstructorFunc>(
   semantics: 'returnOriginal' | 'errorOnClone'
-): ClassDecorator_<I>
-export function customizeClone<I extends object>(
+): ClassDecorator_<C>
+export function customizeClone<C extends ConstructorFunc>(
   semanticsOrOpts?: CloneSemantics | CustomizeCloneOptions, options?: CustomizeCloneOptions | IterateCloneOptions
-): ClassDecorator_<I> {
+): ClassDecorator_<C> {
+  type I = InstanceType<C>;
+
   const semantics: CloneSemantics = typeof semanticsOrOpts === 'string' ? semanticsOrOpts : 'deep';
 
   if (!options) {
@@ -265,17 +270,17 @@ export function customizeClone<I extends object>(
   function iterateMethBuilder(
     addMethod: PropKey, runConstructor?: boolean
   ): (visited: CloneVisited) => I {
-    return function<M>(this: IterateClonable<I, M, typeof addMethod>, visited: CloneVisited): I {
+    return function<M>(this: I & Iterable<M>, visited: CloneVisited): I {
       const target = runConstructor ? constructTarget(this) : createTarget(this);
       visited.set(this, target);
-      for (const member of this) {
+      for (const member of (this as Iterable<M>)) {
         target[addMethod](clonecyc(member, visited));
       }
       return target;
     }
   }
 
-  return function(_constructor: Constructor<I>, context: ClassDecoratorContext): void {
+  return function(_constructor: C, context: ClassDecoratorContext): void {
     if (semantics === 'iterate') {
       const opts = options as IterateCloneOptions;
       context.metadata[CLONE_METHOD] = iterateMethBuilder(opts.addMethod, opts.runConstructor);

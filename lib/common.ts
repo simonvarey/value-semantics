@@ -108,9 +108,13 @@ export function getKeys(
 
 export type Constructor<Instance> = { new(...args: any[]): Instance; };
 
-export type ClassDecorator_<I> = (
+export type ClassDecoratorInst<I> = (
   constructor: Constructor<I>, context: ClassDecoratorContext
 ) => Constructor<I> | void;
+
+export type ClassDecorator_<C> = (
+  constructor: C, context: ClassDecoratorContext
+) => C | void;
 
 // * Errors *
 

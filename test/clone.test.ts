@@ -1,5 +1,6 @@
 import { expect, test } from 'vitest'
 import { clone, customize } from '../lib/main'
+import { Constructor } from '../lib/common';
 
 // * Primitives *
 
@@ -341,16 +342,16 @@ test('constructorParams are implictly excluded', () => {
 
 
 test('class with iterate semantics', () => {
+  @customize.clone('iterate', { runConstructor: true, addMethod: 'push' })
+  class ArraySuperExample<M> extends Array<M> { }
+  const arr = new ArraySuperExample(1, 2);
+  const arrClone = clone(arr);
+  expect(arrClone instanceof ArraySuperExample).toBeTruthy();
+  expect(arrClone[1]).toBe(2);
+
   @customize.clone('iterate', { runConstructor: true, addMethod: 'add' })
   class IterateExample {
-    public members: string[];
-
-    constructor(members?: string[]) { 
-      this.members = [];
-      if (members) {
-        this.members = members;
-      }
-    }
+    public members: string[] = [];
 
     [Symbol.iterator](): Iterator<string> {
       return this.members[Symbol.iterator]();
@@ -360,7 +361,9 @@ test('class with iterate semantics', () => {
       this.members.push(member);
     }
   }
-  const instance = new IterateExample(['a', 'b']);
+  const instance = new IterateExample();
+  instance.add('a');
+  instance.add('b');
   const instanceClone = clone(instance);
   expect(instanceClone instanceof IterateExample).toBeTruthy();
   expect(instanceClone.members[0]).toBe('a');

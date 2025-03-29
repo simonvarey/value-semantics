@@ -5,7 +5,7 @@
 // * Value-Semantics: The JavaScript/TypeScript Value Semantics Toolkit *
 
 import { CLONE_SEMANTICS, CloneSemantics, customizeClone, CustomizeCloneOptions, clone } from './clone';
-import { ClassDecorator_, Constructor } from './common';
+import { ClassDecoratorInst, Constructor } from './common';
 import { customizeEquals, CustomizeEqualsOptions, EQUALS_SEMANTICS, EqualsSemantics, equals } from './equals';
 
 export { clone } from './clone';
@@ -24,53 +24,53 @@ export namespace customize {
   export const clone = customizeClone;
   export const equals = customizeEquals;
 
-  export function value<I extends object>(options?: CustomizeValueOptions): ClassDecorator_<I> // No Semantics
+  export function value<I extends object>(options?: CustomizeValueOptions): ClassDecoratorInst<I> // No Semantics
   export function value<I extends object>( // Clone Semantics
     cloneSemantics: 'deep', options?: CustomizeValueOptions
-  ): ClassDecorator_<I>
+  ): ClassDecoratorInst<I>
   export function value<I extends object>(
     cloneSemantics: 'returnOriginal' | 'errorOnClone', options?: CustomizeEqualsOptions
-  ): ClassDecorator_<I>
+  ): ClassDecoratorInst<I>
   export function value<I extends object>( // Equals Semantics
     equalsSemantics: 'value', options?: CustomizeValueOptions
-  ): ClassDecorator_<I>
+  ): ClassDecoratorInst<I>
   export function value<I extends object>(
     equalsSemantics: 'ref', options?: CustomizeCloneOptions
-  ): ClassDecorator_<I>
+  ): ClassDecoratorInst<I>
   export function value<I extends object>( // Clone then Equals Semantics
     cloneSemantics: 'deep', equalsSemantics: 'value', options?: CustomizeValueOptions
-  ): ClassDecorator_<I>
+  ): ClassDecoratorInst<I>
   export function value<I extends object>(
     cloneSemantics: 'deep', equalsSemantics: 'ref', options?: CustomizeCloneOptions
-  ): ClassDecorator_<I>
+  ): ClassDecoratorInst<I>
   export function value<I extends object>(
     cloneSemantics: 'returnOriginal' | 'errorOnClone', 
     equalsSemantics: 'value', 
     options?: CustomizeEqualsOptions
-  ): ClassDecorator_<I>
+  ): ClassDecoratorInst<I>
   export function value<I extends object>(
     cloneSemantics: 'returnOriginal' | 'errorOnClone', 
     equalsSemantics: 'ref'
-  ): ClassDecorator_<I>
+  ): ClassDecoratorInst<I>
   export function value<I extends object>( // Equals then Clone Semantics
     equalsSemantics: 'value', cloneSemantics: 'deep', options?: CustomizeValueOptions
-  ): ClassDecorator_<I>
+  ): ClassDecoratorInst<I>
   export function value<I extends object>(
     equalsSemantics: 'value', 
     cloneSemantics: 'returnOriginal' | 'errorOnClone', 
     options?: CustomizeEqualsOptions
-  ): ClassDecorator_<I>
+  ): ClassDecoratorInst<I>
   export function value<I extends object>(
     equalsSemantics: 'ref', cloneSemantics: 'deep', options?: CustomizeCloneOptions
-  ): ClassDecorator_<I>
+  ): ClassDecoratorInst<I>
   export function value<I extends object>(
     equalsSemantics: 'ref', cloneSemantics: 'returnOriginal' | 'errorOnClone', 
-  ): ClassDecorator_<I>
+  ): ClassDecoratorInst<I>
   export function value<I extends object>( // Overload
     first?: CloneSemanticsWOIterate | EqualsSemanticsWOIterate | CustomizeValueOptions, 
     second?: CloneSemanticsWOIterate | EqualsSemanticsWOIterate | CustomizeValueOptions,
     third?: CustomizeValueOptions
-  ): ClassDecorator_<I> {
+  ): ClassDecoratorInst<I> {
     return function(constructor: Constructor<I>, context: ClassDecoratorContext): void {
       let cloneSemantics: CloneSemanticsWOIterate = 'deep';
       let equalsSemantics: EqualsSemanticsWOIterate = 'value';
