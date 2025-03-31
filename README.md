@@ -119,7 +119,8 @@ By default, the result of applying `clone` or `equals` to an instance of a user-
 
 It is, however, possible to customize these results for user-defined classes using decorators included in value-semantics. The following behaviors can be customized for instances of a user-defined class:
 - Particular properties can be excluded from cloning and equality comparison, for both `clone` and/or `equals`.
-- All properties can be excluded from cloning and equality comparison by default, and certain properties can then be included, for both `clone` and/or `equals`. 
+- All properties can be excluded from cloning and equality comparison by default, and certain properties can then be included, for both `clone` and/or `equals`.
+- Instances can be cloned and/or compared for equality using their iterator property instead.
 - `clone` can be changed to return the original instance, or to throw an error.
 - `clone` can be changed to run the class' constructor, and arguments can be specified for the constructor (where those arguments are provided by particular properties of the original).
 - `equals` can be changed to compare instances by reference-equality.
