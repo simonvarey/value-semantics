@@ -15,6 +15,7 @@
     - [Deep Cloning](#deep-cloning)
     - [Value-Equality](#value-equality)
     - [Customization](#customization)
+  - [Development](#development)
   - [License](#license)
 
 ## What is `value-semantics`?
@@ -124,6 +125,12 @@ It is, however, possible to customize these results for user-defined classes usi
 - `equals` can be changed to compare instances by reference-equality.
 
 See (the wiki)[https://github.com/simonvarey/value-semantics/wiki/Customization] for API documentation for the customization decorators. Currently, the results of applying `clone` or `equals` to instances of built-in classes, exotic objects, and object literals cannot be customized.
+
+## Development
+
+Use `npm i` and then `npm run build` to build the library.
+
+`value-semantics` contains a playground at `dev/playground.ts` which you can use to test out the functionality of the toolbox. (Note that you need to build the library once before using the playground). Use `npm run playground` to run the playground. The playground can also be used to test out changes to the toolbox, by re-building library after making the changes.
 
 ## License
 
