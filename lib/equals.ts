@@ -88,12 +88,6 @@ const defineRefEquals = (target: Constructor) => {
 
 // Equality Helpers
 
-function checkExactPrototype<C extends Constructor>(
-  subject: unknown, constructor: C
-): subject is InstanceType<C> {
-  return Object.getPrototypeOf(subject) === constructor.prototype;
-}
-
 function checkSamePrototype<L extends object>(lhs: L, rhs: unknown): rhs is L {
   return Object.getPrototypeOf(lhs) === Object.getPrototypeOf(rhs);
 }
@@ -347,7 +341,7 @@ export function equalscyc(lhs: unknown, rhs: unknown, visited: EqualsVisited): b
     }
   }
   // Other Objects
-  if (Object.getPrototypeOf(lhs) !== Object.getPrototypeOf(rhs)) {
+  if (!checkSamePrototype(lhs, rhs)) {
     setVisited(lhs, rhs, visited, false);
     return false;
   }
