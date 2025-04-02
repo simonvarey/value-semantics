@@ -94,6 +94,10 @@ function checkExactPrototype<C extends Constructor>(
   return Object.getPrototypeOf(subject) === constructor.prototype;
 }
 
+function checkSamePrototype<L extends object>(lhs: L, rhs: unknown): rhs is L {
+  return Object.getPrototypeOf(lhs) === Object.getPrototypeOf(rhs);
+}
+
 function wrappedPrimitiveEquals(obj: object, prim: unknown): boolean {
   for (const Wrapped of WrappedPrimitives) {
       if (obj instanceof Wrapped) {
@@ -137,7 +141,7 @@ function checkMapMembers(
 defineEqualsMethod(
   Array, 
   function(this: unknown[], other: object, visited: EqualsVisited): boolean {
-    if (!checkExactPrototype(other, Array)) {
+    if (!checkSamePrototype(this, other)) {
       return false;
     }
     if (this.length !== other.length) {
@@ -150,7 +154,7 @@ defineEqualsMethod(
 defineEqualsMethod(
   Set, 
   function(this: Set<unknown>, other: object, visited: EqualsVisited): boolean {
-    if (!checkExactPrototype(other, Set)) {
+    if (!checkSamePrototype(this, other)) {
       return false;
     }
     if (this.size !== other.size) {
@@ -163,7 +167,7 @@ defineEqualsMethod(
 defineEqualsMethod(
   Map, 
   function(this: Map<unknown, unknown>, other: object, visited: EqualsVisited): boolean {
-    if (!checkExactPrototype(other, Map)) {
+    if (!checkSamePrototype(this, other)) {
       return false;
     }
     if (this.size !== other.size) {
@@ -176,7 +180,7 @@ defineEqualsMethod(
 defineEqualsMethod(
   RegExp, 
   function(this: RegExp, other: object, _visited: EqualsVisited): boolean {
-    if (!checkExactPrototype(other, RegExp)) {
+    if (!checkSamePrototype(this, other)) {
       return false;
     }
     return this.toString() === other.toString();
@@ -186,7 +190,7 @@ defineEqualsMethod(
 defineEqualsMethod(
   Date, 
   function(this: Date, other: object, _visited: EqualsVisited): boolean {
-    if (!checkExactPrototype(other, Date)) {
+    if (!checkSamePrototype(this, other)) {
       return false;
     }
     return +this === +other;
@@ -196,7 +200,7 @@ defineEqualsMethod(
 defineEqualsMethod(
   ArrayBuffer, 
   function(this: ArrayBuffer, other: object, _visited: EqualsVisited): boolean {
-    if (!checkExactPrototype(other, ArrayBuffer)) {
+    if (!checkSamePrototype(this, other)) {
       return false;
     }
     if (this.byteLength !== other.byteLength) {
@@ -216,7 +220,7 @@ defineEqualsMethod(
 defineEqualsMethod(
   SharedArrayBuffer, 
   function(this: SharedArrayBuffer, other: object, _visited: EqualsVisited): boolean {
-    if (!checkExactPrototype(other, SharedArrayBuffer)) {
+    if (!checkSamePrototype(this, other)) {
       return false;
     }
     if (this.byteLength !== other.byteLength) {
@@ -236,7 +240,7 @@ defineEqualsMethod(
 defineEqualsMethod(
   DataView, 
   function(this: DataView, other: object, _visited: EqualsVisited): boolean {
-    if (!checkExactPrototype(other, DataView)) {
+    if (!checkSamePrototype(this, other)) {
       return false;
     }
     if (this.byteLength !== other.byteLength) {
@@ -255,7 +259,7 @@ for (const typedArray of TYPED_ARRAYS) {
   defineEqualsMethod(
     typedArray, 
     function(this: InstanceType<typeof typedArray>, other: object, _visited: EqualsVisited): boolean {
-      if (!checkExactPrototype(other, typedArray)) {
+      if (!checkSamePrototype(this, other)) {
         return false;
       }
       if (this.byteLength !== other.byteLength) {
@@ -274,7 +278,7 @@ for (const typedArray of TYPED_ARRAYS) {
 defineEqualsMethod(
   WeakRef, 
   function(this: WeakRef<WeakKey>, other: object, visited: EqualsVisited): boolean {
-    if (!checkExactPrototype(other, WeakRef)) {
+    if (!checkSamePrototype(this, other)) {
       return false;
     }
     return equalscyc(this.deref(), other.deref(), visited);
