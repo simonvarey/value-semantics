@@ -1,4 +1,4 @@
-import { ClassDecorator, PropKey, CloneVisited } from "./common";
+import { ClassDecorator_, PropKey, CloneVisited } from "./common";
 export declare const ERROR_ON_CLONE: unique symbol;
 export declare function copyProps<T extends Object>(props: Set<PropKey>, target: T, source: T, visited: CloneVisited): void;
 /**
@@ -9,14 +9,15 @@ export declare function copyProps<T extends Object>(props: Set<PropKey>, target:
  */
 export declare function clone<T>(source: T): T;
 export declare function clonecyc<T>(source: T, visited: CloneVisited): T;
-export type CloneSemantics = 'deep' | 'returnOriginal' | 'errorOnClone';
+export declare const CLONE_SEMANTICS: readonly ["deep", "returnOriginal", "errorOnClone"];
+export type CloneSemantics = typeof CLONE_SEMANTICS[number];
 export type CustomizeCloneOptions = {
     runConstructor?: boolean;
     propDefault?: 'include' | 'exclude';
 };
-export declare function customizeClone<I extends object>(options?: CustomizeCloneOptions): ClassDecorator<I>;
-export declare function customizeClone<I extends object>(semantics: 'deep', options?: CustomizeCloneOptions): ClassDecorator<I>;
-export declare function customizeClone<I extends object>(semantics: 'returnOriginal' | 'errorOnClone'): ClassDecorator<I>;
+export declare function customizeClone<I extends object>(options?: CustomizeCloneOptions): ClassDecorator_<I>;
+export declare function customizeClone<I extends object>(semantics: 'deep', options?: CustomizeCloneOptions): ClassDecorator_<I>;
+export declare function customizeClone<I extends object>(semantics: 'returnOriginal' | 'errorOnClone'): ClassDecorator_<I>;
 /**
  * Class field decorators which allow the class' `clone` implementations to be customized.
  * @public
