@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite'
+import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   build: {
@@ -6,5 +6,10 @@ export default defineConfig({
       entry: './lib/main.ts',
       formats: [ 'es' ]
     }
-  }
+  },
+  test: {
+    coverage: {
+      reporter: ['text', 'html', 'clover', 'json', 'json-summary'],
+    },
+  },
 })

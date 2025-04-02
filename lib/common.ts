@@ -23,7 +23,7 @@ export function getMeta<T>(target: object, key: PropKey): T | typeof META_NOT_FO
 }
 
 export function setMeta(
-  target: Constructor<unknown> | BigIntConstructor | SymbolConstructor, key: PropKey, value: unknown
+  target: Constructor | BigIntConstructor | SymbolConstructor, key: PropKey, value: unknown
 ): void {
   target[Symbol.metadata] ??= {};
   target[Symbol.metadata]![key] = value;
@@ -106,19 +106,22 @@ export function getKeys(
 
 // * Customization: Decorators *
 
-export type Constructor<Instance> = { new(...args: any[]): Instance; };
+export type Constructor = abstract new (...args: any) => any;
 
-export type ClassDecorator_<I> = (
-  constructor: Constructor<I>, context: ClassDecoratorContext
-) => Constructor<I> | void;
+export type ClassDecorator_<C> = (
+  constructor: C, context: ClassDecoratorContext
+) => C | void;
 
 // * Errors *
 
-export type ValueSemanticsErrorType = 'ErrorOnClone' | 'IncludeAndExclude';
+export type ValueSemanticsErrorType = 'ErrorOnClone' | 'IncludeAndExclude' | 'IterateNonIterable'
+  | 'IterateNoAddMethod';
 
 export const ERROR_MSGS: Record<ValueSemanticsErrorType, string> = {
   'ErrorOnClone': 'Instances of class % cannot be cloned',
-  'IncludeAndExclude': 'A field cannot be decorated with both `@include` and `@exclude`'
+  'IncludeAndExclude': 'A field cannot be decorated with both `@include` and `@exclude`',
+  'IterateNonIterable': "A non-iterable class cannot be decorated with 'iterate' semantics",
+  'IterateNoAddMethod': 'The specified `addMethod` does not exist on this class'
 }
 
 export class ValueSemanticsError extends Error {
