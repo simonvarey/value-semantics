@@ -8,7 +8,7 @@
 
 import { EQUALS_EXCLUDE_PROPS, EQUALS_INCLUDE_PROPS, EqualsVisited, EQUALS_METHOD, TYPED_ARRAYS, 
   getAllKeys, getKeys, PropKey, EqualMethodFunc, setMeta, getMeta, META_NOT_FOUND, Constructor, 
-  ClassDecorator_ } from "./common";
+  ClassDecorator_, ValueSemanticsError} from "./common";
 
 // * Helpers *
 
@@ -412,7 +412,7 @@ export function customizeEquals<C extends Constructor>(
   }
   const opts: Required<CustomizeEqualsOptions> = { propDefault: 'include', ...options };
 
-  return function(_constructor: C, context: ClassDecoratorContext): void {
+  return function(constructor: C, context: ClassDecoratorContext): void {
     if (semantics === 'ref') {
       context.metadata[REF_EQUALS] = true;
       return;
@@ -462,6 +462,9 @@ export function customizeEquals<C extends Constructor>(
     };
 
     if (semantics === 'iterate') {
+      if (!(Symbol.iterator in constructor.prototype)) {
+        throw new ValueSemanticsError('IterateNonIterable');
+      }
       context.metadata[EQUALS_METHOD] = iterateEqualsMeth;
     } else {
       context.metadata[EQUALS_METHOD] = valueEqualsMeth;

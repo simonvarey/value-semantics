@@ -277,9 +277,15 @@ export function customizeClone<C extends Constructor>(
     }
   }
 
-  return function(_constructor: C, context: ClassDecoratorContext): void {
+  return function(constructor: C, context: ClassDecoratorContext): void {
     if (semantics === 'iterate') {
       const opts = options as IterateCloneOptions;
+      if (!(Symbol.iterator in constructor.prototype)) {
+        throw new ValueSemanticsError('IterateNonIterable');
+      }
+      if (!(opts.addMethod in constructor.prototype)) {
+        throw new ValueSemanticsError('IterateNoAddMethod');
+      }
       context.metadata[CLONE_METHOD] = iterateMethBuilder(opts.addMethod, opts.runConstructor);
     } else if (semantics === 'returnOriginal') {
       context.metadata[CLONE_METHOD] = returnOriginalMeth;
