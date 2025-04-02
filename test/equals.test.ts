@@ -279,3 +279,23 @@ test('equating class instances with reference semantics', () => {
   const instanceR = new StrictEqualsExample();
   expect(equals(instanceL, instanceR)).toBeFalsy();
 })
+
+test('equating class instances with iterate semantics', () => {
+  @customize.equals('iterate')
+  class ArraySuperExample<M> extends Array<M> { }
+  const arr1 = new ArraySuperExample(1, 2);
+  const arr2 = new ArraySuperExample(1, 2);
+  expect(equals(arr1, arr2)).toBeTruthy();
+
+  @customize.equals('iterate')
+  class IterateExample {
+    constructor(public members: string[]) { };
+
+    [Symbol.iterator](): Iterator<string> {
+      return this.members[Symbol.iterator]();
+    }
+  }
+  const instance1 = new IterateExample(['a', 'b']);
+  const instance2 = new IterateExample(['a', 'b']);
+  expect(equals(instance1, instance2)).toBeTruthy();
+})

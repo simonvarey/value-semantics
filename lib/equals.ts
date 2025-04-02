@@ -6,9 +6,9 @@
 
 // * Imports *
 
-import { Constructor, EQUALS_EXCLUDE_PROPS, EQUALS_INCLUDE_PROPS, ClassDecorator_, EqualsVisited, 
-  EQUALS_METHOD, TYPED_ARRAYS, getAllKeys, getKeys, PropKey, EqualMethodFunc, setMeta, getMeta, 
-  META_NOT_FOUND } from "./common";
+import { EQUALS_EXCLUDE_PROPS, EQUALS_INCLUDE_PROPS, EqualsVisited, EQUALS_METHOD, TYPED_ARRAYS, 
+  getAllKeys, getKeys, PropKey, EqualMethodFunc, setMeta, getMeta, META_NOT_FOUND, Constructor, 
+  ClassDecorator_, ValueSemanticsError} from "./common";
 
 // * Helpers *
 
@@ -17,6 +17,8 @@ import { Constructor, EQUALS_EXCLUDE_PROPS, EQUALS_INCLUDE_PROPS, ClassDecorator
 export const REF_EQUALS = Symbol.for('ref-equals');
 
 const WrappedPrimitives = [Boolean, Number, BigInt, String, Symbol];
+
+type IterateEquatable<I, M> = I & Iterable<M>
 
 // Utility Functions
 
@@ -74,22 +76,20 @@ function setVisited(fst: object, snd: object, visited: EqualsVisited, res: boole
 
 // Definition Helpers
 
-const defineEqualsMethod = <C extends Constructor<unknown>>(
+const defineEqualsMethod = <C extends Constructor>(
   target: C, value: EqualMethodFunc<InstanceType<C>>
 ) => {
   setMeta(target, EQUALS_METHOD, value);
 };
 
-const defineRefEquals = (target: Constructor<unknown>) => {
+const defineRefEquals = (target: Constructor) => {
   setMeta(target, REF_EQUALS, true);
 };
 
 // Equality Helpers
 
-function checkExactPrototype<C extends Constructor<unknown>>(
-  subject: unknown, constructor: C
-): subject is InstanceType<C> {
-  return Object.getPrototypeOf(subject) === constructor.prototype;
+function checkSamePrototype<L extends object>(lhs: L, rhs: unknown): rhs is L {
+  return Object.getPrototypeOf(lhs) === Object.getPrototypeOf(rhs);
 }
 
 function wrappedPrimitiveEquals(obj: object, prim: unknown): boolean {
@@ -135,7 +135,7 @@ function checkMapMembers(
 defineEqualsMethod(
   Array, 
   function(this: unknown[], other: object, visited: EqualsVisited): boolean {
-    if (!checkExactPrototype(other, Array)) {
+    if (!checkSamePrototype(this, other)) {
       return false;
     }
     if (this.length !== other.length) {
@@ -148,7 +148,7 @@ defineEqualsMethod(
 defineEqualsMethod(
   Set, 
   function(this: Set<unknown>, other: object, visited: EqualsVisited): boolean {
-    if (!checkExactPrototype(other, Set)) {
+    if (!checkSamePrototype(this, other)) {
       return false;
     }
     if (this.size !== other.size) {
@@ -161,7 +161,7 @@ defineEqualsMethod(
 defineEqualsMethod(
   Map, 
   function(this: Map<unknown, unknown>, other: object, visited: EqualsVisited): boolean {
-    if (!checkExactPrototype(other, Map)) {
+    if (!checkSamePrototype(this, other)) {
       return false;
     }
     if (this.size !== other.size) {
@@ -174,7 +174,7 @@ defineEqualsMethod(
 defineEqualsMethod(
   RegExp, 
   function(this: RegExp, other: object, _visited: EqualsVisited): boolean {
-    if (!checkExactPrototype(other, RegExp)) {
+    if (!checkSamePrototype(this, other)) {
       return false;
     }
     return this.toString() === other.toString();
@@ -184,7 +184,7 @@ defineEqualsMethod(
 defineEqualsMethod(
   Date, 
   function(this: Date, other: object, _visited: EqualsVisited): boolean {
-    if (!checkExactPrototype(other, Date)) {
+    if (!checkSamePrototype(this, other)) {
       return false;
     }
     return +this === +other;
@@ -194,7 +194,7 @@ defineEqualsMethod(
 defineEqualsMethod(
   ArrayBuffer, 
   function(this: ArrayBuffer, other: object, _visited: EqualsVisited): boolean {
-    if (!checkExactPrototype(other, ArrayBuffer)) {
+    if (!checkSamePrototype(this, other)) {
       return false;
     }
     if (this.byteLength !== other.byteLength) {
@@ -214,7 +214,7 @@ defineEqualsMethod(
 defineEqualsMethod(
   SharedArrayBuffer, 
   function(this: SharedArrayBuffer, other: object, _visited: EqualsVisited): boolean {
-    if (!checkExactPrototype(other, SharedArrayBuffer)) {
+    if (!checkSamePrototype(this, other)) {
       return false;
     }
     if (this.byteLength !== other.byteLength) {
@@ -234,7 +234,7 @@ defineEqualsMethod(
 defineEqualsMethod(
   DataView, 
   function(this: DataView, other: object, _visited: EqualsVisited): boolean {
-    if (!checkExactPrototype(other, DataView)) {
+    if (!checkSamePrototype(this, other)) {
       return false;
     }
     if (this.byteLength !== other.byteLength) {
@@ -253,7 +253,7 @@ for (const typedArray of TYPED_ARRAYS) {
   defineEqualsMethod(
     typedArray, 
     function(this: InstanceType<typeof typedArray>, other: object, _visited: EqualsVisited): boolean {
-      if (!checkExactPrototype(other, typedArray)) {
+      if (!checkSamePrototype(this, other)) {
         return false;
       }
       if (this.byteLength !== other.byteLength) {
@@ -272,7 +272,7 @@ for (const typedArray of TYPED_ARRAYS) {
 defineEqualsMethod(
   WeakRef, 
   function(this: WeakRef<WeakKey>, other: object, visited: EqualsVisited): boolean {
-    if (!checkExactPrototype(other, WeakRef)) {
+    if (!checkSamePrototype(this, other)) {
       return false;
     }
     return equalscyc(this.deref(), other.deref(), visited);
@@ -341,7 +341,7 @@ export function equalscyc(lhs: unknown, rhs: unknown, visited: EqualsVisited): b
     }
   }
   // Other Objects
-  if (Object.getPrototypeOf(lhs) !== Object.getPrototypeOf(rhs)) {
+  if (!checkSamePrototype(lhs, rhs)) {
     setVisited(lhs, rhs, visited, false);
     return false;
   }
@@ -367,7 +367,7 @@ export function equalscyc(lhs: unknown, rhs: unknown, visited: EqualsVisited): b
 
 // Types
 
-export const EQUALS_SEMANTICS = ['value', 'ref'] as const;
+export const EQUALS_SEMANTICS = ['value', 'ref', 'iterate'] as const;
 export type EqualsSemantics = typeof EQUALS_SEMANTICS[number];
 
 export type CustomizeEqualsOptions = {
@@ -382,14 +382,19 @@ function checkExactSamePrototype<I>(lhs: I, rhs: unknown): rhs is I {
 
 // Class Decorator
 
-export function customizeEquals<I extends object>(options?: CustomizeEqualsOptions): ClassDecorator_<I>
-export function customizeEquals<I extends object>(
+export function customizeEquals<C extends Constructor>(
+  options?: CustomizeEqualsOptions
+): ClassDecorator_<C>
+export function customizeEquals<C extends Constructor>(
   semantics: 'value', options?: CustomizeEqualsOptions
-): ClassDecorator_<I>
-export function customizeEquals<I extends object>(semantics: 'ref'): ClassDecorator_<I>
-export function customizeEquals<I extends object>(
+): ClassDecorator_<C>
+export function customizeEquals<C extends Constructor>(semantics: 'ref'): ClassDecorator_<C>
+export function customizeEquals<C extends Constructor>(semantics: 'iterate'): ClassDecorator_<C>
+export function customizeEquals<C extends Constructor>(
   semanticsOrOpts?: EqualsSemantics | CustomizeEqualsOptions, options?: CustomizeEqualsOptions
-): ClassDecorator_<I> {
+): ClassDecorator_<C> {
+  type I = InstanceType<C>;
+
   const semantics: EqualsSemantics = typeof semanticsOrOpts === 'string' ? semanticsOrOpts : 'value';
   
   if (!options) {
@@ -401,24 +406,63 @@ export function customizeEquals<I extends object>(
   }
   const opts: Required<CustomizeEqualsOptions> = { propDefault: 'include', ...options };
 
-  return function(_constructor: Constructor<I>, context: ClassDecoratorContext): void {
+  return function(constructor: C, context: ClassDecoratorContext): void {
     if (semantics === 'ref') {
       context.metadata[REF_EQUALS] = true;
       return;
     };
 
-    context.metadata[EQUALS_METHOD] = function(this: I, other: object, visited: EqualsVisited): boolean {
+    const valueEqualsMeth = function(this: I, other: object, visited: EqualsVisited): boolean {
+      setVisited(this, other, visited, true);
       if (!checkExactSamePrototype(this, other)) {
+        setVisited(this, other, visited, false);
         return false;
       }
       const equalsProps = getKeys(this, opts.propDefault, 'equals');
       for (const key of equalsProps) {
         if (!(equalscyc(this[key as keyof I], other[key as keyof I], visited))) {
+          setVisited(this, other, visited, false);
           return false;
         }
       }
       return true;
     };
+
+    const iterateEqualsMeth = function<M>(
+      this: IterateEquatable<I, M>, other: object, visited: EqualsVisited
+    ): boolean {
+      setVisited(this, other, visited, true);
+      if (!checkExactSamePrototype(this, other)) {
+        setVisited(this, other, visited, false);
+        return false;
+      }
+      const thisIterator = this[Symbol.iterator]();
+      const otherIterator = other[Symbol.iterator]();
+      let thisResult: IteratorResult<M>;
+      let otherResult: IteratorResult<M>;
+      do {
+        thisResult = thisIterator.next();
+        otherResult = otherIterator.next();
+        if (thisResult.done !== otherResult.done) {
+          setVisited(this, other, visited, false);
+          return false;
+        }
+        if (!equalscyc(thisResult.value, otherResult.value, visited)) {
+          setVisited(this, other, visited, false);
+          return false;
+        }
+      } while (!thisResult.done)
+      return true;
+    };
+
+    if (semantics === 'iterate') {
+      if (!(Symbol.iterator in constructor.prototype)) {
+        throw new ValueSemanticsError('IterateNonIterable');
+      }
+      context.metadata[EQUALS_METHOD] = iterateEqualsMeth;
+    } else {
+      context.metadata[EQUALS_METHOD] = valueEqualsMeth;
+    }
   }
 }
 
