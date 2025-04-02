@@ -1,6 +1,6 @@
 {
   "name": "value-semantics",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Mimic value semantics for JavaScript objects with deep cloning and equality functions",
   "keywords": [
     "value-semantics",
