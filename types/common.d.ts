@@ -1,6 +1,6 @@
 export declare const META_NOT_FOUND: unique symbol;
 export declare function getMeta<T>(target: object, key: PropKey): T | typeof META_NOT_FOUND;
-export declare function setMeta(target: Constructor<unknown> | BigIntConstructor | SymbolConstructor, key: PropKey, value: unknown): void;
+export declare function setMeta(target: Constructor | BigIntConstructor | SymbolConstructor, key: PropKey, value: unknown): void;
 type TypedArrays = Int8Array | Uint8Array | Uint8ClampedArray | Int16Array | Uint16Array | Int32Array | Uint32Array | Float32Array | Float64Array | BigInt64Array | BigUint64Array;
 type TypedArrayConstructor = new <TArrayBuffer extends ArrayBufferLike = ArrayBuffer>(buffer: TArrayBuffer, byteOffset?: number, length?: number) => TypedArrays;
 export declare const TYPED_ARRAYS: TypedArrayConstructor[];
@@ -19,11 +19,9 @@ export type PropKey = string | symbol;
 export type PropDefault = 'include' | 'exclude';
 export declare function getAllKeys(source: Object): Set<PropKey>;
 export declare function getKeys(source: object, propDefault: PropDefault, deriveKind: 'clone' | 'equals', constructor?: boolean): Set<PropKey>;
-export type Constructor<Instance> = {
-    new (...args: any[]): Instance;
-};
-export type ClassDecorator_<I> = (constructor: Constructor<I>, context: ClassDecoratorContext) => Constructor<I> | void;
-export type ValueSemanticsErrorType = 'ErrorOnClone' | 'IncludeAndExclude';
+export type Constructor = abstract new (...args: any) => any;
+export type ClassDecorator_<C> = (constructor: C, context: ClassDecoratorContext) => C | void;
+export type ValueSemanticsErrorType = 'ErrorOnClone' | 'IncludeAndExclude' | 'IterateNonIterable' | 'IterateNoAddMethod';
 export declare const ERROR_MSGS: Record<ValueSemanticsErrorType, string>;
 export declare class ValueSemanticsError extends Error {
     type: ValueSemanticsErrorType;
