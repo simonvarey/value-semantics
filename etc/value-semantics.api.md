@@ -27,44 +27,43 @@ export namespace customize {
     //
     // (undocumented)
     equals: typeof customizeEquals;
-    // Warning: (ae-forgotten-export) The symbol "ConstructorFunc" needs to be exported by the entry point main.d.ts
     // Warning: (ae-forgotten-export) The symbol "CustomizeValueOptions" needs to be exported by the entry point main.d.ts
     // Warning: (ae-forgotten-export) The symbol "ClassDecorator_" needs to be exported by the entry point main.d.ts
     //
     // (undocumented)
-    export function value<C extends ConstructorFunc>(options?: CustomizeValueOptions): ClassDecorator_<C>;
+    export function value<I extends object>(options?: CustomizeValueOptions): ClassDecorator_<I>;
     // (undocumented)
-    export function value<C extends ConstructorFunc>(// Clone Semantics
-    cloneSemantics: 'deep', options?: CustomizeValueOptions): ClassDecorator_<C>;
+    export function value<I extends object>(// Clone Semantics
+    cloneSemantics: 'deep', options?: CustomizeValueOptions): ClassDecorator_<I>;
     // Warning: (ae-forgotten-export) The symbol "CustomizeEqualsOptions" needs to be exported by the entry point main.d.ts
     //
     // (undocumented)
-    export function value<C extends ConstructorFunc>(cloneSemantics: 'returnOriginal' | 'errorOnClone', options?: CustomizeEqualsOptions): ClassDecorator_<C>;
+    export function value<I extends object>(cloneSemantics: 'returnOriginal' | 'errorOnClone', options?: CustomizeEqualsOptions): ClassDecorator_<I>;
     // (undocumented)
-    export function value<C extends ConstructorFunc>(// Equals Semantics
-    equalsSemantics: 'value', options?: CustomizeValueOptions): ClassDecorator_<C>;
+    export function value<I extends object>(// Equals Semantics
+    equalsSemantics: 'value', options?: CustomizeValueOptions): ClassDecorator_<I>;
     // Warning: (ae-forgotten-export) The symbol "CustomizeCloneOptions" needs to be exported by the entry point main.d.ts
     //
     // (undocumented)
-    export function value<C extends ConstructorFunc>(equalsSemantics: 'ref', options?: CustomizeCloneOptions): ClassDecorator_<C>;
+    export function value<I extends object>(equalsSemantics: 'ref', options?: CustomizeCloneOptions): ClassDecorator_<I>;
     // (undocumented)
-    export function value<C extends ConstructorFunc>(// Clone then Equals Semantics
-    cloneSemantics: 'deep', equalsSemantics: 'value', options?: CustomizeValueOptions): ClassDecorator_<C>;
+    export function value<I extends object>(// Clone then Equals Semantics
+    cloneSemantics: 'deep', equalsSemantics: 'value', options?: CustomizeValueOptions): ClassDecorator_<I>;
     // (undocumented)
-    export function value<C extends ConstructorFunc>(cloneSemantics: 'deep', equalsSemantics: 'ref', options?: CustomizeCloneOptions): ClassDecorator_<C>;
+    export function value<I extends object>(cloneSemantics: 'deep', equalsSemantics: 'ref', options?: CustomizeCloneOptions): ClassDecorator_<I>;
     // (undocumented)
-    export function value<C extends ConstructorFunc>(cloneSemantics: 'returnOriginal' | 'errorOnClone', equalsSemantics: 'value', options?: CustomizeEqualsOptions): ClassDecorator_<C>;
+    export function value<I extends object>(cloneSemantics: 'returnOriginal' | 'errorOnClone', equalsSemantics: 'value', options?: CustomizeEqualsOptions): ClassDecorator_<I>;
     // (undocumented)
-    export function value<C extends ConstructorFunc>(cloneSemantics: 'returnOriginal' | 'errorOnClone', equalsSemantics: 'ref'): ClassDecorator_<C>;
+    export function value<I extends object>(cloneSemantics: 'returnOriginal' | 'errorOnClone', equalsSemantics: 'ref'): ClassDecorator_<I>;
     // (undocumented)
-    export function value<C extends ConstructorFunc>(// Equals then Clone Semantics
-    equalsSemantics: 'value', cloneSemantics: 'deep', options?: CustomizeValueOptions): ClassDecorator_<C>;
+    export function value<I extends object>(// Equals then Clone Semantics
+    equalsSemantics: 'value', cloneSemantics: 'deep', options?: CustomizeValueOptions): ClassDecorator_<I>;
     // (undocumented)
-    export function value<C extends ConstructorFunc>(equalsSemantics: 'value', cloneSemantics: 'returnOriginal' | 'errorOnClone', options?: CustomizeEqualsOptions): ClassDecorator_<C>;
+    export function value<I extends object>(equalsSemantics: 'value', cloneSemantics: 'returnOriginal' | 'errorOnClone', options?: CustomizeEqualsOptions): ClassDecorator_<I>;
     // (undocumented)
-    export function value<C extends ConstructorFunc>(equalsSemantics: 'ref', cloneSemantics: 'deep', options?: CustomizeCloneOptions): ClassDecorator_<C>;
+    export function value<I extends object>(equalsSemantics: 'ref', cloneSemantics: 'deep', options?: CustomizeCloneOptions): ClassDecorator_<I>;
     // (undocumented)
-    export function value<C extends ConstructorFunc>(equalsSemantics: 'ref', cloneSemantics: 'returnOriginal' | 'errorOnClone'): ClassDecorator_<C>;
+    export function value<I extends object>(equalsSemantics: 'ref', cloneSemantics: 'returnOriginal' | 'errorOnClone'): ClassDecorator_<I>;
 }
 
 // @public
