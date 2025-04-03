@@ -2,7 +2,7 @@
 
 **The JavaScript/TypeScript Value Semantics Toolkit**
 
-> All the functions you need to program as if objects in JavaScript had value semantics, including comprehensive and highly customisible deep cloning and equality functions
+> All the functions you need to program as if objects in JavaScript had value semantics, including comprehensive and highly customizable deep cloning and equality functions.
 
 <span class="badge-npmversion"><a href="https://npmjs.org/package/value-semantics" title="View this project on NPM"><img src="https://img.shields.io/npm/v/value-semantics.svg" alt="NPM version" /></a></span>
 <span class="badge-licence"><a href="https://opensource.org/license/mit" title="View this project's license"><img src="https://img.shields.io/npm/l/value-semantics.svg" alt="License" /></a></span>

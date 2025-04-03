@@ -10,6 +10,7 @@ import { customizeEquals, CustomizeEqualsOptions, EQUALS_SEMANTICS, EqualsSemant
 
 export { clone } from './clone';
 export { equals } from './equals';
+export { ValueArray } from './value-array';
 
 type CustomizeValueOptions = CustomizeCloneOptions;
 
