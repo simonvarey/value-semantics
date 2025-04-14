@@ -130,3 +130,17 @@ export class ValueSemanticsError extends Error {
     super(msg);
   }
 }
+
+// * Generators *
+
+function findProtoInInstanceChain(proto: Function, instance: object): boolean {
+  const ersatzConstructor = function() {};
+  ersatzConstructor.prototype = proto;
+  return instance instanceof ersatzConstructor;
+}
+
+const GENERATOR_PROTO = (function* () {}.constructor).prototype.prototype;
+
+export function isGenerator(instance: object): boolean {
+  return findProtoInInstanceChain(GENERATOR_PROTO, instance);
+}
