@@ -8,7 +8,8 @@
 
 import { EQUALS_EXCLUDE_PROPS, EQUALS_INCLUDE_PROPS, EqualsVisited, EQUALS_METHOD, TYPED_ARRAYS, 
   getAllKeys, getKeys, PropKey, EqualMethodFunc, setMeta, getMeta, META_NOT_FOUND, Constructor, 
-  ClassDecorator_, ValueSemanticsError} from "./common";
+  ClassDecorator_, ValueSemanticsError,
+  isGenerator} from "./common";
 
 // * Helpers *
 
@@ -339,6 +340,11 @@ export function equalscyc(lhs: unknown, rhs: unknown, visited: EqualsVisited): b
     } else {
       throw except;
     }
+  }
+  // Generator Objects
+  if (isGenerator(lhs) || isGenerator(rhs)) {
+    setVisited(lhs, rhs, visited, false);
+    return false;
   }
   // Other Objects
   if (!checkSamePrototype(lhs, rhs)) {
