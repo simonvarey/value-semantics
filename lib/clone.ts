@@ -10,7 +10,8 @@
 
 import { CLONE_EXCLUDE_PROPS, CLONE_INCLUDE_PROPS, CLONE_METHOD, TYPED_ARRAYS, PropKey, 
   getAllKeys, getKeys, getMeta, META_NOT_FOUND, CloneMethodFunc, setMeta, CONSTRUCTOR_PROPS, 
-  ValueSemanticsError, CloneVisited, ClassDecorator_, Constructor } from "./common";
+  ValueSemanticsError, CloneVisited, ClassDecorator_, Constructor, 
+  isGenerator} from "./common";
 
 // Symbols
 
@@ -193,6 +194,10 @@ export function clonecyc<T>(source: T, visited: CloneVisited): T {
     if (meth !== META_NOT_FOUND) {
       const target = meth.call(source, visited);
       return target;
+    }
+    // Generator Objects
+    if (isGenerator(source)) {
+      throw new ValueSemanticsError('ErrorOnGeneratorClone');
     }
     // Other Object
     const proto = Object.getPrototypeOf(source);

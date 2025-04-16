@@ -115,13 +115,14 @@ export type ClassDecorator_<C> = (
 // * Errors *
 
 export type ValueSemanticsErrorType = 'ErrorOnClone' | 'IncludeAndExclude' | 'IterateNonIterable'
-  | 'IterateNoAddMethod';
+  | 'IterateNoAddMethod' | 'ErrorOnGeneratorClone';
 
 export const ERROR_MSGS: Record<ValueSemanticsErrorType, string> = {
   'ErrorOnClone': 'Instances of class % cannot be cloned',
   'IncludeAndExclude': 'A field cannot be decorated with both `@include` and `@exclude`',
   'IterateNonIterable': "A non-iterable class cannot be decorated with 'iterate' semantics",
-  'IterateNoAddMethod': 'The specified `addMethod` does not exist on this class'
+  'IterateNoAddMethod': 'The specified `addMethod` does not exist on this class',
+  'ErrorOnGeneratorClone': 'Generator objects cannot be cloned'
 }
 
 export class ValueSemanticsError extends Error {
