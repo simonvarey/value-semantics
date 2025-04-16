@@ -58,7 +58,7 @@ function checkVisited(fst: object, snd: object, visited: EqualsVisited): boolean
   return null;
 }
 
-function setVisited(fst: object, snd: object, visited: EqualsVisited, res: boolean) {
+function setVisited(fst: object, snd: object, visited: EqualsVisited, res: boolean): boolean {
   let fstVisited = visited.get(fst);
   if (fstVisited === undefined) {
     fstVisited = new Map();
@@ -71,6 +71,7 @@ function setVisited(fst: object, snd: object, visited: EqualsVisited, res: boole
     visited.set(snd, sndVisited);
   }
   sndVisited!.set(fst, res);
+  return res;
 }
 
 // * Builtins *
@@ -343,30 +344,27 @@ export function equalscyc(lhs: unknown, rhs: unknown, visited: EqualsVisited): b
   }
   // Generator Objects
   if (isGenerator(lhs) || isGenerator(rhs)) {
-    setVisited(lhs, rhs, visited, false);
-    return false;
+    return setVisited(lhs, rhs, visited, false);
   }
   // Other Objects
   if (!checkSamePrototype(lhs, rhs)) {
-    setVisited(lhs, rhs, visited, false);
-    return false;
+    return setVisited(lhs, rhs, visited, false);
   }
   const lhsKeys = getAllKeys(lhs);
   const rhsKeys = getAllKeys(rhs);
   if (lhsKeys.size !== rhsKeys.size) {
-    return false;
+    return setVisited(lhs, rhs, visited, false);
   }
   if (lhsKeys.intersection(rhsKeys).size !== lhsKeys.size) {
-    return false;
+    return setVisited(lhs, rhs, visited, false);
   }
   for (const key of lhsKeys) {
     if (!(equalscyc(lhs[key as keyof typeof lhs], rhs[key as keyof typeof rhs], visited))) {
       setVisited(lhs, rhs, visited, false);
-      return false;
+      return setVisited(lhs, rhs, visited, false);
     }
   }
-  setVisited(lhs, rhs, visited, true);
-  return true;
+  return setVisited(lhs, rhs, visited, true);
 }
 
 // * Equals Customization Decorators *
