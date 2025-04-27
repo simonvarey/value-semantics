@@ -308,8 +308,8 @@ export function equalscyc(lhs: unknown, rhs: unknown, visited: EqualsVisited): b
   }
   // LHS non-object
   if (typeof lhs !== 'object') {
-    if (typeof lhs === 'number' && isNaN(lhs)) {
-      return typeof rhs === 'number' && isNaN(rhs);
+    if (Number.isNaN(lhs)) {
+      return Number.isNaN(rhs);
     }
     if (typeof rhs === 'object') {
       return wrappedPrimitiveEquals(rhs, lhs);
