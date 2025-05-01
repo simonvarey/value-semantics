@@ -108,6 +108,20 @@ test('equating maps', () => {
   expect(equals(map5, map3)).toBeFalsy();
 })
 
+test('equating maps with value-equal keys', () => {
+  const entry1: [unknown, unknown] = [{ a: 1 }, 'z'];
+  const entry2: [unknown, unknown] = [{ a: 1 }, 'z'];
+  const entry3: [unknown, unknown] = [{ a: 1 }, 'y'];
+  const map1 = new Map([entry1, entry2]);
+  const map2 = new Map([entry1, entry3]);
+  const map3 = new Map([entry1, entry2]);
+  expect(equals(map1, map2)).toBeFalsy();
+  expect(equals(map2, map1)).toBeFalsy();
+  expect(equals(map1, map3)).toBeTruthy();
+  expect(equals(map3, map1)).toBeTruthy();
+})
+
+
 test('equating regexps', () => {
   const re1 = /ab/;
   const re2 = /ab/;

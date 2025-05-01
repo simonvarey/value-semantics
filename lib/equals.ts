@@ -122,14 +122,15 @@ function checkSetMembers(lhs: Set<unknown>, rhs: Set<unknown>, visited: EqualsVi
 
 function checkMapMembers(
   lhs: Map<unknown, unknown>, rhs: Map<unknown, unknown>, visited: EqualsVisited
-): boolean {  
+): boolean {
+  const rhsKeysArray = [...rhs.keys()];
   outer: for (const lKey of lhs.keys()) {
-    for (const rKey of rhs.keys()) {
+    for (const [rKey, rIndex] of enumerate(rhsKeysArray)) {
       if (equalscyc(lKey, rKey, visited)) {
-        if (!(equalscyc(lhs.get(lKey), rhs.get(rKey), visited))) {
-          return false;
+        if (equalscyc(lhs.get(lKey), rhs.get(rKey), visited)) {
+          rhsKeysArray.splice(rIndex, 1);
+          continue outer;
         }
-        continue outer;
       }
     }
     return false;
