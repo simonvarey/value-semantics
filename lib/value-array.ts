@@ -6,5 +6,7 @@
 
 import { customizeClone } from "./clone";
 
-@customizeClone('iterate', { runConstructor: true, addMethod: 'push' })
-export class ValueArray<M> extends Array<M> { }
+@customizeClone('iterate', { runConstructor: true, addMethod: 'push' }) 
+class ValueArray<M> extends Array<M> { }
+
+export { ValueArray }

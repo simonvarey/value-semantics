@@ -10,8 +10,7 @@
 
 import { CLONE_EXCLUDE_PROPS, CLONE_INCLUDE_PROPS, CLONE_METHOD, TYPED_ARRAYS, PropKey, 
   getAllKeys, getKeys, getMeta, META_NOT_FOUND, CloneMethodFunc, setMeta, CONSTRUCTOR_PROPS, 
-  ValueSemanticsError, CloneVisited, ClassDecorator_, Constructor, 
-  isGenerator} from "./common";
+  ValueSemanticsError, CloneVisited, ClassDecorator_, Constructor, isGenerator } from "./common";
 
 // Symbols
 

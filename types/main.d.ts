@@ -3,6 +3,7 @@ import { ClassDecorator_, Constructor } from './common';
 import { customizeEquals, CustomizeEqualsOptions } from './equals';
 export { clone } from './clone';
 export { equals } from './equals';
+export { ValueArray } from './value-array';
 type CustomizeValueOptions = CustomizeCloneOptions;
 /**
  * Class decorators which allow the class' `equals` and `clone` implementations to be customized.

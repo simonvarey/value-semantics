@@ -86,6 +86,10 @@ export namespace value {
     export function include<C, V>(target: undefined, context: ClassFieldDecoratorContext<C, V>): void;
 }
 
+// @public (undocumented)
+export class ValueArray<M> extends Array<M> {
+}
+
 // (No @packageDocumentation comment for this package)
 
 ```

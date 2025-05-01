@@ -8,8 +8,7 @@
 
 import { EQUALS_EXCLUDE_PROPS, EQUALS_INCLUDE_PROPS, EqualsVisited, EQUALS_METHOD, TYPED_ARRAYS, 
   getAllKeys, getKeys, PropKey, EqualMethodFunc, setMeta, getMeta, META_NOT_FOUND, Constructor, 
-  ClassDecorator_, ValueSemanticsError,
-  isGenerator} from "./common";
+  ClassDecorator_, ValueSemanticsError, isGenerator } from "./common";
 
 // * Helpers *
 
@@ -25,6 +24,10 @@ type IterateEquatable<I, M> = I & Iterable<M>
 
 function zip<TL, TR>(lArray: TL[], rArray: TR[]): [TL, TR][] {
   return lArray.map((l, i) => { return [l, rArray[i]]; });
+}
+
+function enumerate<E>(arr: E[]): IterableIterator<[E, number]> {
+  return arr.map((value, index) => [value, index] as [E, number]).values();
 }
 
 // Metadata Helpers
@@ -104,9 +107,11 @@ function wrappedPrimitiveEquals(obj: object, prim: unknown): boolean {
 }
 
 function checkSetMembers(lhs: Set<unknown>, rhs: Set<unknown>, visited: EqualsVisited): boolean {
+  const rhsArray = [...rhs];
   outer: for (const l of lhs) {
-    for (const r of rhs) {
+    for (const [r, rIndex] of enumerate(rhsArray)) {
       if (equalscyc(l, r, visited)) {
+        rhsArray.splice(rIndex, 1);
         continue outer;
       }
     }
