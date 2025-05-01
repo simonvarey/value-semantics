@@ -87,7 +87,11 @@ test('equating sets', () => {
 test('equating sets with value-equal members', () => {
   const set1 = new Set([{ a: 1 }, { a: 1 }, 'z']);
   const set2 = new Set([{ a: 1 }, 'y', 'z']);
+  const set3 = new Set([{ a: 1 }, { a: 1 }, 'z']);
   expect(equals(set1, set2)).toBeFalsy();
+  expect(equals(set2, set1)).toBeFalsy();
+  expect(equals(set1, set3)).toBeTruthy();
+  expect(equals(set3, set1)).toBeTruthy();
 })
 
 test('equating maps', () => {
