@@ -5,18 +5,24 @@ function isClone(orig: unknown, copy: unknown): boolean {
   return equals(orig, copy) && orig != copy;
 }
 
-// TODO: Constructor w/out `new`, single number argument
-// External clone
 test('Array.constructor', () => {
   const arr = [{ a: 1 }, { b: 2 }];
-  const orig = new ValueArray(...arr);
-  const copy = new ValueArray(...clone(arr)); // extra [] allocation
-  expect(equals(orig, orig)).toBeTruthy();
   expect(equals(new ValueArray(), new ValueArray())).toBeTruthy();
   expect(equals(
     new ValueArray({ a: 1 }, { b: 2 }), 
     new ValueArray({ a: 1 }, { b: 2 }))
   ).toBeTruthy();
+  expect(equals(new ValueArray(...arr), new ValueArray({ a: 1 }, { b: 2 }))).toBeTruthy();
+  expect(equals(new ValueArray(1), new ValueArray(1))).toBeTruthy();
+  expect(equals(new ValueArray(1), new ValueArray(0))).toBeFalsy();
+  expect(equals(new ValueArray(1), new ValueArray([1]))).toBeFalsy();
+  expect(equals(new ValueArray(...['a', 'b']), new ValueArray('a', 'b'))).toBeTruthy();
+  // TODO: constructor without `new`
+
+  // External clone
+  const orig = new ValueArray(...arr);
+  const copy = clone(new ValueArray(...arr));
+  expect(equals(orig, orig)).toBeTruthy();
   expect(equals(orig, copy)).toBeTruthy();
   expect(isClone(orig, copy)).toBeTruthy();
 })

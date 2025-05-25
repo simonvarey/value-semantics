@@ -22,12 +22,24 @@ type IterateEquatable<I, M> = I & Iterable<M>
 
 // Utility Functions
 
-function zip<TL, TR>(lArray: TL[], rArray: TR[]): [TL, TR][] {
-  return lArray.map((l, i) => { return [l, rArray[i]]; });
+function zip<EL, ER>(lArray: EL[], rArray: ER[]): [EL, ER][] {
+  const ret: [EL, ER][] = [];
+  // NOTE: `for..of` required for sparse arrays, as `map` skips empty slots
+  for (const [lElement, arrIndex] of enumerate(lArray)) {
+    ret.push([lElement, rArray[arrIndex]]);
+  }
+  return ret;
 }
 
 function enumerate<E>(arr: E[]): IterableIterator<[E, number]> {
-  return arr.map((value, index) => [value, index] as [E, number]).values();
+  const ret: [E, number][] = [];
+  let arrIndex = 0;
+  // NOTE: `for..of` required for sparse arrays, as `map` skips empty slots
+  for (const element of arr) {
+    ret.push([element, arrIndex]);
+    arrIndex++;
+  }
+  return ret.values();
 }
 
 // Metadata Helpers
