@@ -156,6 +156,32 @@ test('clones a typed array & shared array buffer', () => {
   expect(arrClone[0]).toBe(1);
 });
 
+test('error: cannot clone a generator', () => {
+  expect(() => {
+    function* genFunc(): Generator {
+      yield 1;
+      yield 2;
+    }
+    const gen = genFunc();
+    const genClone = clone(gen);
+  }).toThrowError(
+    /^Generator objects cannot be cloned$/
+  )
+})
+
+test('error: cannot clone an async generator', () => {
+  expect(() => {
+    async function* genFunc(): AsyncGenerator {
+      yield 1;
+      yield 2;
+    }
+    const gen = genFunc();
+    const genClone = clone(gen);
+  }).toThrowError(
+    /^Generator objects cannot be cloned$/
+  )
+})
+
 // Wrapper Objects
 
 test('clones a wrapped boolean', () => {
