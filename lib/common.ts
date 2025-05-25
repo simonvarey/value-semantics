@@ -145,3 +145,9 @@ const GENERATOR_PROTO = (function* () {}.constructor).prototype.prototype;
 export function isGenerator(instance: object): boolean {
   return findProtoInInstanceChain(GENERATOR_PROTO, instance);
 }
+
+const ASYNC_GENERATOR_PROTO = (async function* () {}.constructor).prototype.prototype;
+
+export function isAsyncGenerator(instance: object): boolean {
+  return findProtoInInstanceChain(ASYNC_GENERATOR_PROTO, instance);
+}
