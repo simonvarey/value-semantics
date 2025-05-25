@@ -25,6 +25,7 @@ test('Array.constructor', () => {
   expect(equals(orig, orig)).toBeTruthy();
   expect(equals(orig, copy)).toBeTruthy();
   expect(isClone(orig, copy)).toBeTruthy();
+  expect(isClone(orig[0], copy[0])).toBeTruthy();
 })
 
 test('Array.from', () => {
@@ -34,6 +35,7 @@ test('Array.from', () => {
   const copy = clone(orig);
   expect(equals(orig, copy)).toBeTruthy();
   expect(isClone(orig, copy)).toBeTruthy();
+  expect(isClone(orig[0], copy[0])).toBeTruthy();
 })
 
 test('Array.fromAsync', async () => {
@@ -41,13 +43,14 @@ test('Array.fromAsync', async () => {
   const asyncIterable = (async function* () {
     for (let i = 0; i < 5; i++) {
       await new Promise((resolve) => setTimeout(resolve, 10 * i));
-      yield i;
+      yield { a: i };
     }
   })();
   const orig = await ValueArray.fromAsync(asyncIterable);
   const copy = clone(orig);
   expect(equals(orig, copy)).toBeTruthy();
   expect(isClone(orig, copy)).toBeTruthy();
+  expect(isClone(orig[0], copy[0])).toBeTruthy();
 })
 
 // No change
@@ -65,6 +68,7 @@ test('Array.of', () => {
   const copy = clone(orig);
   expect(equals(orig, copy)).toBeTruthy();
   expect(isClone(orig, copy)).toBeTruthy();
+  expect(isClone(orig[0], copy[0])).toBeTruthy();
 })
 
 // No Change
@@ -76,8 +80,8 @@ test('Array.at', () => {
   // External clone
   const valArr = new ValueArray({ a: 1 }, { b: 2 });
   const copy = clone(valArr.at(1));
-  expect(equals({ b: 2 }, copy)).toBeTruthy();
-  expect(isClone({ b: 2 }, copy)).toBeTruthy();
+  expect(equals(valArr[1], copy)).toBeTruthy();
+  expect(isClone(valArr[1], copy)).toBeTruthy();
 })
 
 test('Array.concat', () => {
@@ -87,7 +91,8 @@ test('Array.concat', () => {
   const valArrConcat = clone(valArr1.concat(valArr2));
   const valArrExpect = new ValueArray({ a: 1 }, { b: 2 }, { c: 3 }, { d: 4 });
   expect(equals(valArrConcat, valArrExpect)).toBeTruthy();
-  expect(isClone(valArrConcat, valArrExpect)).toBeTruthy();
+  expect(isClone(valArr1[0], valArrConcat[0])).toBeTruthy();
+  expect(isClone(valArr2[0], valArrConcat[2])).toBeTruthy();
 })
 
 // Array.copyWithin()
