@@ -21,24 +21,36 @@ test('Array.constructor', () => {
 
   // External clone
   const orig = new ValueArray(...arr);
-  const copy = clone(new ValueArray(...arr));
+  const copy = clone(orig);
   expect(equals(orig, orig)).toBeTruthy();
   expect(equals(orig, copy)).toBeTruthy();
   expect(isClone(orig, copy)).toBeTruthy();
 })
 
-// External clone
 test('Array.from', () => {
+  // External clone
   const arr = [{ a: 1 }, { b: 2 }];
   const orig = ValueArray.from(arr);
-  const copy = ValueArray.from(clone(arr)); // extra [] allocation
+  const copy = clone(orig);
   expect(equals(orig, copy)).toBeTruthy();
   expect(isClone(orig, copy)).toBeTruthy();
 })
 
-//Array.fromAsync
+test('Array.fromAsync', async () => {
+  // External clone
+  const asyncIterable = (async function* () {
+    for (let i = 0; i < 5; i++) {
+      await new Promise((resolve) => setTimeout(resolve, 10 * i));
+      yield i;
+    }
+  })();
+  const orig = await ValueArray.fromAsync(asyncIterable);
+  const copy = clone(orig);
+  expect(equals(orig, copy)).toBeTruthy();
+  expect(isClone(orig, copy)).toBeTruthy();
+})
 
-// Same
+// No change
 test('Array.isArray', () => {
   const arr = [{ a: 1 }, { b: 2 }];;
   const valArr = new ValueArray(...arr);
@@ -46,33 +58,33 @@ test('Array.isArray', () => {
   expect(ValueArray.isArray(valArr)).toBeTruthy();
 })
 
-// External clone
 test('Array.of', () => {
+  // External clone
   const arr = [{ a: 1 }, { b: 2 }];;
   const orig = ValueArray.of(...arr);
-  const copy = ValueArray.of(...clone(arr)); // extra [] allocation
+  const copy = clone(orig);
   expect(equals(orig, copy)).toBeTruthy();
   expect(isClone(orig, copy)).toBeTruthy();
 })
 
-// Same
+// No Change
 test('Array[Symbol.species]', () => {
   expect(ValueArray[Symbol.species]).toBe(ValueArray);
 })
 
-// External clone
 test('Array.at', () => {
+  // External clone
   const valArr = new ValueArray({ a: 1 }, { b: 2 });
   const copy = clone(valArr.at(1));
   expect(equals({ b: 2 }, copy)).toBeTruthy();
   expect(isClone({ b: 2 }, copy)).toBeTruthy();
 })
 
-// External clone
 test('Array.concat', () => {
+  // External clone
   const valArr1 = new ValueArray<object>({ a: 1 }, { b: 2 });
   const valArr2 = new ValueArray({ c: 3 }, { d: 4 });
-  const valArrConcat = valArr1.concat(clone(valArr2)); // extra [] allocation
+  const valArrConcat = clone(valArr1.concat(valArr2));
   const valArrExpect = new ValueArray({ a: 1 }, { b: 2 }, { c: 3 }, { d: 4 });
   expect(equals(valArrConcat, valArrExpect)).toBeTruthy();
   expect(isClone(valArrConcat, valArrExpect)).toBeTruthy();
