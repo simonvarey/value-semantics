@@ -3,16 +3,16 @@ import { customize, equals } from '../lib/main'
 
 // * Primitives *
 
-test('equate nulls', () => {
+test('equating nulls', () => {
   expect(equals(null, null)).toBeTruthy();
 })
 
-test('equate null and number', () => {
+test('equating null and number', () => {
   expect(equals(null, 1)).toBeFalsy();
   expect(equals(1, null)).toBeFalsy();
 })
 
-test('equate numbers', () => {
+test('equating numbers', () => {
   expect(equals(1, 1)).toBeTruthy();
   expect(equals(1, 2)).toBeFalsy();
   expect(equals(3, 1)).toBeFalsy();
@@ -21,43 +21,45 @@ test('equate numbers', () => {
   expect(equals(NaN, 1)).toBeFalsy();
 })
 
-test('equate strings', () => {
+test('equating strings', () => {
   expect(equals('a', 'a')).toBeTruthy();
   expect(equals('b', 'c')).toBeFalsy();
 })
 
-test('equate empty object and null', () => {
+test('equating empty object and null', () => {
   expect(equals({}, null)).toBeFalsy();
   expect(equals(null, {})).toBeFalsy();
 })
 
-test('equate arrays', () => {
+test('equating arrays', () => {
   expect(equals([1, 'a'], [1, 'a'])).toBeTruthy();
   expect(equals([1, 'a'], [1])).toBeFalsy();
 })
 
-test('equate arrays and numbers', () => {
+test('equating arrays and numbers', () => {
   expect(equals([1, 'a'], 1)).toBeFalsy();
 })
 
-test('equate array and empty object', () => {
+test('equating arrays and empty objects', () => {
   expect(equals([1, 'a'], {})).toBeFalsy();
 })
 
-test('equate function with itself', () => {
-  const func = function (param: number): number { return param; };
-  expect(equals(func, func)).toBeTruthy();
+test('equating functions', () => {
+  const func1 = function (param: number): number { return param; };
+  const func2 = function (param: number): number { return param; };
+  expect(equals(func1, func1)).toBeTruthy();
+  expect(equals(func1, func2)).toBeFalsy();
 })
 
 // * Objects *
 
 // Object Literals
 
-test('object literal equals object literal', () => {
+test('equating object literals', () => {
   expect(equals({ a: 1 }, { a: 1 })).toBeTruthy();
 })
 
-test('object literal equals null prototype object', () => {
+test('equating object literals and null prototype objects', () => {
   expect(equals({ a: 1 }, Object.create(null))).toBeFalsy();
 })
 
@@ -66,7 +68,7 @@ test('equating different object literals', () => {
   expect(equals({ a: 1, b: 2 }, { a: 2 })).toBeFalsy();
 })
 
-test('null prototype object equals null prototype object', () => {
+test('equating null prototype objects', () => {
   expect(equals(Object.create(null), Object.create(null))).toBeTruthy();
 })
 
@@ -121,7 +123,6 @@ test('equating maps with value-equal keys', () => {
   expect(equals(map3, map1)).toBeTruthy();
 })
 
-
 test('equating regexps', () => {
   const re1 = /ab/;
   const re2 = /ab/;
@@ -161,7 +162,7 @@ test('equating weakrefs', () => {
   expect(ref3.deref()!.b).toBe(2);
 })
 
-test('equating typed array', () => {
+test('equating typed arrays', () => {
   const array1 = new Uint8Array([1, 2]);
   const array2 = new Uint8Array([1, 2]);
   const array3 = new Uint8Array([3]);
@@ -217,9 +218,39 @@ test('equating data views & shared array buffers', () => {
   expect(equals(view1, {})).toBeFalsy();
 });
 
+test('equating generators', () => {
+  function* genFunc1(): Generator {
+    yield 1;
+    yield 2;
+  }
+  function* genFunc2(): Generator {
+    yield 1;
+    yield 2;
+  }
+  const gen1 = genFunc1();
+  const gen2 = genFunc2();
+  expect(equals(gen1, gen1)).toBeTruthy();
+  expect(equals(gen1, gen2)).toBeFalsy();
+})
+
+test('equating async generators', () => {
+  async function* genFunc1(): AsyncGenerator {
+    yield 1;
+    yield 2;
+  }
+  async function* genFunc2(): AsyncGenerator {
+    yield 1;
+    yield 2;
+  }
+  const gen1 = genFunc1();
+  const gen2 = genFunc2();
+  expect(equals(gen1, gen1)).toBeTruthy();
+  expect(equals(gen1, gen2)).toBeFalsy();
+})
+
 // Circular Objects 
 
-test('circular object', () => {
+test('equating circular objects', () => {
   const a0: any = { b: null };
   a0.b = a0;
   const a1: any = { b: null };
@@ -229,7 +260,7 @@ test('circular object', () => {
 
 // Wrapped Primitive
 
-test('wrapped bigint', () => {
+test('equating wrapped bigints', () => {
   const wrappedBigInt = Object(10n);
   expect(equals(wrappedBigInt, 10n)).toBeTruthy();
   expect(equals(10n, wrappedBigInt)).toBeTruthy();
