@@ -25,21 +25,10 @@ type IterateEquatable<I, M> = I & Iterable<M>
 function zip<EL, ER>(lArray: EL[], rArray: ER[]): [EL, ER][] {
   const ret: [EL, ER][] = [];
   // NOTE: `for..of` required for sparse arrays, as `map` skips empty slots
-  for (const [lElement, arrIndex] of enumerate(lArray)) {
+  for (const [arrIndex, lElement] of lArray.entries()) {
     ret.push([lElement, rArray[arrIndex]]);
   }
   return ret;
-}
-
-function enumerate<E>(arr: E[]): IterableIterator<[E, number]> {
-  const ret: [E, number][] = [];
-  let arrIndex = 0;
-  // NOTE: `for..of` required for sparse arrays, as `map` skips empty slots
-  for (const element of arr) {
-    ret.push([element, arrIndex]);
-    arrIndex++;
-  }
-  return ret.values();
 }
 
 // Metadata Helpers
@@ -121,7 +110,7 @@ function wrappedPrimitiveEquals(obj: object, prim: unknown): boolean {
 function checkSetMembers(lhs: Set<unknown>, rhs: Set<unknown>, visited: EqualsVisited): boolean {
   const rhsArray = [...rhs];
   outer: for (const l of lhs) {
-    for (const [r, rIndex] of enumerate(rhsArray)) {
+    for (const [rIndex, r] of rhsArray.entries()) {
       if (equalscyc(l, r, visited)) {
         rhsArray.splice(rIndex, 1);
         continue outer;
@@ -137,7 +126,7 @@ function checkMapMembers(
 ): boolean {
   const rhsKeysArray = [...rhs.keys()];
   outer: for (const lKey of lhs.keys()) {
-    for (const [rKey, rIndex] of enumerate(rhsKeysArray)) {
+    for (const [rIndex, rKey] of rhsKeysArray.entries()) {
       if (equalscyc(lKey, rKey, visited)) {
         if (equalscyc(lhs.get(lKey), rhs.get(rKey), visited)) {
           rhsKeysArray.splice(rIndex, 1);
