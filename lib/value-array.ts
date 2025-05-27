@@ -34,6 +34,8 @@ function normalizeIndexWithDefaultAndMax(
 
 @customizeClone('iterate', { runConstructor: true, addMethod: 'push' }) 
 class ValueArray<M> extends Array<M> {
+
+  // clone
   copyWithin(target: number, start: number, end?: number): typeof this {
     if (target >= this.length) {
       return this;
