@@ -134,6 +134,12 @@ for (const TypedArray of TYPED_ARRAYS) {
   );
 }
 
+defineCloneMethod(Promise, function<T>(this: Promise<T>, visited: CloneVisited): Promise<T> {
+  const target = this.then();
+  visited.set(this, target);
+  return target;
+});
+
 function defineCloneReturnOriginal<C extends Constructor>(proto: C) {
   defineCloneMethod(proto, function(this: InstanceType<C>, visited: CloneVisited): InstanceType<C> {
     visited.set(this, this);
