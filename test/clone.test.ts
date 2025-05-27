@@ -176,10 +176,21 @@ test('error: cannot clone an async generator', () => {
       yield 2;
     }
     const gen = genFunc();
-    const genClone = clone(gen);
+    const genClone = clone(gen); // Needed to throw error
   }).toThrowError(
     /^Generator objects cannot be cloned$/
   )
+})
+
+test('clones a promise', async () => {
+  const promise = new Promise((resolve, _reject) => {
+    setTimeout(() => { resolve({ a: 1 }); }, 300);
+  });
+  const promiseClone = clone(promise);
+  const result = await promise;
+  const resultOfClone = await promiseClone;
+  expect(resultOfClone).toStrictEqual({ a: 1 });
+  expect(resultOfClone).toBe(result); // TODO: Is this acceptable behavior?
 })
 
 // Wrapper Objects
