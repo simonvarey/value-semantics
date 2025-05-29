@@ -88,6 +88,8 @@ export namespace value {
 
 // @public (undocumented)
 export class ValueArray<M> extends Array<M> {
+    // (undocumented)
+    copyWithin(target: number, start: number, end?: number): typeof ValueArray;
 }
 
 // (No @packageDocumentation comment for this package)

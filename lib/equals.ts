@@ -290,6 +290,7 @@ defineEqualsMethod(
 
 defineRefEquals(WeakSet);
 defineRefEquals(WeakMap);
+defineRefEquals(Promise);
 
 // * Main Equals Function *
 

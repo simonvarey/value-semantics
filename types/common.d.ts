@@ -28,4 +28,5 @@ export declare class ValueSemanticsError extends Error {
     constructor(type: ValueSemanticsErrorType, arg?: string);
 }
 export declare function isGenerator(instance: object): boolean;
+export declare function isAsyncGenerator(instance: object): boolean;
 export {};
