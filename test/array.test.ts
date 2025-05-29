@@ -145,3 +145,14 @@ test('Array.copyWithin', () => {
   const arrayD = new ValueArray({d: 10}, {d: 4}, {e: 5}, {d: 4}, {e: 5});
   expect(equals(arrayA, arrayD)).toBeTruthy();
 })
+
+test('Array.entries', () => {
+  // External clone
+  const valArr = new ValueArray<object>({ a: 1 }, { b: 2 });
+  const clones = [];
+  for (const member of clone(valArr)) {
+    clones.push(member);
+  }
+  expect(isClone(valArr[0], clones[0])).toBeTruthy();
+  expect(isClone(valArr[1], clones[1])).toBeTruthy();
+})

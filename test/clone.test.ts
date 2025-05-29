@@ -187,6 +187,7 @@ test('clones a promise', async () => {
     setTimeout(() => { resolve({ a: 1 }); }, 300);
   });
   const promiseClone = clone(promise);
+  expect(promiseClone).not.toBe(promise);
   const result = await promise;
   const resultOfClone = await promiseClone;
   expect(resultOfClone).toStrictEqual({ a: 1 });
