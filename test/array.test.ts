@@ -156,3 +156,8 @@ test('Array.entries', () => {
   expect(isClone(valArr[0], clones[0])).toBeTruthy();
   expect(isClone(valArr[1], clones[1])).toBeTruthy();
 })
+
+// No change
+test('Array.every', () => {
+  expect(new ValueArray(1, 1, 1).every((member) => member === 1)).toBeTruthy();
+})
