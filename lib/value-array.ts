@@ -71,6 +71,21 @@ class ValueArray<M> extends Array<M> {
     }
     return this;
   }
+
+  // clone
+  fill(value: M, start?: number, end?: number): this {
+    start = normalizeIndexWithDefaultAndMax(start, this.length, 0, this.length);
+    end = normalizeIndexWithDefaultAndMax(end, this.length, this.length, this.length);
+    if (end <= start) {
+      return this;
+    }
+
+    for (let idx = start; idx < end; idx++) {
+      this[idx] = clone(value);
+    }
+
+    return this;
+  }
 }
 
 export { ValueArray }
