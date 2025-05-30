@@ -161,3 +161,42 @@ test('Array.entries', () => {
 test('Array.every', () => {
   expect(new ValueArray(1, 1, 1).every((member) => member === 1)).toBeTruthy();
 })
+
+// Adapted from code samples in 
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/fill
+test('Array.fill', () => {
+  // Primitive elements
+  const array1 = new ValueArray(1, 2, 3, 4);
+  array1.fill(0, 2, 4);
+  expect(equals(array1, new ValueArray(1, 2, 0, 0)));
+  array1.fill(5, 1);
+  expect(equals(array1, new ValueArray(1, 5, 5, 5)));
+  array1.fill(6);
+  expect(equals(array1, new ValueArray(6, 6, 6, 6)));
+
+  expect(equals(new ValueArray(1, 2, 3).fill(4), new ValueArray(4, 4, 4)));
+  expect(equals(new ValueArray(1, 2, 3).fill(4, 1), new ValueArray(1, 4, 4)));
+  expect(equals(new ValueArray(1, 2, 3).fill(4, 1, 2), new ValueArray(1, 4, 3)));
+  expect(equals(new ValueArray(1, 2, 3).fill(4, 1, 1), new ValueArray(1, 2, 3)));
+  expect(equals(new ValueArray(1, 2, 3).fill(4, 3, 3), new ValueArray(1, 2, 3)));
+  expect(equals(new ValueArray(1, 2, 3).fill(4, -3, -2), new ValueArray(4, 2, 3)));
+  expect(equals(new ValueArray(1, 2, 3).fill(4, NaN, NaN), new ValueArray(1, 2, 3)));
+  expect(equals(new ValueArray(1, 2, 3).fill(4, 3, 5), new ValueArray(1, 2, 3)));
+  expect(equals(new ValueArray(3).fill(4), new ValueArray(4, 4, 4)));
+
+  const array2 = new ValueArray<ValueArray<number>>(3);
+  for (let i = 0; i < array2.length; i++) {
+    array2[i] = new ValueArray<number>(4).fill(1);
+  }
+  array2[0][0] = 10;
+  expect(array2[0][0]).toEqual(10);
+  expect(array2[1][0]).toEqual(1);
+  expect(array2[2][0]).toEqual(1);
+
+  expect(equals(new ValueArray(3).fill('value', 0), new ValueArray('value', 'value', 'value', 'value', 'value')));
+
+  // Object Elements
+  const array3 = new ValueArray<{ hi?: string }>(3).fill({});
+  array3[0].hi = 'hi';
+  expect(equals(array3, new ValueArray({ hi: 'hi' }, { }, { })));
+})
