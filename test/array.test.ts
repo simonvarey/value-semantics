@@ -39,7 +39,7 @@ test('Array.from', () => {
   // External clone
   const arr = [{ a: 1 }, { b: 2 }];
   const orig = ValueArray.from(arr);
-  expect(orig instanceof ValueArray).toBeTruthy();
+  expect(orig).toBeInstanceOf(ValueArray);
   const copy = clone(orig);
   expect(equals(orig, copy)).toBeTruthy();
   expect(isClone(orig, copy)).toBeTruthy();
@@ -55,7 +55,7 @@ test('Array.fromAsync', async () => {
     }
   })();
   const orig = await ValueArray.fromAsync(asyncIterable);
-  expect(orig instanceof ValueArray).toBeTruthy();
+  expect(orig).toBeInstanceOf(ValueArray);
   const copy = clone(orig);
   expect(equals(orig, copy)).toBeTruthy();
   expect(isClone(orig, copy)).toBeTruthy();
@@ -74,7 +74,7 @@ test('Array.of', () => {
   // External clone
   const arr = [{ a: 1 }, { b: 2 }];;
   const orig = ValueArray.of(...arr);
-  expect(orig instanceof ValueArray).toBeTruthy();
+  expect(orig).toBeInstanceOf(ValueArray);
   const copy = clone(orig);
   expect(equals(orig, copy)).toBeTruthy();
   expect(isClone(orig, copy)).toBeTruthy();
@@ -199,4 +199,12 @@ test('Array.fill', () => {
   const array3 = new ValueArray<{ hi?: string }>(3).fill({});
   array3[0].hi = 'hi';
   expect(equals(array3, new ValueArray({ hi: 'hi' }, { }, { })));
+})
+
+test('ValueArray.prototype.filter', () => {
+  const valArr = new ValueArray('a', 'b', 'c')
+  expect(valArr).toBeInstanceOf(ValueArray);
+  const filterArr = valArr.filter((val) => val === 'b');
+  expect(filterArr).toBeInstanceOf(ValueArray);
+  expect(equals(filterArr, new ValueArray('b'))).toBeTruthy();
 })
