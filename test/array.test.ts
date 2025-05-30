@@ -7,32 +7,49 @@
 import { expect, test } from 'vitest';
 import { clone, equals, ValueArray } from '../lib/main';
 
-function isClone(orig: unknown, copy: unknown): boolean {
-  return equals(orig, copy) && orig != copy;
+function expectIsClone(orig: unknown, copy: unknown): void {
+  const isClone = equals(orig, copy) && orig != copy;
+  if (!isClone) {
+    console.log('not clone', orig, copy);
+  }
+  expect(isClone).toBeTruthy();
+}
+
+function expectValueEquals(lhs: unknown, rhs: unknown): void {
+  const same = equals(lhs, rhs);
+  if (!same) {
+    console.log('not value equals', lhs, rhs);
+  }
+  expect(same).toBeTruthy();
+}
+
+function expectNotValueEquals(lhs: unknown, rhs: unknown): void {
+  const different = equals(lhs, rhs);
+  if (!different) {
+    console.log('value equals', lhs, rhs);
+  }
+  expect(different).toBeFalsy();
 }
 
 test('Array.constructor', () => {
-  expect(equals(new ValueArray(), new ValueArray())).toBeTruthy();
-  expect(equals(new ValueArray(), [])).toBeFalsy();
-  expect(equals(
-    new ValueArray({ a: 1 }, { b: 2 }), 
-    new ValueArray({ a: 1 }, { b: 2 }))
-  ).toBeTruthy();
+  expectValueEquals(new ValueArray(), new ValueArray());
+  expectNotValueEquals(new ValueArray(), []);
+  expectValueEquals(new ValueArray({ a: 1 }, { b: 2 }), new ValueArray({ a: 1 }, { b: 2 }));
   const arr = [{ a: 1 }, { b: 2 }];
-  expect(equals(new ValueArray(...arr), new ValueArray({ a: 1 }, { b: 2 }))).toBeTruthy();
-  expect(equals(new ValueArray(1), new ValueArray(1))).toBeTruthy();
-  expect(equals(new ValueArray(1), new ValueArray(0))).toBeFalsy();
-  expect(equals(new ValueArray(1), new ValueArray([1]))).toBeFalsy();
-  expect(equals(new ValueArray(...['a', 'b']), new ValueArray('a', 'b'))).toBeTruthy();
+  expectValueEquals(new ValueArray(...arr), new ValueArray({ a: 1 }, { b: 2 }));
+  expectValueEquals(new ValueArray(1), new ValueArray(1));
+  expectNotValueEquals(new ValueArray(1), new ValueArray(0));
+  expectNotValueEquals(new ValueArray(1), new ValueArray([1]));
+  expectValueEquals(new ValueArray(...['a', 'b']), new ValueArray('a', 'b'));
   // TODO: constructor without `new`
 
   // External clone
   const orig = new ValueArray(...arr);
   const copy = clone(orig);
-  expect(equals(orig, orig)).toBeTruthy();
-  expect(equals(orig, copy)).toBeTruthy();
-  expect(isClone(orig, copy)).toBeTruthy();
-  expect(isClone(orig[0], copy[0])).toBeTruthy();
+  expectValueEquals(orig, orig);
+  expectValueEquals(orig, copy);
+  expectIsClone(orig, copy);
+  expectIsClone(orig[0], copy[0]);
 })
 
 test('Array.from', () => {
@@ -41,9 +58,9 @@ test('Array.from', () => {
   const orig = ValueArray.from(arr);
   expect(orig).toBeInstanceOf(ValueArray);
   const copy = clone(orig);
-  expect(equals(orig, copy)).toBeTruthy();
-  expect(isClone(orig, copy)).toBeTruthy();
-  expect(isClone(orig[0], copy[0])).toBeTruthy();
+  expectValueEquals(orig, copy);
+  expectIsClone(orig, copy);
+  expectIsClone(orig[0], copy[0]);
 })
 
 test('Array.fromAsync', async () => {
@@ -57,9 +74,9 @@ test('Array.fromAsync', async () => {
   const orig = await ValueArray.fromAsync(asyncIterable);
   expect(orig).toBeInstanceOf(ValueArray);
   const copy = clone(orig);
-  expect(equals(orig, copy)).toBeTruthy();
-  expect(isClone(orig, copy)).toBeTruthy();
-  expect(isClone(orig[0], copy[0])).toBeTruthy();
+  expectValueEquals(orig, copy);
+  expectIsClone(orig, copy);
+  expectIsClone(orig[0], copy[0]);
 })
 
 // No change
@@ -76,9 +93,9 @@ test('Array.of', () => {
   const orig = ValueArray.of(...arr);
   expect(orig).toBeInstanceOf(ValueArray);
   const copy = clone(orig);
-  expect(equals(orig, copy)).toBeTruthy();
-  expect(isClone(orig, copy)).toBeTruthy();
-  expect(isClone(orig[0], copy[0])).toBeTruthy();
+  expectValueEquals(orig, copy);
+  expectIsClone(orig, copy);
+  expectIsClone(orig[0], copy[0]);
 })
 
 // No Change
@@ -90,8 +107,8 @@ test('Array.at', () => {
   // External clone
   const valArr = new ValueArray({ a: 1 }, { b: 2 });
   const copy = clone(valArr.at(1));
-  expect(equals(valArr[1], copy)).toBeTruthy();
-  expect(isClone(valArr[1], copy)).toBeTruthy();
+  expectValueEquals(valArr[1], copy);
+  expectIsClone(valArr[1], copy);
 })
 
 test('Array.concat', () => {
@@ -100,9 +117,9 @@ test('Array.concat', () => {
   const valArr2 = new ValueArray({ c: 3 }, { d: 4 });
   const valArrConcat = valArr1.concat(clone(valArr2));
   const valArrExpect = new ValueArray({ a: 1 }, { b: 2 }, { c: 3 }, { d: 4 });
-  expect(equals(valArrConcat, valArrExpect)).toBeTruthy();
+  expectValueEquals(valArrConcat, valArrExpect);
   expect(valArr1[0] === valArrConcat[0]).toBeTruthy();
-  expect(isClone(valArr2[0], valArrConcat[2])).toBeTruthy();
+  expectValueEquals(valArr2[0], valArrConcat[2]);
 })
 
 // Adapted from code samples in 
@@ -111,39 +128,39 @@ test('Array.copyWithin', () => {
   // Primitive elements
   const array1 = new ValueArray('a', 'b', 'c', 'd', 'e');
   array1.copyWithin(0, 3, 4);
-  expect(equals(array1, new ValueArray('d', 'b', 'c', 'd', 'e'))).toBeTruthy();
+  expectValueEquals(array1, new ValueArray('d', 'b', 'c', 'd', 'e'));
   array1.copyWithin(1, 3);
-  expect(equals(array1, new ValueArray('d', 'd', 'e', 'd', 'e'))).toBeTruthy();
+  expectValueEquals(array1, new ValueArray('d', 'd', 'e', 'd', 'e'));
 
   const array2 = new ValueArray(1, 2, 3, 4, 5).copyWithin(2, 0);
-  expect(equals(array2, new ValueArray(1, 2, 1, 2, 3))).toBeTruthy();
+  expectValueEquals(array2, new ValueArray(1, 2, 1, 2, 3));
 
   const array3 = new ValueArray(1, 2, 3, 4, 5).copyWithin(0, 3);
-  expect(equals(array3, new ValueArray(4, 5, 3, 4, 5))).toBeTruthy();
+  expectValueEquals(array3, new ValueArray(4, 5, 3, 4, 5));
 
   const array4 = new ValueArray(1, 2, 3, 4, 5).copyWithin(0, 3, 4);
-  expect(equals(array4, new ValueArray(4, 2, 3, 4, 5))).toBeTruthy();
+  expectValueEquals(array4, new ValueArray(4, 2, 3, 4, 5));
 
   const array5 = new ValueArray(1, 2, 3, 4, 5).copyWithin(-2, -3, -1);
-  expect(equals(array5, new ValueArray(1, 2, 3, 3, 4))).toBeTruthy();
+  expectValueEquals(array5, new ValueArray(1, 2, 3, 3, 4));
 
   const array6 = new ValueArray(...[1, , 3]).copyWithin(2, 1, 2);
-  expect(equals(array6, new ValueArray(...[1, , ,]))).toBeTruthy();
+  expectValueEquals(array6, new ValueArray(...[1, , ,]));
 
   // Object elements
   const arrayA = new ValueArray({a: 1}, {b: 2}, {c: 3}, {d: 4}, {e: 5});
 
   arrayA.copyWithin(0, 3, 4);
   const arrayB = new ValueArray({d: 4}, {b: 2}, {c: 3}, {d: 4}, {e: 5});
-  expect(equals(arrayA, arrayB)).toBeTruthy();
+  expectValueEquals(arrayA, arrayB);
 
   arrayA.copyWithin(1, 3);
   const arrayC = new ValueArray({d: 4}, {d: 4}, {e: 5}, {d: 4}, {e: 5});
-  expect(equals(arrayA, arrayC)).toBeTruthy();
+  expectValueEquals(arrayA, arrayC);
 
   arrayA[0].d = 10;
   const arrayD = new ValueArray({d: 10}, {d: 4}, {e: 5}, {d: 4}, {e: 5});
-  expect(equals(arrayA, arrayD)).toBeTruthy();
+  expectValueEquals(arrayA, arrayD);
 })
 
 test('Array.entries', () => {
@@ -153,8 +170,8 @@ test('Array.entries', () => {
   for (const member of clone(valArr)) {
     clones.push(member);
   }
-  expect(isClone(valArr[0], clones[0])).toBeTruthy();
-  expect(isClone(valArr[1], clones[1])).toBeTruthy();
+  expectIsClone(valArr[0], clones[0]);
+  expectIsClone(valArr[1], clones[1]);
 })
 
 // No change
@@ -168,21 +185,21 @@ test('Array.fill', () => {
   // Primitive elements
   const array1 = new ValueArray(1, 2, 3, 4);
   array1.fill(0, 2, 4);
-  expect(equals(array1, new ValueArray(1, 2, 0, 0)));
+  expectValueEquals(array1, new ValueArray(1, 2, 0, 0));
   array1.fill(5, 1);
-  expect(equals(array1, new ValueArray(1, 5, 5, 5)));
+  expectValueEquals(array1, new ValueArray(1, 5, 5, 5));
   array1.fill(6);
-  expect(equals(array1, new ValueArray(6, 6, 6, 6)));
+  expectValueEquals(array1, new ValueArray(6, 6, 6, 6));
 
-  expect(equals(new ValueArray(1, 2, 3).fill(4), new ValueArray(4, 4, 4)));
-  expect(equals(new ValueArray(1, 2, 3).fill(4, 1), new ValueArray(1, 4, 4)));
-  expect(equals(new ValueArray(1, 2, 3).fill(4, 1, 2), new ValueArray(1, 4, 3)));
-  expect(equals(new ValueArray(1, 2, 3).fill(4, 1, 1), new ValueArray(1, 2, 3)));
-  expect(equals(new ValueArray(1, 2, 3).fill(4, 3, 3), new ValueArray(1, 2, 3)));
-  expect(equals(new ValueArray(1, 2, 3).fill(4, -3, -2), new ValueArray(4, 2, 3)));
-  expect(equals(new ValueArray(1, 2, 3).fill(4, NaN, NaN), new ValueArray(1, 2, 3)));
-  expect(equals(new ValueArray(1, 2, 3).fill(4, 3, 5), new ValueArray(1, 2, 3)));
-  expect(equals(new ValueArray(3).fill(4), new ValueArray(4, 4, 4)));
+  expectValueEquals(new ValueArray(1, 2, 3).fill(4), new ValueArray(4, 4, 4));
+  expectValueEquals(new ValueArray(1, 2, 3).fill(4, 1), new ValueArray(1, 4, 4));
+  expectValueEquals(new ValueArray(1, 2, 3).fill(4, 1, 2), new ValueArray(1, 4, 3));
+  expectValueEquals(new ValueArray(1, 2, 3).fill(4, 1, 1), new ValueArray(1, 2, 3));
+  expectValueEquals(new ValueArray(1, 2, 3).fill(4, 3, 3), new ValueArray(1, 2, 3));
+  expectValueEquals(new ValueArray(1, 2, 3).fill(4, -3, -2), new ValueArray(4, 2, 3));
+  expectValueEquals(new ValueArray(1, 2, 3).fill(4, NaN, NaN), new ValueArray(1, 2, 3));
+  expectValueEquals(new ValueArray(1, 2, 3).fill(4, 3, 5), new ValueArray(1, 2, 3));
+  expectValueEquals(new ValueArray(3).fill(4), new ValueArray(4, 4, 4));
 
   const array2 = new ValueArray<ValueArray<number>>(3);
   for (let i = 0; i < array2.length; i++) {
@@ -193,12 +210,15 @@ test('Array.fill', () => {
   expect(array2[1][0]).toEqual(1);
   expect(array2[2][0]).toEqual(1);
 
-  expect(equals(new ValueArray(3).fill('value', 0), new ValueArray('value', 'value', 'value', 'value', 'value')));
+  expectValueEquals(
+    new ValueArray(5).fill('value', 0), 
+    new ValueArray('value', 'value', 'value', 'value', 'value')
+  );
 
   // Object Elements
   const array3 = new ValueArray<{ hi?: string }>(3).fill({});
   array3[0].hi = 'hi';
-  expect(equals(array3, new ValueArray({ hi: 'hi' }, { }, { })));
+  expectValueEquals(array3, new ValueArray({ hi: 'hi' }, { }, { }));
 })
 
 test('ValueArray.prototype.filter', () => {
@@ -206,5 +226,5 @@ test('ValueArray.prototype.filter', () => {
   expect(valArr).toBeInstanceOf(ValueArray);
   const filterArr = valArr.filter((val) => val === 'b');
   expect(filterArr).toBeInstanceOf(ValueArray);
-  expect(equals(filterArr, new ValueArray('b'))).toBeTruthy();
+  expectValueEquals(filterArr, new ValueArray('b'));
 })
