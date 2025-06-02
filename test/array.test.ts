@@ -242,7 +242,14 @@ test('Array.prototype.find', () => {
   expectIsClone(valArr2[1], find2[0]);
 })
 
-// findIndex: no change
+// No change
+test('Array.prototype.findIndex', () => {
+  const valArr = new ValueArray(1, 2, 3);
+  console.log(valArr)
+  const idx = valArr.findIndex((val) => val === 2);
+  expect(idx).toBe(1);
+})
+
 // findLast:  external clone of result
 // findLastIndex: no change
 
