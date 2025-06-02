@@ -24,11 +24,11 @@ function expectValueEquals(lhs: unknown, rhs: unknown): void {
 }
 
 function expectNotValueEquals(lhs: unknown, rhs: unknown): void {
-  const different = equals(lhs, rhs);
-  if (!different) {
+  const same = equals(lhs, rhs);
+  if (same) {
     console.log('value equals', lhs, rhs);
   }
-  expect(different).toBeFalsy();
+  expect(same).toBeFalsy();
 }
 
 test('Array.constructor', () => {
@@ -245,7 +245,6 @@ test('Array.prototype.find', () => {
 // No change
 test('Array.prototype.findIndex', () => {
   const valArr = new ValueArray(1, 2, 3);
-  console.log(valArr)
   const idx = valArr.findIndex((val) => val === 2);
   expect(idx).toBe(1);
 })
@@ -260,6 +259,11 @@ test('Array.prototype.findLast', () => {
   expectIsClone(find2, { p: 4 });
 })
 
-// findLastIndex: no change
+// No change
+test('Array.prototype.findLastIndex', () => {
+  const valArr = new ValueArray(1, 2, 3, 4);
+  const idx = valArr.findLastIndex((val) => val % 2 === 0);
+  expect(idx).toBe(3);
+})
 
 
