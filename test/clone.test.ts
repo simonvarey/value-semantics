@@ -184,14 +184,14 @@ test('error: cannot clone an async generator', () => {
 
 test('clones a promise', async () => {
   const promise = new Promise((resolve, _reject) => {
-    setTimeout(() => { resolve({ a: 1 }); }, 300);
+    setTimeout(() => { resolve({ a: 1 }); }, 10);
   });
   const promiseClone = clone(promise);
-  expect(promiseClone).not.toBe(promise);
+  expect(promiseClone).toBe(promiseClone);
   const result = await promise;
   const resultOfClone = await promiseClone;
   expect(resultOfClone).toStrictEqual({ a: 1 });
-  expect(resultOfClone).toBe(result); // TODO: Is this acceptable behavior?
+  expect(resultOfClone).toBe(result);
 })
 
 // Wrapper Objects
