@@ -238,8 +238,8 @@ test('Array.prototype.find', () => {
   expect(find1).toBe(2);
   // external clone
   const valArr2 = new ValueArray({ p: 'a' }, { p: 'b' }, { p: 'c' });
-  const find2 = clone(valArr2.filter((val) => val.p === 'b'));
-  expectIsClone(valArr2[1], find2[0]);
+  const find2 = clone(valArr2.find((val) => val.p === 'b'));
+  expectIsClone(valArr2[1], find2);
 })
 
 // No change
@@ -250,7 +250,16 @@ test('Array.prototype.findIndex', () => {
   expect(idx).toBe(1);
 })
 
-// findLast:  external clone of result
+test('Array.prototype.findLast', () => {
+  const valArr1 = new ValueArray(1, 2, 3, 4);
+  const find1 = valArr1.findLast((val) => val % 2 === 0);
+  expect(find1).toBe(4);
+  // external clone
+  const valArr2 = new ValueArray({ p: 1 }, { p: 2 }, { p: 3 }, { p: 4 });
+  const find2 = clone(valArr2.findLast((val) => val.p % 2 === 0));
+  expectIsClone(find2, { p: 4 });
+})
+
 // findLastIndex: no change
 
 
