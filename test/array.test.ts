@@ -221,10 +221,21 @@ test('Array.fill', () => {
   expectValueEquals(array3, new ValueArray({ hi: 'hi' }, { }, { }));
 })
 
-test('ValueArray.prototype.filter', () => {
-  const valArr = new ValueArray('a', 'b', 'c')
-  expect(valArr).toBeInstanceOf(ValueArray);
-  const filterArr = valArr.filter((val) => val === 'b');
-  expect(filterArr).toBeInstanceOf(ValueArray);
-  expectValueEquals(filterArr, new ValueArray('b'));
+test('Array.prototype.filter', () => {
+  const valArr1 = new ValueArray('a', 'b', 'c');
+  expect(valArr1).toBeInstanceOf(ValueArray);
+  const filterArr1 = valArr1.filter((val) => val === 'b');
+  expect(filterArr1).toBeInstanceOf(ValueArray);
+  expectValueEquals(filterArr1, new ValueArray('b'));
+  // external clone
+  const valArr2 = new ValueArray({ p: 'a' }, { p: 'b' }, { p: 'c' });
+  const filterArr2 = clone(valArr2.filter((val) => val.p === 'b'));
+  expectIsClone(valArr2[1], filterArr2[0]);
 })
+
+// find: external clone of result
+// findIndex: no change
+// findLast:  external clone of result
+// findLastIndex: no change
+
+
