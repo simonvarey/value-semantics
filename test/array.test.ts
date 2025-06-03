@@ -120,6 +120,12 @@ test('Array.concat', () => {
   expectValueEquals(valArrConcat, valArrExpect);
   expect(valArr1[0] === valArrConcat[0]).toBeTruthy();
   expectValueEquals(valArr2[0], valArrConcat[2]);
+  const valArr3 = new ValueArray<object>({ a: 1 }, { b: 2 });
+  const arr = [{ c: 3 }, { d: 4 }];
+  const arrConcat = valArr3.concat(clone(arr));
+  expectValueEquals(arrConcat, valArrExpect);
+  expect(valArr3[0] === arrConcat[0]).toBeTruthy();
+  expectValueEquals(arr[0], arrConcat[2]);
 })
 
 // Adapted from code samples in 
