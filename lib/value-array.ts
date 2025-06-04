@@ -8,27 +8,6 @@
 
 import { clone, customizeClone } from "./clone";
 
-// * Types *
-
-type FlatArray<Arr, Depth extends number> = {
-  done: Arr;
-  recur: Arr extends ReadonlyArray<infer InnerArr> 
-    ? FlatArray<
-        InnerArr, 
-        [-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20][Depth]
-      >
-    : Arr;
-}[Depth extends -1 ? 'done' : 'recur'];
-
-declare global {
-  interface Array<T> {
-    flat<A extends Array<T>, D extends number = 1>(
-      this: A,
-      depth?: D,
-    ): FlatArray<A, D>[];
-  }
-}
-
 // * Helpers *
 
 function normalizeIndex(idx: number, length: number): number {
@@ -131,17 +110,6 @@ class ValueArray<M> extends Array<M> {
     }
 
     return this;
-  }
-
-  // Based on https://github.com/es-shims/Array.prototype.flat/blob/main/implementation.js which is 
-  //   MIT licenced
-  flat<A extends Array<M>, D extends number = 1>(
-    this: A,
-    depth?: D
-  ): ValueArray<FlatArray<A, D>> {
-    const target = new ValueArray<FlatArray<A, D>>();
-	  flattenIntoArray(target, this, this.length, 0, depth ?? (1 as D));
-	  return target;
   }
 }
 
