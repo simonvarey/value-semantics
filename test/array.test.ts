@@ -31,6 +31,10 @@ function expectNotValueEquals(lhs: unknown, rhs: unknown): void {
   expect(same).toBeFalsy();
 }
 
+function va(...elements: any[]): ValueArray<any> {
+  return new ValueArray(...elements);
+}
+
 test('Array.constructor', () => {
   expectValueEquals(new ValueArray(), new ValueArray());
   expectNotValueEquals(new ValueArray(), []);
@@ -272,4 +276,25 @@ test('Array.prototype.findLastIndex', () => {
   expect(idx).toBe(3);
 })
 
+test('Array.prototype.flat', () => {
+  const valArr = va('a', 'b', va('c', 'd', va('e', 'f', va('g', 'h'))));
+  const flat1 = valArr.flat();
+  expectValueEquals(flat1, new ValueArray<any>('a', 'b', 'c', 'd', va('e', 'f', va('g', 'h'))));
+  const flat2 = valArr.flat(2);
+  expectValueEquals(flat2, new ValueArray<any>('a', 'b', 'c', 'd', 'e', 'f', va('g', 'h')));
+  const flat3 = valArr.flat(Infinity);
+  expectValueEquals(flat3, new ValueArray<any>('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'));
+  const valArrWithArr = va('a', 'b', ['c', 'd', va('e', 'f', ['g', 'h'])]);
+  const flat4 = valArrWithArr.flat(3);
+  expectValueEquals(flat4, new ValueArray<any>('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'));
+  const arrWithValArr = ['a', 'b', va('c', 'd', ['e', 'f', va('g', 'h')])];
+  const flat5 = arrWithValArr.flat(3);
+  expectValueEquals(flat5, ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']);
+  // external clone
+  const valArrObj = va({ p: 1 }, { p: 2 }, va({ p: 3 }, { p: 4 }, va({ p: 5 }, { p: 6 })));
+  const flat6 = clone(valArrObj.flat());
+  expectIsClone(valArrObj[0], flat6[0]);
+  expectIsClone(valArrObj[2][2], flat6[4]);
+})
 
+// flatMap()
