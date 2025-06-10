@@ -298,12 +298,16 @@ test('Array.prototype.flat', () => {
 })
 
 test('Array.prototype.flatMap', () => {
-  const valArr1 = new ValueArray(1, 2, 3);
-  const fm1 = valArr1.flatMap((val) => val % 2 === 0 ? val : [val, val]);
-  expectValueEquals(fm1, new ValueArray(1, 1, 2, 3, 3));
+  const valArr = new ValueArray(1, 2, 3);
+  const fmArr = valArr.flatMap((val) => val % 2 === 0 ? val : [val, val]);
+  expectValueEquals(fmArr, new ValueArray(1, 1, 2, 3, 3));
+  const fmValArr = valArr.flatMap((val) => val % 2 === 0 ? val : new ValueArray(val, val));
+  expectValueEquals(fmValArr, new ValueArray(1, 1, 2, 3, 3));
   // external clone
-  const valArr2 = new ValueArray({ p: 'a' }, { p: 'b' }, { p: 'c' });
-  const fm2 = clone(valArr2.flatMap((val) => val.p === 'b' ? val : [val, val]));
-  expectIsClone(valArr2[0], fm2[0]);
-  expectIsClone(valArr2[0], fm2[1]);
+  const valArrObj = new ValueArray({ p: 'a' }, { p: 'b' }, { p: 'c' });
+  const fmObj = clone(valArrObj.flatMap((val) => val.p === 'b' ? val : [val, val]));
+  expectIsClone(valArrObj[0], fmObj[0]);
+  expectIsClone(valArrObj[0], fmObj[1]);
 })
+
+// forEach
