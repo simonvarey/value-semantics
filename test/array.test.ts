@@ -297,4 +297,13 @@ test('Array.prototype.flat', () => {
   expectIsClone(valArrObj[2][2], flat6[4]);
 })
 
-// flatMap()
+test('Array.prototype.flatMap', () => {
+  const valArr1 = new ValueArray(1, 2, 3);
+  const fm1 = valArr1.flatMap((val) => val % 2 === 0 ? val : [val, val]);
+  expectValueEquals(fm1, new ValueArray(1, 1, 2, 3, 3));
+  // external clone
+  const valArr2 = new ValueArray({ p: 'a' }, { p: 'b' }, { p: 'c' });
+  const fm2 = clone(valArr2.flatMap((val) => val.p === 'b' ? val : [val, val]));
+  expectIsClone(valArr2[0], fm2[0]);
+  expectIsClone(valArr2[0], fm2[1]);
+})
