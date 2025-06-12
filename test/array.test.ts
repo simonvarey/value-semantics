@@ -310,4 +310,12 @@ test('Array.prototype.flatMap', () => {
   expectIsClone(valArrObj[0], fmObj[1]);
 })
 
-// forEach
+// No change
+test('Array.prototype.forEach', () => {
+  let testIter = 0;
+  const valArr = new ValueArray(1, 2, 3, 4);
+  valArr.forEach((element) => { testIter += element; });
+  expect(testIter).toBe(10);
+})
+
+//includes
