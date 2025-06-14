@@ -3,8 +3,30 @@ import { customize, equals } from '../lib/main'
 
 // * Primitives *
 
+test('equating booleans', () => {
+  expect(equals(true, true)).toBeTruthy();
+  expect(equals(true, false)).toBeFalsy();
+  expect(equals(true, new Boolean(true))).toBeTruthy();
+  expect(equals(new Boolean(true), true)).toBeTruthy();
+  expect(equals(new Boolean(true), new Boolean(true))).toBeTruthy();
+})
+
+test('equating undefined', () => {
+  expect(equals(undefined, undefined)).toBeTruthy();
+  expect(equals(undefined, {})).toBeFalsy();
+})
+
+test('equating symbols', () => {
+  const sym = Symbol();
+  expect(equals(sym, sym)).toBeTruthy();
+  expect(equals(sym, {})).toBeFalsy();
+  expect(equals(Symbol.for('x'), Symbol.for('x'))).toBeTruthy();
+})
+
 test('equating nulls', () => {
   expect(equals(null, null)).toBeTruthy();
+  expect(equals(null, Object.create(null))).toBeFalsy();
+  expect(equals(null, {})).toBeFalsy();
 })
 
 test('equating null and number', () => {
@@ -19,11 +41,20 @@ test('equating numbers', () => {
   expect(equals(NaN, NaN)).toBeTruthy();
   expect(equals(1, NaN)).toBeFalsy();
   expect(equals(NaN, 1)).toBeFalsy();
+  expect(equals(1, new Number(1))).toBeTruthy();
+  expect(equals(new Number(1), 1)).toBeTruthy();
+  expect(equals(new Number(1), new Number(1))).toBeTruthy();
+  expect(equals(new Number(NaN), new Number(NaN))).toBeTruthy();
+  expect(equals(NaN, new Number(NaN))).toBeTruthy();
+  expect(equals(new Number(NaN), NaN)).toBeTruthy();
 })
 
 test('equating strings', () => {
   expect(equals('a', 'a')).toBeTruthy();
   expect(equals('b', 'c')).toBeFalsy();
+  expect(equals('a', new String('a'))).toBeTruthy();
+  expect(equals(new String('a'), 'a')).toBeTruthy();
+  expect(equals(new String('a'), new String('a'))).toBeTruthy();
 })
 
 test('equating empty object and null', () => {
