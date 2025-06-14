@@ -101,7 +101,7 @@ function checkSamePrototype<L extends object>(lhs: L, rhs: unknown): rhs is L {
 function wrappedPrimitiveEquals(obj: object, prim: unknown): boolean {
   for (const Wrapped of WrappedPrimitives) {
       if (obj instanceof Wrapped) {
-        return obj.valueOf() === prim;
+        return obj.valueOf() === prim || (Number.isNaN(obj.valueOf()) && Number.isNaN(prim));
     }
   }
   return false;
@@ -316,11 +316,12 @@ export function equalscyc(lhs: unknown, rhs: unknown, visited: EqualsVisited): b
   }
   // LHS non-object
   if (typeof lhs !== 'object') {
-    if (Number.isNaN(lhs)) {
-      return Number.isNaN(rhs);
-    }
     if (typeof rhs === 'object') {
       return wrappedPrimitiveEquals(rhs, lhs);
+    }
+    // This needs to be after the rhs object check to catch equals(NaN, new Number(NaN))
+    if (Number.isNaN(lhs)) {
+      return Number.isNaN(rhs);
     }
     return false;
   }
