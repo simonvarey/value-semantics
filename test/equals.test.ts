@@ -53,9 +53,12 @@ test('equating bigints', () => {
   expect(equals(1n, 1n)).toBeTruthy();
   expect(equals(1n, 2n)).toBeFalsy();
   expect(equals(3n, 1n)).toBeFalsy();
-  expect(equals(1, BigInt(1))).toBeTruthy();
-  expect(equals(BigInt(1), 1)).toBeTruthy();
+  expect(equals(1n, BigInt(1))).toBeTruthy();
+  expect(equals(BigInt(1), 1n)).toBeTruthy();
   expect(equals(BigInt(1), BigInt(1))).toBeTruthy();
+  const wrappedBigInt = Object(10n);
+  expect(equals(wrappedBigInt, 10n)).toBeTruthy();
+  expect(equals(10n, wrappedBigInt)).toBeTruthy();
 })
 
 test('equating strings', () => {
@@ -296,14 +299,6 @@ test('equating circular objects', () => {
   const a1: any = { b: null };
   a1.b = a1;
   expect(equals(a0, a1)).toBeTruthy();
-})
-
-// Wrapped Primitive
-
-test('equating wrapped bigints', () => {
-  const wrappedBigInt = Object(10n);
-  expect(equals(wrappedBigInt, 10n)).toBeTruthy();
-  expect(equals(10n, wrappedBigInt)).toBeTruthy();
 })
 
 // * Classes *
