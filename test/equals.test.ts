@@ -49,6 +49,15 @@ test('equating numbers', () => {
   expect(equals(new Number(NaN), NaN)).toBeTruthy();
 })
 
+test('equating bigints', () => {
+  expect(equals(1n, 1n)).toBeTruthy();
+  expect(equals(1n, 2n)).toBeFalsy();
+  expect(equals(3n, 1n)).toBeFalsy();
+  expect(equals(1, BigInt(1))).toBeTruthy();
+  expect(equals(BigInt(1), 1)).toBeTruthy();
+  expect(equals(BigInt(1), BigInt(1))).toBeTruthy();
+})
+
 test('equating strings', () => {
   expect(equals('a', 'a')).toBeTruthy();
   expect(equals('b', 'c')).toBeFalsy();
