@@ -318,4 +318,34 @@ test('Array.prototype.forEach', () => {
   expect(testIter).toBe(10);
 })
 
-//includes
+// Adapted from code samples in 
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/includes
+test('Array.equals.includes', () => {
+  // Primitive elements
+  const pets = new ValueArray('cat', 'dog', 'bat');
+  expect(pets.includes('cat')).toBeTruthy();
+  expect(pets.includes('at')).toBeFalsy();
+
+  expect(new ValueArray(1, 2, 3).includes(2)).toBeTruthy();
+  expect(new ValueArray(1, 2, 3).includes(4)).toBeFalsy();
+  expect(new ValueArray(1, 2, 3).includes(3, 3)).toBeFalsy();
+  expect(new ValueArray(1, 2, 3).includes(3, -1)).toBeTruthy();
+  expect(new ValueArray(1, 2, NaN).includes(NaN)).toBeTruthy();
+  // @ts-expect-error
+  expect(new ValueArray(1, 2, 3).includes('2')).toBeFalsy();
+  
+  const arr = new ValueArray('a', 'b', 'c');
+  expect(arr.includes('c', 3)).toBeFalsy();
+  expect(arr.includes('c', 100)).toBeFalsy();
+  expect(arr.includes('a', -100)).toBeTruthy();
+  expect(arr.includes('b', -100)).toBeTruthy();
+  expect(arr.includes('c', -100)).toBeTruthy();
+  expect(arr.includes('a', -2)).toBeFalsy();
+
+  expect(new ValueArray(...[1, , 3]).includes(undefined)).toBeTruthy();
+
+  // Object elements
+  const objArr = new ValueArray({ a: 0 }, { b: 1 }, { c: 2 });
+  expect(objArr.includes({ a: 0 })).toBeTruthy();
+  expect(objArr.includes({ a: 1 })).toBeFalsy();
+})
