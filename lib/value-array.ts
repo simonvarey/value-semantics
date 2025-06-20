@@ -7,6 +7,7 @@
 // * Imports *
 
 import { clone, customizeClone } from "./clone";
+import { equals } from "./equals";
 
 // * Helpers *
 
@@ -110,6 +111,19 @@ class ValueArray<M> extends Array<M> {
     }
 
     return this;
+  }
+
+  // equals
+  includes(needle: M, fromIndex?: number): boolean {
+    fromIndex = normalizeIndexWithDefault(fromIndex, this.length, 0);
+    
+    for (let idx = fromIndex; idx < this.length; idx++) {
+      if (equals(needle, this[idx])) {
+        return true;
+      }
+    }
+
+    return false;
   }
 }
 
