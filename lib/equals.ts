@@ -16,7 +16,9 @@ import { EQUALS_EXCLUDE_PROPS, EQUALS_INCLUDE_PROPS, EqualsVisited, EQUALS_METHO
 
 export const REF_EQUALS = Symbol.for('ref-equals');
 
-const WrappedPrimitives = [Boolean, Number, BigInt, String, Symbol];
+const WRAPPED_PRIMITIVE_PROTOS = [
+  Boolean.prototype, Number.prototype, BigInt.prototype, String.prototype, Symbol.prototype
+];
 
 type IterateEquatable<I, M> = I & Iterable<M>
 
@@ -99,9 +101,9 @@ function checkSamePrototype<L extends object>(lhs: L, rhs: unknown): rhs is L {
 }
 
 function wrappedPrimitiveEquals(obj: object, prim: unknown): boolean {
-  for (const Wrapped of WrappedPrimitives) {
-      if (obj instanceof Wrapped) {
-        return obj.valueOf() === prim || (Number.isNaN(obj.valueOf()) && Number.isNaN(prim));
+  for (const wrappedProto of WRAPPED_PRIMITIVE_PROTOS) {
+    if (Object.getPrototypeOf(obj) === wrappedProto) {
+      return obj.valueOf() === prim || (Number.isNaN(obj.valueOf()) && Number.isNaN(prim));
     }
   }
   return false;
