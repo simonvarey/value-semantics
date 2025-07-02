@@ -127,6 +127,10 @@ class ValueArray<M> extends Array<M> {
   }
 
   indexOf(needle: M, fromIndex?: number): number {
+    if (Number.isNaN(needle)) {
+      return -1;
+    }
+
     fromIndex = normalizeIndexWithDefault(fromIndex, this.length, 0);
     
     for (let idx = fromIndex; idx < this.length; idx++) {
