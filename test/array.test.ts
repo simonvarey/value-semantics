@@ -57,6 +57,7 @@ test('Array.constructor', () => {
 })
 
 test('Array.from', () => {
+  expect(ValueArray.from([NaN])[0]).toBe(NaN);
   // External clone
   const arr = [{ a: 1 }, { b: 2 }];
   const orig = ValueArray.from(arr);
@@ -320,7 +321,7 @@ test('Array.prototype.forEach', () => {
 
 // Adapted from code samples in 
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/includes
-test('Array.equals.includes', () => {
+test('Array.prototype.includes', () => {
   // Primitive elements
   const pets = new ValueArray('cat', 'dog', 'bat');
   expect(pets.includes('cat')).toBeTruthy();
@@ -348,4 +349,37 @@ test('Array.equals.includes', () => {
   const objArr = new ValueArray({ a: 0 }, { b: 1 }, { c: 2 });
   expect(objArr.includes({ a: 0 })).toBeTruthy();
   expect(objArr.includes({ a: 1 })).toBeFalsy();
+})
+
+// Adapted from code samples in 
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/indexOf
+test('Array.prototype.indexOf', () => {
+  // Primitive elements
+  const animals = new ValueArray('ant', 'bison', 'camel', 'duck', 'bison');
+  expect(animals.indexOf('bison')).toBe(1);
+  expect(animals.indexOf('bison', 2)).toBe(4);
+  expect(animals.indexOf('giraffe', 2)).toBe(-1);
+
+  const array1 = new ValueArray(2, 9, 9);
+  expect(array1.indexOf(2)).toBe(0);
+  expect(array1.indexOf(7)).toBe(-1);
+  expect(array1.indexOf(9, 2)).toBe(2);
+  expect(array1.indexOf(2, -1)).toBe(-1);
+  expect(array1.indexOf(2, -3)).toBe(0);
+
+  const indices = [];
+  const array2 = new ValueArray('a', 'b', 'a', 'c', 'a', 'd');
+  const element = 'a';
+  let idx = array2.indexOf(element);
+  while (idx !== -1) {
+    indices.push(idx);
+    idx = array2.indexOf(element, idx + 1);
+  }
+  expect(indices).toStrictEqual([0, 2, 4])
+
+  expect(ValueArray.from([1, , 3]).indexOf(undefined)).toBe(-1);
+  expect(ValueArray.from([NaN]).indexOf(NaN)).toBe(-1);
+  
+  // Object elements
+  expect(new ValueArray({a: 0}).indexOf({a: 0})).toBe(0);
 })
