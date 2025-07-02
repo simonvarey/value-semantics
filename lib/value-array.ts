@@ -125,6 +125,18 @@ class ValueArray<M> extends Array<M> {
 
     return false;
   }
+
+  indexOf(needle: M, fromIndex?: number): number {
+    fromIndex = normalizeIndexWithDefault(fromIndex, this.length, 0);
+    
+    for (let idx = fromIndex; idx < this.length; idx++) {
+      if (equals(needle, this[idx])) {
+        return idx;
+      }
+    }
+
+    return -1;
+  }
 }
 
 export { ValueArray }
