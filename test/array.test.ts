@@ -389,3 +389,9 @@ test('Array.prototype.join', () => {
   const valArr = new ValueArray<any>("a", 1, undefined, { b: 2 });
   expect(valArr.join('/')).toBe('a/1//[object Object]');
 })
+
+// No change
+test('Array.prototype.keys', () => {
+  const valArr = new ValueArray<any>("a", 1, undefined, { b: 2 });
+  expect([...valArr.keys()]).toEqual([0, 1, 2, 3]);
+})
