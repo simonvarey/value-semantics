@@ -396,4 +396,34 @@ test('Array.prototype.keys', () => {
   expect([...valArr.keys()]).toEqual([0, 1, 2, 3]);
 })
 
-// lastIndexOf()
+// Adapted from code samples in 
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/lastIndexOf
+test('array.equals.lastIndexOf', () => {
+  const animals = new ValueArray('Dodo', 'Tiger', 'Penguin', 'Dodo');
+  expect(animals.lastIndexOf('Dodo')).toBe(3);
+  expect(animals.lastIndexOf('Tiger')).toBe(1);
+
+  const numbers = new ValueArray(2, 5, 9, 2);
+  expect(numbers.lastIndexOf(2)).toBe(3);
+  expect(numbers.lastIndexOf(7)).toBe(-1);
+  expect(numbers.lastIndexOf(2, 3)).toBe(3);
+  expect(numbers.lastIndexOf(2, 2)).toBe(0);
+  expect(numbers.lastIndexOf(2, -2)).toBe(0);
+  expect(numbers.lastIndexOf(2, -1)).toBe(3);
+  
+  const indices = [];
+  const array1 = new ValueArray('a', 'b', 'a', 'c', 'a', 'd');
+  const element = 'a';
+  let idx = array1.lastIndexOf(element);
+  while (idx !== -1) {
+    indices.push(idx);
+    idx = idx > 0 ? array1.lastIndexOf(element, idx - 1) : -1;
+  }
+  expect(indices).toStrictEqual([4, 2, 0]);
+
+  expect(ValueArray.from([1, , 3]).lastIndexOf(undefined)).toBe(-1);
+  expect(ValueArray.from([NaN]).lastIndexOf(NaN)).toBe(-1);
+  
+  // Object elements
+  expect(new ValueArray({a: 0}).lastIndexOf({a: 0})).toBe(0);
+})
