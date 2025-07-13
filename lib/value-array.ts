@@ -141,6 +141,22 @@ class ValueArray<M> extends Array<M> {
 
     return -1;
   }
+
+  lastIndexOf(needle: M, fromIndex?: number): number {
+    if (Number.isNaN(needle)) {
+      return -1;
+    }
+
+    fromIndex = normalizeIndexWithDefaultAndMax(fromIndex, this.length, this.length - 1, this.length - 1);
+    
+    for (let idx = fromIndex; idx >= 0; idx--) {
+      if (equals(needle, this[idx])) {
+        return idx;
+      }
+    }
+
+    return -1;
+  }
 }
 
 export { ValueArray }

@@ -395,3 +395,5 @@ test('Array.prototype.keys', () => {
   const valArr = new ValueArray<any>("a", 1, undefined, { b: 2 });
   expect([...valArr.keys()]).toEqual([0, 1, 2, 3]);
 })
+
+// lastIndexOf()
