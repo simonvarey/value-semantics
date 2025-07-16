@@ -427,3 +427,15 @@ test('array.equals.lastIndexOf', () => {
   // Object elements
   expect(new ValueArray({a: 0}).lastIndexOf({a: 0})).toBe(0);
 })
+
+test('Array.prototype.map', () => {
+  const valArr = new ValueArray(1, 2, 3);
+  const map = valArr.map((val) => val + 1)
+  expectValueEquals(map, new ValueArray(2, 3, 4));
+  // external clone
+  const valArrObj = new ValueArray({ p: 1 }, { p: 2 }, { p: 3 }, { p: 4 }, { p: 5 }, { p: 6 });
+  const mapObj = valArrObj.map((obj) => clone(obj));
+  expectIsClone(valArrObj, mapObj);
+})
+
+// pop
