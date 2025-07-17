@@ -438,4 +438,10 @@ test('Array.prototype.map', () => {
   expectIsClone(valArrObj, mapObj);
 })
 
-// pop
+// No change
+test('Array.prototype.pop', () => {
+  const valArr = new ValueArray<any>("a", 1, undefined, { b: 2 });
+  expect(valArr.pop()).toEqual({ b: 2 });
+})
+
+//push
