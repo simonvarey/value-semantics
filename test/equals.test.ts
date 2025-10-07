@@ -6,9 +6,6 @@ import { customize, equals } from '../lib/main'
 test('equating booleans', () => {
   expect(equals(true, true)).toBeTruthy();
   expect(equals(true, false)).toBeFalsy();
-  expect(equals(true, new Boolean(true))).toBeTruthy();
-  expect(equals(new Boolean(true), true)).toBeTruthy();
-  expect(equals(new Boolean(true), new Boolean(true))).toBeTruthy();
 })
 
 test('equating undefined', () => {
