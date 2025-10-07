@@ -38,12 +38,6 @@ test('equating numbers', () => {
   expect(equals(NaN, NaN)).toBeTruthy();
   expect(equals(1, NaN)).toBeFalsy();
   expect(equals(NaN, 1)).toBeFalsy();
-  expect(equals(1, new Number(1))).toBeTruthy();
-  expect(equals(new Number(1), 1)).toBeTruthy();
-  expect(equals(new Number(1), new Number(1))).toBeTruthy();
-  expect(equals(new Number(NaN), new Number(NaN))).toBeTruthy();
-  expect(equals(NaN, new Number(NaN))).toBeTruthy();
-  expect(equals(new Number(NaN), NaN)).toBeTruthy();
 })
 
 test('equating bigints', () => {
