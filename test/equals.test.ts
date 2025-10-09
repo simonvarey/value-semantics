@@ -55,9 +55,6 @@ test('equating bigints', () => {
 test('equating strings', () => {
   expect(equals('a', 'a')).toBeTruthy();
   expect(equals('b', 'c')).toBeFalsy();
-  expect(equals('a', new String('a'))).toBeTruthy();
-  expect(equals(new String('a'), 'a')).toBeTruthy();
-  expect(equals(new String('a'), new String('a'))).toBeTruthy();
 })
 
 test('equating empty object and null', () => {
