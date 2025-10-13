@@ -90,6 +90,14 @@ export namespace value {
 export class ValueArray<M> extends Array<M> {
     // (undocumented)
     copyWithin(target: number, start: number, end?: number): typeof ValueArray;
+    // (undocumented)
+    fill(value: M, start?: number, end?: number): this;
+    // (undocumented)
+    includes(needle: M, fromIndex?: number): boolean;
+    // (undocumented)
+    indexOf(needle: M, fromIndex?: number): number;
+    // (undocumented)
+    lastIndexOf(needle: M, fromIndex?: number): number;
 }
 
 // (No @packageDocumentation comment for this package)

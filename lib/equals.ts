@@ -8,19 +8,36 @@
 
 import { EQUALS_EXCLUDE_PROPS, EQUALS_INCLUDE_PROPS, EqualsVisited, EQUALS_METHOD, TYPED_ARRAYS, 
   getAllKeys, getKeys, PropKey, EqualMethodFunc, setMeta, getMeta, META_NOT_FOUND, Constructor, 
-  ClassDecorator_, ValueSemanticsError, isGenerator, isAsyncGenerator} from "./common";
+  ClassDecorator_, ValueSemanticsError, isGenerator, isAsyncGenerator } from "./common";
 
 // * Helpers *
 
-// Constants
+// Constants & Types
 
 export const REF_EQUALS = Symbol.for('ref-equals');
 
-const WRAPPED_PRIMITIVE_PROTOS = [
-  Boolean.prototype, Number.prototype, BigInt.prototype, String.prototype, Symbol.prototype
-];
+const WRAP_PRIM_OVERRIDE = Symbol.for('wrap-prim-override');
 
 type IterateEquatable<I, M> = I & Iterable<M>
+
+// Wrapped Primitives
+
+type Primitive = boolean | number | BigInt | string | symbol | undefined;
+
+function isPrimitive(val: unknown): val is Primitive {
+  return ['boolean', 'number', 'bigint', 'string', 'symbol', 'undefined'].includes(typeof val)
+    || val == null;
+}
+
+const WRAPPED_PRIMITIVE_CONSTRUCTORS = [
+  Boolean, Number, BigInt, String, Symbol
+];
+
+type WrappedPrimitive = typeof WRAPPED_PRIMITIVE_CONSTRUCTORS[number];
+
+function isWrappedPrimSubtype(obj: object): obj is WrappedPrimitive {
+  return WRAPPED_PRIMITIVE_CONSTRUCTORS.some((prim) => obj instanceof prim);
+}
 
 // Utility Functions
 
@@ -100,13 +117,12 @@ function checkSamePrototype<L extends object>(lhs: L, rhs: unknown): rhs is L {
   return Object.getPrototypeOf(lhs) === Object.getPrototypeOf(rhs);
 }
 
-function wrappedPrimitiveEquals(obj: object, prim: unknown): boolean {
-  for (const wrappedProto of WRAPPED_PRIMITIVE_PROTOS) {
-    if (Object.getPrototypeOf(obj) === wrappedProto) {
-      return obj.valueOf() === prim || (Number.isNaN(obj.valueOf()) && Number.isNaN(prim));
-    }
-  }
-  return false;
+function sameValueZero(lhs: unknown, rhs: unknown): boolean {
+  return lhs === rhs || (Number.isNaN(lhs) && Number.isNaN(rhs));
+}
+
+function sameValueZeroPrimitive(lhs: Primitive, rhs: Primitive): boolean {
+  return sameValueZero(lhs, rhs);
 }
 
 function checkSetMembers(lhs: Set<unknown>, rhs: Set<unknown>, visited: EqualsVisited): boolean {
@@ -309,7 +325,7 @@ export function equals(lhs: unknown, rhs: unknown): boolean {
 
 export function equalscyc(lhs: unknown, rhs: unknown, visited: EqualsVisited): boolean {
   // Quick return for reference-equals / primitives
-  if (lhs === rhs) {
+  if (sameValueZero(lhs, rhs)) {
     return true;
   }
   // Null
@@ -317,20 +333,22 @@ export function equalscyc(lhs: unknown, rhs: unknown, visited: EqualsVisited): b
     return false;
   }
   // LHS non-object
-  if (typeof lhs !== 'object') {
-    if (typeof rhs === 'object') {
-      return wrappedPrimitiveEquals(rhs, lhs);
-    }
-    // This needs to be after the rhs object check to catch equals(NaN, new Number(NaN))
-    if (Number.isNaN(lhs)) {
-      return Number.isNaN(rhs);
+  if (isPrimitive(lhs)) {
+    if (typeof rhs === 'object' 
+      && isWrappedPrimSubtype(rhs) 
+      && getMeta(rhs, WRAP_PRIM_OVERRIDE) !== true
+    ) {
+      return sameValueZeroPrimitive(rhs.valueOf() as Primitive, lhs);
     }
     return false;
   }
   // LHS object
   // RHS non-object
-  if (typeof rhs !== 'object') {
-    return wrappedPrimitiveEquals(lhs, rhs);
+  if (isPrimitive(rhs)) {
+    if (isWrappedPrimSubtype(lhs) && getMeta(lhs, WRAP_PRIM_OVERRIDE) !== true) {
+      return sameValueZeroPrimitive(lhs.valueOf() as Primitive, rhs);
+    }
+    return false;
   }
   // Already visited objects
   const lrVisited = checkVisited(lhs, rhs, visited);
@@ -371,7 +389,15 @@ export function equalscyc(lhs: unknown, rhs: unknown, visited: EqualsVisited): b
   }
   for (const key of lhsKeys) {
     if (!(equalscyc(lhs[key as keyof typeof lhs], rhs[key as keyof typeof rhs], visited))) {
-      setVisited(lhs, rhs, visited, false);
+      return setVisited(lhs, rhs, visited, false);
+    }
+  }
+  // Wrapped Primitives
+  if (isWrappedPrimSubtype(lhs) // and therefore isWrappedPrimSubtype(rhs)
+    && typeof lhs.valueOf === 'function' 
+    && typeof rhs.valueOf === 'function'
+  ) { 
+    if (!sameValueZeroPrimitive(lhs.valueOf() as Primitive, rhs.valueOf() as Primitive)) {
       return setVisited(lhs, rhs, visited, false);
     }
   }
@@ -422,6 +448,8 @@ export function customizeEquals<C extends Constructor>(
   const opts: Required<CustomizeEqualsOptions> = { propDefault: 'include', ...options };
 
   return function(constructor: C, context: ClassDecoratorContext): void {
+    context.metadata[WRAP_PRIM_OVERRIDE] = true;
+
     if (semantics === 'ref') {
       context.metadata[REF_EQUALS] = true;
       return;
@@ -430,17 +458,26 @@ export function customizeEquals<C extends Constructor>(
     const valueEqualsMeth = function(this: I, other: object, visited: EqualsVisited): boolean {
       setVisited(this, other, visited, true);
       if (!checkExactSamePrototype(this, other)) {
-        setVisited(this, other, visited, false);
-        return false;
+        return setVisited(this, other, visited, false);
       }
       const equalsProps = getKeys(this, opts.propDefault, 'equals');
       for (const key of equalsProps) {
         if (!(equalscyc(this[key as keyof I], other[key as keyof I], visited))) {
-          setVisited(this, other, visited, false);
-          return false;
+          return setVisited(this, other, visited, false);
         }
       }
-      return true;
+      if (isWrappedPrimSubtype(this) // and therefore isWrappedPrimSubtype(rhs)
+        && typeof (this as WrappedPrimitive).valueOf === 'function' 
+        && typeof other.valueOf === 'function'
+      ) { 
+        if (!sameValueZeroPrimitive(
+          (this as WrappedPrimitive).valueOf() as Primitive, 
+          other.valueOf() as Primitive)
+        ) {
+          return setVisited(this, other, visited, false);
+        }
+      }
+      return setVisited(this, other, visited, true);
     };
 
     const iterateEqualsMeth = function<M>(
