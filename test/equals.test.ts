@@ -14,10 +14,13 @@ test('equating undefined', () => {
 })
 
 test('equating symbols', () => {
-  const sym = Symbol();
-  expect(equals(sym, sym)).toBeTruthy();
-  expect(equals(sym, {})).toBeFalsy();
+  const sym1 = Symbol();
+  const sym2 = Symbol();
+  expect(equals(sym1, sym1)).toBeTruthy();
+  expect(equals(sym1, sym2)).toBeFalsy();
+  expect(equals(sym1, {})).toBeFalsy();
   expect(equals(Symbol.for('x'), Symbol.for('x'))).toBeTruthy();
+  expect(equals(Symbol.for('x'), sym1)).toBeFalsy();
 })
 
 test('equating nulls', () => {

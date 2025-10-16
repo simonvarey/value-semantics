@@ -16,8 +16,6 @@ import { EQUALS_EXCLUDE_PROPS, EQUALS_INCLUDE_PROPS, EqualsVisited, EQUALS_METHO
 
 export const REF_EQUALS = Symbol.for('ref-equals');
 
-const WRAP_PRIM_OVERRIDE = Symbol.for('wrap-prim-override');
-
 type IterateEquatable<I, M> = I & Iterable<M>
 
 // Wrapped Primitives
@@ -35,8 +33,15 @@ const WRAPPED_PRIMITIVE_CONSTRUCTORS = [
 
 type WrappedPrimitive = typeof WRAPPED_PRIMITIVE_CONSTRUCTORS[number];
 
-function isWrappedPrimSubtype(obj: object): obj is WrappedPrimitive {
+// Exported for Testing
+export function isWrappedPrimSubtype(obj: object): obj is WrappedPrimitive {
   return WRAPPED_PRIMITIVE_CONSTRUCTORS.some((prim) => obj instanceof prim);
+}
+
+function isWrappedPrimitive(obj: unknown): obj is WrappedPrimitive {
+  return WRAPPED_PRIMITIVE_CONSTRUCTORS.some(
+    (WrapPrim) => Object.getPrototypeOf(obj) === WrapPrim.prototype
+  );
 }
 
 // Utility Functions
@@ -334,10 +339,7 @@ export function equalscyc(lhs: unknown, rhs: unknown, visited: EqualsVisited): b
   }
   // LHS non-object
   if (isPrimitive(lhs)) {
-    if (typeof rhs === 'object' 
-      && isWrappedPrimSubtype(rhs) 
-      && getMeta(rhs, WRAP_PRIM_OVERRIDE) !== true
-    ) {
+    if (isWrappedPrimitive(rhs)) {
       return sameValueZeroPrimitive(rhs.valueOf() as Primitive, lhs);
     }
     return false;
@@ -345,7 +347,7 @@ export function equalscyc(lhs: unknown, rhs: unknown, visited: EqualsVisited): b
   // LHS object
   // RHS non-object
   if (isPrimitive(rhs)) {
-    if (isWrappedPrimSubtype(lhs) && getMeta(lhs, WRAP_PRIM_OVERRIDE) !== true) {
+    if (isWrappedPrimitive(lhs)) {
       return sameValueZeroPrimitive(lhs.valueOf() as Primitive, rhs);
     }
     return false;
@@ -396,7 +398,7 @@ export function equalscyc(lhs: unknown, rhs: unknown, visited: EqualsVisited): b
   if (isWrappedPrimSubtype(lhs) // and therefore isWrappedPrimSubtype(rhs)
     && typeof lhs.valueOf === 'function' 
     && typeof rhs.valueOf === 'function'
-  ) { 
+  ) {
     if (!sameValueZeroPrimitive(lhs.valueOf() as Primitive, rhs.valueOf() as Primitive)) {
       return setVisited(lhs, rhs, visited, false);
     }
@@ -448,8 +450,6 @@ export function customizeEquals<C extends Constructor>(
   const opts: Required<CustomizeEqualsOptions> = { propDefault: 'include', ...options };
 
   return function(constructor: C, context: ClassDecoratorContext): void {
-    context.metadata[WRAP_PRIM_OVERRIDE] = true;
-
     if (semantics === 'ref') {
       context.metadata[REF_EQUALS] = true;
       return;

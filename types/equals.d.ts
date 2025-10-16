@@ -1,5 +1,8 @@
 import { EqualsVisited, Constructor, ClassDecorator_ } from "./common";
 export declare const REF_EQUALS: unique symbol;
+declare const WRAPPED_PRIMITIVE_CONSTRUCTORS: (SymbolConstructor | BigIntConstructor | BooleanConstructor | NumberConstructor | StringConstructor)[];
+type WrappedPrimitive = typeof WRAPPED_PRIMITIVE_CONSTRUCTORS[number];
+export declare function isWrappedPrimSubtype(obj: object): obj is WrappedPrimitive;
 /**
  * Compares two values for value-equality.
  * @param lhs - The first value to compare.
@@ -26,3 +29,4 @@ export declare namespace equals {
     function include<C, V>(_target: undefined, context: ClassFieldDecoratorContext<C, V>): void;
     function exclude<C, V>(_target: undefined, context: ClassFieldDecoratorContext<C, V>): void;
 }
+export {};
