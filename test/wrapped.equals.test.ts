@@ -171,4 +171,29 @@ test('equating wrapped symbols', () => {
   expect(equals(symSub1, symSub3)).toBeFalsy();
   expect(equals(symSub1, symProto)).toBeFalsy();
   expect(equals(symProto, symSub1)).toBeFalsy();
+
+  // Symbol Subclass with Different Equals Semantics
+  //const WrapSym = Object(Symbol());
+  function DiffSymbolSub(wrapSym: typeof WrapSym, field: string): Symbol {
+    const instance = Object.create(wrapSym);
+    instance.valueOf = () => {
+      return wrapSym.valueOf();
+    }
+    instance.field = field;
+    return instance;
+  }
+
+  const diffSymProto = Symbol();
+  const wrapDiffSymProto = Object(diffSymProto);
+  const diffSymSub1 = DiffSymbolSub(wrapDiffSymProto, 'a');
+  const diffSymSub2 = DiffSymbolSub(wrapDiffSymProto, 'a');
+  const diffSymSub3 = DiffSymbolSub(wrapDiffSymProto, 'b');
+  expect(diffSymSub1 instanceof Symbol).toBeTruthy();
+  expect(diffSymSub1.valueOf() === diffSymProto).toBeTruthy();
+  expect(isWrappedPrimSubtype(diffSymSub1)).toBeTruthy();
+  expect(equals(diffSymSub1, diffSymSub1)).toBeTruthy();
+  expect(equals(diffSymSub1, diffSymSub2)).toBeTruthy();
+  expect(equals(diffSymSub1, diffSymSub3)).toBeFalsy();
+  expect(equals(diffSymSub1, symProto)).toBeFalsy();
+  expect(equals(diffSymSub3, diffSymSub1)).toBeFalsy();
 })
