@@ -311,6 +311,7 @@ defineEqualsMethod(
   }
 );
 
+defineRefEquals(Function);
 defineRefEquals(WeakSet);
 defineRefEquals(WeakMap);
 defineRefEquals(Promise);
@@ -367,8 +368,7 @@ export function equalscyc(lhs: unknown, rhs: unknown, visited: EqualsVisited): b
     checkRefEqualsProp(rhs, lhs);
   } catch (except) {
     if (typeof except === "boolean") {
-      setVisited(lhs, rhs, visited, except);
-      return except;
+      return setVisited(lhs, rhs, visited, except);
     } else {
       throw except;
     }

@@ -79,8 +79,8 @@ test('equating arrays and empty objects', () => {
 })
 
 test('equating functions', () => {
-  const func1 = function (param: number): number { return param; };
-  const func2 = function (param: number): number { return param; };
+  const func1 = function func (param: number): number { return param; };
+  const func2 = function func (param: number): number { return param; };
   expect(equals(func1, func1)).toBeTruthy();
   expect(equals(func1, func2)).toBeFalsy();
 })

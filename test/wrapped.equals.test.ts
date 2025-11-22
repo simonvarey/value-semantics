@@ -149,57 +149,67 @@ test('equating wrapped symbols', () => {
   expect(equals(Object(sym1), Object(sym3))).toBeFalsy();
 
   // Symbol Subclass
-  const WrapSym = Object(Symbol());
-  function SymbolSub(wrapSym: typeof WrapSym): Symbol {
-    const instance = Object.create(wrapSym);
-    instance.valueOf = () => {
-      return wrapSym.valueOf();
+  const WrappedSymbolProto = Object.getPrototypeOf(Object(Symbol()));
+
+  const SubSymbolProto = Object.create(WrappedSymbolProto, {
+    valueOf: {
+      value: function() { return this.sym }
+    },
+    sym: {
+      value: Symbol()
     }
-    return instance;
+  });
+
+  function SubSym(sym: Symbol) {
+    return Object.create(SubSymbolProto, {
+      sym: {
+        value: sym
+      }
+    });
   }
 
-  const symProto = Symbol();
-  const wrapSymProto = Object(symProto);
-  const symSub1 = SymbolSub(wrapSymProto);
-  const symSub2 = SymbolSub(wrapSymProto);
-  const symSub3 = SymbolSub(Object(Symbol()));
-  expect(symSub1 instanceof Symbol).toBeTruthy();
-  expect(symSub1.valueOf() === symProto).toBeTruthy();
-  expect(isWrappedPrimSubtype(symSub1)).toBeTruthy();
-  expect(equals(symSub1, symSub1)).toBeTruthy();
-  expect(equals(symSub1, symSub2)).toBeTruthy();
-  expect(equals(symSub1, symSub3)).toBeFalsy();
-  expect(equals(symSub1, symProto)).toBeFalsy();
-  expect(equals(symProto, symSub1)).toBeFalsy();
+  const sym4 = Symbol();
+  const symSub4a = SubSym(sym4);
+  const symSub4b = SubSym(sym4);
+  const symSub5 = SubSym(Symbol());
+  expect(symSub4a instanceof Symbol).toBeTruthy();
+  expect(symSub4a.valueOf() === sym4).toBeTruthy();
+  expect(isWrappedPrimSubtype(symSub4a)).toBeTruthy();
+  expect(equals(symSub4a, symSub4a)).toBeTruthy();
+  expect(equals(symSub4a, symSub4b)).toBeTruthy();
+  expect(equals(symSub4a, symSub5)).toBeFalsy();
+  expect(equals(symSub4a, Object(sym4))).toBeFalsy();
+  expect(equals(Object(sym4), symSub4a)).toBeFalsy();
 
   // Symbol Subclass with Different Equals Semantics
-  function DiffSymbolSub(wrapSym: typeof WrapSym, field: string): Symbol {
-    const instance = Object.create(wrapSym);
-    instance.valueOf = () => {
-      return wrapSym.valueOf();
-    }
-    instance.field = field;
-    return instance;
+  function DiffSubSym(sym: Symbol, field: string) {
+    return Object.create(SubSymbolProto, {
+      sym: {
+        value: sym
+      },
+      field: {
+        value: field
+      }
+    });
   }
 
-  const diffSymProto = Symbol();
-  const wrapDiffSymProto = Object(diffSymProto);
-  const diffSymSub1 = DiffSymbolSub(wrapDiffSymProto, 'a');
-  const diffSymSub2 = DiffSymbolSub(wrapDiffSymProto, 'a');
-  const diffSymSub3 = DiffSymbolSub(wrapDiffSymProto, 'b');
-  expect(diffSymSub1 instanceof Symbol).toBeTruthy();
-  expect(diffSymSub1.valueOf() === diffSymProto).toBeTruthy();
-  expect(isWrappedPrimSubtype(diffSymSub1)).toBeTruthy();
-  expect(equals(diffSymSub1, diffSymSub1)).toBeTruthy();
-  expect(equals(diffSymSub1, diffSymSub2)).toBeTruthy();
-  expect(equals(diffSymSub1, diffSymSub3)).toBeFalsy();
-  expect(equals(diffSymSub1, symProto)).toBeFalsy();
-  expect(equals(diffSymSub3, diffSymSub1)).toBeFalsy();
+  const sym6 = Symbol();
+  const diffSymSub6a = DiffSubSym(sym6, 'a');
+  const diffSymSub6aa = DiffSubSym(sym6, 'a');
+  const diffSymSub7 = DiffSubSym(sym6, 'b');
+  expect(diffSymSub6a instanceof Symbol).toBeTruthy();
+  expect(diffSymSub6a.valueOf() === sym6).toBeTruthy();
+  expect(isWrappedPrimSubtype(diffSymSub6a)).toBeTruthy();
+  expect(equals(diffSymSub6a, diffSymSub6a)).toBeTruthy();
+  expect(equals(diffSymSub6a, diffSymSub6aa)).toBeTruthy();
+  expect(equals(diffSymSub6a, diffSymSub7)).toBeFalsy();
+  expect(equals(diffSymSub6a, sym6)).toBeFalsy();
+  expect(equals(sym6, diffSymSub6a)).toBeFalsy();
 })
 
 test('equating wrapped bigints', () => {
   // Wrapped BigInts
-  const bigint = 10n;//
+  const bigint = 10n;
   expect(Object(bigint).valueOf() === bigint).toBeTruthy();
   expect(equals(bigint, Object(bigint))).toBeTruthy();
   expect(equals(Object(bigint), bigint)).toBeTruthy();
@@ -213,51 +223,59 @@ test('equating wrapped bigints', () => {
   expect(equals(Object(bigint1), Object(bigint2))).toBeTruthy();
   expect(equals(Object(bigint1), Object(bigint3))).toBeFalsy();
 
-  // Symbol BigInts
-  const WrapBigInt = Object(10n);
-  function BigIntSub(wrapBigInt: typeof WrapBigInt): BigInt {
-    const instance = Object.create(wrapBigInt);
-    instance.valueOf = () => {
-      return wrapBigInt.valueOf();
+  // BigInt Subclass
+  const WrappedBigIntProto = Object.getPrototypeOf(Object(0n));
+
+  const SubBigIntProto = Object.create(WrappedBigIntProto, {
+    valueOf: {
+      value: function() { return this.bigint }
+    },
+    bigint: {
+      value: 0n
     }
-    return instance;
+  });
+
+  function SubBigInt(bigint: BigInt) {
+    return Object.create(SubBigIntProto, {
+      bigint: {
+        value: bigint
+      }
+    });
   }
 
-  const bigintProto = 10n;
-  const wrapBigIntProto = Object(bigintProto);
-  const bigintSub1 = BigIntSub(wrapBigIntProto);
-  const bigintSub2 = BigIntSub(wrapBigIntProto);
-  const bigintSub3 = BigIntSub(Object(10n));
+  const bigintSub1 = SubBigInt(10n);
+  const bigintSub2 = SubBigInt(10n);
+  const bigintSub3 = SubBigInt(11n);
   expect(bigintSub1 instanceof BigInt).toBeTruthy();
-  expect(bigintSub1.valueOf() === bigintProto).toBeTruthy();
+  expect(bigintSub1.valueOf() === 10n).toBeTruthy();
   expect(isWrappedPrimSubtype(bigintSub1)).toBeTruthy();
   expect(equals(bigintSub1, bigintSub1)).toBeTruthy();
   expect(equals(bigintSub1, bigintSub2)).toBeTruthy();
   expect(equals(bigintSub1, bigintSub3)).toBeFalsy();
-  expect(equals(bigintSub1, bigintProto)).toBeFalsy();
-  expect(equals(bigintProto, bigintSub1)).toBeFalsy();
+  expect(equals(bigintSub1, 10n)).toBeFalsy();
+  expect(equals(10n, bigintSub1)).toBeFalsy();
 
   // BigInt Subclass with Different Equals Semantics
-  function DiffBigIntSub(wrapBigInt: typeof WrapBigInt, field: string): BigInt {
-    const instance = Object.create(wrapBigInt);
-    instance.valueOf = () => {
-      return wrapBigInt.valueOf();
-    }
-    instance.field = field;
-    return instance;
+  function DiffBigIntSub(bigint: BigInt, field: string) {
+    return Object.create(SubBigIntProto, {
+      bigint: {
+        value: bigint
+      },
+      field: {
+        value: field
+      }
+    });
   }
 
-  const diffBigIntProto = 10n;
-  const wrapDiffBigIntProto = Object(diffBigIntProto);
-  const diffBigIntSub1 = DiffBigIntSub(wrapDiffBigIntProto, 'a');
-  const diffBigIntSub2 = DiffBigIntSub(wrapDiffBigIntProto, 'a');
-  const diffBigIntSub3 = DiffBigIntSub(wrapDiffBigIntProto, 'b');
-  expect(diffBigIntSub1 instanceof BigInt).toBeTruthy();
-  expect(diffBigIntSub1.valueOf() === diffBigIntProto).toBeTruthy();
-  expect(isWrappedPrimSubtype(diffBigIntSub1)).toBeTruthy();
-  expect(equals(diffBigIntSub1, diffBigIntSub1)).toBeTruthy();
-  expect(equals(diffBigIntSub1, diffBigIntSub2)).toBeTruthy();
-  expect(equals(diffBigIntSub1, diffBigIntSub3)).toBeFalsy();
-  expect(equals(diffBigIntSub1, diffBigIntProto)).toBeFalsy();
-  expect(equals(diffBigIntProto, diffBigIntSub1)).toBeFalsy();
+  const diffBigIntSub4a = DiffBigIntSub(20n, 'a');
+  const diffBigIntSub4b = DiffBigIntSub(20n, 'a');
+  const diffBigIntSub5 = DiffBigIntSub(21n, 'b');
+  expect(diffBigIntSub4a instanceof BigInt).toBeTruthy();
+  expect(diffBigIntSub4a.valueOf() === 20n).toBeTruthy();
+  expect(isWrappedPrimSubtype(diffBigIntSub4a)).toBeTruthy();
+  expect(equals(diffBigIntSub4a, diffBigIntSub4a)).toBeTruthy();
+  expect(equals(diffBigIntSub4a, diffBigIntSub4b)).toBeTruthy();
+  expect(equals(diffBigIntSub4a, diffBigIntSub5)).toBeFalsy();
+  expect(equals(diffBigIntSub4a, 20n)).toBeFalsy();
+  expect(equals(20n, diffBigIntSub4a)).toBeFalsy();
 })
