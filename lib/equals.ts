@@ -408,6 +408,19 @@ export function equalscyc(lhs: unknown, rhs: unknown, visited: EqualsVisited): b
 
 // * Equals Customization Decorators *
 
+// Helper 
+
+function checkProtoChain(haystack: object, needle: object): boolean {
+  let current = haystack;
+  while (current !== null) {
+    if (current === needle) {
+      return true;
+    }
+    current = Object.getPrototypeOf(current);
+  }
+  return false;
+}
+
 // Types
 
 export const EQUALS_SEMANTICS = ['value', 'ref', 'iterate'] as const;
@@ -415,12 +428,6 @@ export type EqualsSemantics = typeof EQUALS_SEMANTICS[number];
 
 export type CustomizeEqualsOptions = {
   propDefault?: 'include' | 'exclude'
-}
-
-// Helpers
-
-function checkExactSamePrototype<I>(lhs: I, rhs: unknown): rhs is I {
-  return Object.getPrototypeOf(lhs) === Object.getPrototypeOf(rhs);
 }
 
 // Class Decorator
@@ -457,7 +464,7 @@ export function customizeEquals<C extends Constructor>(
 
     const valueEqualsMeth = function(this: I, other: object, visited: EqualsVisited): boolean {
       setVisited(this, other, visited, true);
-      if (!checkExactSamePrototype(this, other)) {
+      if (!checkSamePrototype(this, other)) {
         return setVisited(this, other, visited, false);
       }
       const equalsProps = getKeys(this, opts.propDefault, 'equals');
@@ -484,7 +491,7 @@ export function customizeEquals<C extends Constructor>(
       this: IterateEquatable<I, M>, other: object, visited: EqualsVisited
     ): boolean {
       setVisited(this, other, visited, true);
-      if (!checkExactSamePrototype(this, other)) {
+      if (!checkSamePrototype(this, other)) {
         setVisited(this, other, visited, false);
         return false;
       }
@@ -513,6 +520,9 @@ export function customizeEquals<C extends Constructor>(
       }
       context.metadata[EQUALS_METHOD] = iterateEqualsMeth;
     } else {
+      if (checkProtoChain(constructor, Function)) {
+        throw new ValueSemanticsError('FunctionValueEquals', context.name ?? '(Anonymous class)');
+      }
       context.metadata[EQUALS_METHOD] = valueEqualsMeth;
     }
   }

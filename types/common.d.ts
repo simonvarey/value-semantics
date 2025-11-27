@@ -21,7 +21,7 @@ export declare function getAllKeys(source: Object): Set<PropKey>;
 export declare function getKeys(source: object, propDefault: PropDefault, deriveKind: 'clone' | 'equals', constructor?: boolean): Set<PropKey>;
 export type Constructor = abstract new (...args: any) => any;
 export type ClassDecorator_<C> = (constructor: C, context: ClassDecoratorContext) => C | void;
-export type ValueSemanticsErrorType = 'ErrorOnClone' | 'IncludeAndExclude' | 'IterateNonIterable' | 'IterateNoAddMethod' | 'ErrorOnGeneratorClone';
+export type ValueSemanticsErrorType = 'ErrorOnClone' | 'IncludeAndExclude' | 'IterateNonIterable' | 'IterateNoAddMethod' | 'ErrorOnGeneratorClone' | 'FunctionValueEquals';
 export declare const ERROR_MSGS: Record<ValueSemanticsErrorType, string>;
 export declare class ValueSemanticsError extends Error {
     type: ValueSemanticsErrorType;

@@ -83,6 +83,51 @@ test('equating functions', () => {
   const func2 = function func (param: number): number { return param; };
   expect(equals(func1, func1)).toBeTruthy();
   expect(equals(func1, func2)).toBeFalsy();
+
+  const func3 = new Function('a', 'b', 'return a + b;');
+  const func4 = new Function('a', 'b', 'return a + b;');
+  const func5 = new Function('a', 'b', 'return a - b;');
+  expect(equals(func3, func3)).toBeTruthy();
+  expect(equals(func3, func4)).toBeFalsy();
+  expect(equals(func3, func5)).toBeFalsy();
+
+  class FunctionSub extends Function {}
+  const sub1a = new FunctionSub('a', 'b', 'return a + b;');
+  const sub1b = new FunctionSub('a', 'b', 'return a + b;');
+  const sub2 = new FunctionSub('a', 'b', 'return a - b;');
+  const sub3 = new FunctionSub('a', 'return a;');
+  expect(typeof sub1a === 'function').toBeTruthy();
+  expect(sub1a instanceof Function).toBeTruthy();
+  expect(sub1a instanceof FunctionSub).toBeTruthy();
+  expect(sub1a(1, 2)).toBe(3);
+  expect(equals(sub1a.valueOf(), sub1a)).toBeTruthy();
+  expect(equals(sub1a, sub1a)).toBeTruthy();
+  expect(equals(sub1a, sub1b)).toBeFalsy();
+  expect(equals(sub1a, sub2)).toBeFalsy();
+  expect(equals(sub1a, sub3)).toBeFalsy();
+
+  @customize.equals('ref')
+  class FunctionRef extends Function {}
+  const ref1a = new FunctionRef('a', 'b', 'return a + b;');
+  const ref1b = new FunctionRef('a', 'b', 'return a + b;');
+  const ref2 = new FunctionRef('a', 'b', 'return a - b;');
+  const ref3 = new FunctionRef('a', 'return a;');
+  expect(typeof ref1a === 'function').toBeTruthy();
+  expect(ref1a instanceof Function).toBeTruthy();
+  expect(ref1a instanceof FunctionRef).toBeTruthy();
+  expect(sub1a(1, 2)).toBe(3);
+  expect(equals(ref1a.valueOf(), ref1a)).toBeTruthy();
+  expect(equals(ref1a, ref1a)).toBeTruthy();
+  expect(equals(ref1a, ref1b)).toBeFalsy();
+  expect(equals(ref1a, ref2)).toBeFalsy();
+  expect(equals(ref1a, ref3)).toBeFalsy();
+
+  expect(() => {
+    @customize.equals('value')
+    class FunctionVal extends Function {}
+  }).toThrowError(
+    /^The class FunctionVal is a subtype of `Function`, and therefore cannot be decorated with 'value' `equals` semantics'$/
+  )
 })
 
 // * Objects *
