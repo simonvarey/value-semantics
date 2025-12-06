@@ -396,8 +396,7 @@ export function equalscyc(lhs: unknown, rhs: unknown, visited: EqualsVisited): b
   }
   // Wrapped Primitives
   if (isWrappedPrimSubtype(lhs) // and therefore isWrappedPrimSubtype(rhs)
-    && typeof lhs.valueOf === 'function' 
-    && typeof rhs.valueOf === 'function'
+    && typeof lhs.valueOf === 'function' // and therefore typeof rhs.valueOf === 'function'
   ) {
     if (!sameValueZeroPrimitive(lhs.valueOf() as Primitive, rhs.valueOf() as Primitive)) {
       return setVisited(lhs, rhs, visited, false);
