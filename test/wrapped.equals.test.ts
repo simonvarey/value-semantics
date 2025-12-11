@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest';
 import { customize, equals } from '../lib/main';
-import { isWrappedPrimSubtype } from '../lib/equals';
+import { isWrappedPrimitive, isWrappedPrimSubtype } from '../lib/equals';
 
 test('equating wrapped booleans', () => {
   // Wrapped Booleans
@@ -42,6 +42,20 @@ test('equating wrapped booleans', () => {
   expect(equals(boolVal1, boolVal3)).toBeFalsy();
   expect(equals(boolVal1, false)).toBeFalsy();
   expect(equals(false, boolVal1)).toBeFalsy();
+
+  // Boolean Wrapper and Subwrapper Objects
+  const wrapper = Object(true);
+  expect(wrapper instanceof Boolean).toBeTruthy();
+  expect(isWrappedPrimitive(wrapper)).toBeTruthy();
+  expect(equals(wrapper, true)).toBeTruthy();
+  expect(equals(true, wrapper)).toBeTruthy();
+  const subwrapper = Object.create(Object(true), { field: { value: 0 } });
+  expect(subwrapper instanceof Boolean).toBeTruthy();
+  expect(isWrappedPrimitive(subwrapper)).toBeFalsy();
+  expect(equals(subwrapper, true)).toBeFalsy();
+  expect(equals(true, subwrapper)).toBeFalsy();
+  expect(equals(subwrapper, wrapper)).toBeFalsy();
+  expect(equals(wrapper, subwrapper)).toBeFalsy();
 })
 
 test('equating wrapped numbers', () => {

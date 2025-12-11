@@ -38,7 +38,8 @@ export function isWrappedPrimSubtype(obj: object): obj is WrappedPrimitive {
   return WRAPPED_PRIMITIVE_CONSTRUCTORS.some((prim) => obj instanceof prim);
 }
 
-function isWrappedPrimitive(obj: unknown): obj is WrappedPrimitive {
+// Exported for Testing
+export function isWrappedPrimitive(obj: unknown): obj is WrappedPrimitive {
   return WRAPPED_PRIMITIVE_CONSTRUCTORS.some(
     (WrapPrim) => Object.getPrototypeOf(obj) === WrapPrim.prototype
   );
