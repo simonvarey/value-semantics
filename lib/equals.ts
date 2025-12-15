@@ -18,7 +18,7 @@ export const REF_EQUALS = Symbol.for('ref-equals');
 
 type IterateEquatable<I, M> = I & Iterable<M>
 
-// Wrapped Primitives
+// Primitive values and Wrapper Objects
 
 type Primitive = boolean | number | BigInt | string | symbol | undefined;
 
@@ -27,20 +27,20 @@ function isPrimitive(val: unknown): val is Primitive {
     || val == null;
 }
 
-const WRAPPED_PRIMITIVE_CONSTRUCTORS = [
+const WRAPPER_OBJECT_CONSTRUCTORS = [
   Boolean, Number, BigInt, String, Symbol
 ];
 
-type WrappedPrimitive = typeof WRAPPED_PRIMITIVE_CONSTRUCTORS[number];
+type WrapperObject = typeof WRAPPER_OBJECT_CONSTRUCTORS[number];
 
 // Exported for Testing
-export function isWrappedPrimSubtype(obj: object): obj is WrappedPrimitive {
-  return WRAPPED_PRIMITIVE_CONSTRUCTORS.some((prim) => obj instanceof prim);
+export function isPrimitiveWrapper(obj: object): obj is WrapperObject {
+  return WRAPPER_OBJECT_CONSTRUCTORS.some((prim) => obj instanceof prim);
 }
 
 // Exported for Testing
-export function isWrappedPrimitive(obj: unknown): obj is WrappedPrimitive {
-  return WRAPPED_PRIMITIVE_CONSTRUCTORS.some(
+export function isWrapperObject(obj: unknown): obj is WrapperObject {
+  return WRAPPER_OBJECT_CONSTRUCTORS.some(
     (WrapPrim) => Object.getPrototypeOf(obj) === WrapPrim.prototype
   );
 }
@@ -341,7 +341,7 @@ export function equalscyc(lhs: unknown, rhs: unknown, visited: EqualsVisited): b
   }
   // LHS non-object
   if (isPrimitive(lhs)) {
-    if (isWrappedPrimitive(rhs)) {
+    if (isWrapperObject(rhs)) {
       return sameValueZeroPrimitive(rhs.valueOf() as Primitive, lhs);
     }
     return false;
@@ -349,7 +349,7 @@ export function equalscyc(lhs: unknown, rhs: unknown, visited: EqualsVisited): b
   // LHS object
   // RHS non-object
   if (isPrimitive(rhs)) {
-    if (isWrappedPrimitive(lhs)) {
+    if (isWrapperObject(lhs)) {
       return sameValueZeroPrimitive(lhs.valueOf() as Primitive, rhs);
     }
     return false;
@@ -361,7 +361,7 @@ export function equalscyc(lhs: unknown, rhs: unknown, visited: EqualsVisited): b
   }
   // Set as equal initially - this prevents infinite recursion
   setVisited(lhs, rhs, visited, true);
-  // Objects with REF_EQUALS or EQUALS_METHOD
+  // Objects with customized equals implementations
   try {
     checkEqualsMethod(lhs, rhs, visited);
     checkEqualsMethod(rhs, lhs, visited);
@@ -395,8 +395,8 @@ export function equalscyc(lhs: unknown, rhs: unknown, visited: EqualsVisited): b
       return setVisited(lhs, rhs, visited, false);
     }
   }
-  // Wrapped Primitives
-  if (isWrappedPrimSubtype(lhs) // and therefore isWrappedPrimSubtype(rhs)
+  // Primitive Wrappers
+  if (isPrimitiveWrapper(lhs) // and therefore isPrimitiveWrapper(rhs)
     && typeof lhs.valueOf === 'function' // and therefore typeof rhs.valueOf === 'function'
   ) {
     if (!sameValueZeroPrimitive(lhs.valueOf() as Primitive, rhs.valueOf() as Primitive)) {
@@ -473,12 +473,12 @@ export function customizeEquals<C extends Constructor>(
           return setVisited(this, other, visited, false);
         }
       }
-      if (isWrappedPrimSubtype(this) // and therefore isWrappedPrimSubtype(rhs)
-        && typeof (this as WrappedPrimitive).valueOf === 'function' 
+      if (isPrimitiveWrapper(this) // and therefore isPrimitiveWrapper(rhs)
+        && typeof (this as WrapperObject).valueOf === 'function' 
         && typeof other.valueOf === 'function'
       ) { 
         if (!sameValueZeroPrimitive(
-          (this as WrappedPrimitive).valueOf() as Primitive, 
+          (this as WrapperObject).valueOf() as Primitive, 
           other.valueOf() as Primitive)
         ) {
           return setVisited(this, other, visited, false);

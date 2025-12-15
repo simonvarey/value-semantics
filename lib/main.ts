@@ -4,9 +4,9 @@
 
 // * Value-Semantics: The JavaScript/TypeScript Value Semantics Toolkit *
 
-import { CLONE_SEMANTICS, CloneSemantics, customizeClone, CustomizeCloneOptions, clone } from './clone';
+import { CLONE_SEMANTICS, customizeClone, CustomizeCloneOptions, clone } from './clone';
 import { ClassDecorator_, Constructor } from './common';
-import { customizeEquals, CustomizeEqualsOptions, EQUALS_SEMANTICS, EqualsSemantics, equals } from './equals';
+import { customizeEquals, CustomizeEqualsOptions, EQUALS_SEMANTICS, equals } from './equals';
 
 export { clone } from './clone';
 export { equals } from './equals';
