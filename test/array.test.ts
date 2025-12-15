@@ -444,4 +444,15 @@ test('Array.prototype.pop', () => {
   expect(valArr.pop()).toEqual({ b: 2 });
 })
 
-//push
+test('Array.prototype.push', () => {
+  const valArr = new ValueArray(1, 2, 3);
+  valArr.push(4);
+  expectValueEquals(valArr, new ValueArray(1, 2, 3, 4));
+  // external clone
+  const valArrObj = new ValueArray({ p: 1 }, { p: 2 }, { p: 3 });
+  valArrObj.push({ p: 4 });
+  const valArrObjExpect = new ValueArray({ p: 1 }, { p: 2 }, { p: 3 }, { p: 4 });
+  expectIsClone(valArrObj, valArrObjExpect);
+})
+
+// reduce

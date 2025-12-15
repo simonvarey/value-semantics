@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest';
 import { customize, equals } from '../lib/main';
-import { isWrappedPrimitive, isWrappedPrimSubtype } from '../lib/equals';
+import { isWrapperObject, isPrimitiveWrapper } from '../lib/equals';
 
 test('equating wrapped booleans', () => {
   // Wrapped Booleans
@@ -46,12 +46,12 @@ test('equating wrapped booleans', () => {
   // Boolean Wrapper and Subwrapper Objects
   const wrapper = Object(true);
   expect(wrapper instanceof Boolean).toBeTruthy();
-  expect(isWrappedPrimitive(wrapper)).toBeTruthy();
+  expect(isWrapperObject(wrapper)).toBeTruthy();
   expect(equals(wrapper, true)).toBeTruthy();
   expect(equals(true, wrapper)).toBeTruthy();
   const subwrapper = Object.create(Object(true), { field: { value: 0 } });
   expect(subwrapper instanceof Boolean).toBeTruthy();
-  expect(isWrappedPrimitive(subwrapper)).toBeFalsy();
+  expect(isWrapperObject(subwrapper)).toBeFalsy();
   expect(equals(subwrapper, true)).toBeFalsy();
   expect(equals(true, subwrapper)).toBeFalsy();
   expect(equals(subwrapper, wrapper)).toBeFalsy();
@@ -188,7 +188,7 @@ test('equating wrapped symbols', () => {
   const symSub5 = SubSym(Symbol());
   expect(symSub4a instanceof Symbol).toBeTruthy();
   expect(symSub4a.valueOf() === sym4).toBeTruthy();
-  expect(isWrappedPrimSubtype(symSub4a)).toBeTruthy();
+  expect(isPrimitiveWrapper(symSub4a)).toBeTruthy();
   expect(equals(symSub4a, symSub4a)).toBeTruthy();
   expect(equals(symSub4a, symSub4b)).toBeTruthy();
   expect(equals(symSub4a, symSub5)).toBeFalsy();
@@ -213,7 +213,7 @@ test('equating wrapped symbols', () => {
   const diffSymSub7 = DiffSubSym(sym6, 'b');
   expect(diffSymSub6a instanceof Symbol).toBeTruthy();
   expect(diffSymSub6a.valueOf() === sym6).toBeTruthy();
-  expect(isWrappedPrimSubtype(diffSymSub6a)).toBeTruthy();
+  expect(isPrimitiveWrapper(diffSymSub6a)).toBeTruthy();
   expect(equals(diffSymSub6a, diffSymSub6a)).toBeTruthy();
   expect(equals(diffSymSub6a, diffSymSub6aa)).toBeTruthy();
   expect(equals(diffSymSub6a, diffSymSub7)).toBeFalsy();
@@ -262,7 +262,7 @@ test('equating wrapped bigints', () => {
   const bigintSub3 = SubBigInt(11n);
   expect(bigintSub1 instanceof BigInt).toBeTruthy();
   expect(bigintSub1.valueOf() === 10n).toBeTruthy();
-  expect(isWrappedPrimSubtype(bigintSub1)).toBeTruthy();
+  expect(isPrimitiveWrapper(bigintSub1)).toBeTruthy();
   expect(equals(bigintSub1, bigintSub1)).toBeTruthy();
   expect(equals(bigintSub1, bigintSub2)).toBeTruthy();
   expect(equals(bigintSub1, bigintSub3)).toBeFalsy();
@@ -286,7 +286,7 @@ test('equating wrapped bigints', () => {
   const diffBigIntSub5 = DiffBigIntSub(21n, 'b');
   expect(diffBigIntSub4a instanceof BigInt).toBeTruthy();
   expect(diffBigIntSub4a.valueOf() === 20n).toBeTruthy();
-  expect(isWrappedPrimSubtype(diffBigIntSub4a)).toBeTruthy();
+  expect(isPrimitiveWrapper(diffBigIntSub4a)).toBeTruthy();
   expect(equals(diffBigIntSub4a, diffBigIntSub4a)).toBeTruthy();
   expect(equals(diffBigIntSub4a, diffBigIntSub4b)).toBeTruthy();
   expect(equals(diffBigIntSub4a, diffBigIntSub5)).toBeFalsy();
