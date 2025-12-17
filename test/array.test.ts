@@ -455,4 +455,15 @@ test('Array.prototype.push', () => {
   expectIsClone(valArrObj, valArrObjExpect);
 })
 
+test('Array.prototype.reduce', () => {
+  const valArr = new ValueArray(1, 2, 3);
+  const sum = valArr.reduce((acc, num) => acc + num, 0);
+  expectValueEquals(sum, 6);
+  // external clone
+  const expectObj = { p: 3 };
+  const valArrObj = new ValueArray({ p: 1 }, { p: 2 }, expectObj);
+  const largestObj = valArrObj.reduce((prev, obj) => prev.p > obj.p ? prev : clone(obj), { p: 0 });
+  expectIsClone(expectObj, largestObj);
+})
+
 // reduce
