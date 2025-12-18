@@ -466,4 +466,31 @@ test('Array.prototype.reduce', () => {
   expectIsClone(expectObj, largestObj);
 })
 
-// reduce
+test('Array.prototype.reduceRight', () => {
+  const valArr = new ValueArray(1, 2, 3);
+  const sum = valArr.reduceRight((acc, num) => acc + num, 0);
+  expectValueEquals(sum, 6);
+  // external clone
+  const expectObj = { p: 3 };
+  const valArrObj = new ValueArray({ p: 1 }, { p: 2 }, expectObj);
+  const largestObj = valArrObj.reduceRight((prev, obj) => prev.p > obj.p ? prev : clone(obj), { p: 0 });
+  expectIsClone(expectObj, largestObj);
+})
+
+// reverse
+// shift
+// slice
+// some()
+//    sort()
+//    splice()
+//    toLocaleString()
+//    toReversed()
+//    toSorted()
+//    toSpliced()
+//    toString()
+ //   unshift()
+ //   values()
+  //  with()
+ //   [Symbol.iterator]()
+//length
+//[Symbol.unscopables]
