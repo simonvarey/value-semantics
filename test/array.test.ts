@@ -477,7 +477,17 @@ test('Array.prototype.reduceRight', () => {
   expectIsClone(expectObj, largestObj);
 })
 
-// reverse
+test('Array.prototype.reverse', () => {
+  const valArr = new ValueArray(1, 2, 3);
+  valArr.reverse();
+  expectValueEquals(valArr, new ValueArray(3, 2, 1));
+  // external clone
+  const valArrObj = new ValueArray({ p: 1 }, { p: 2 }, { p: 3 });
+  clone(valArrObj.reverse());
+  expectIsClone(valArrObj, new ValueArray({ p: 3 }, { p: 2 }, { p: 1 }));
+  expectIsClone(valArrObj[0], { p: 3 });
+})
+
 // shift
 // slice
 // some()
