@@ -488,7 +488,19 @@ test('Array.prototype.reverse', () => {
   expectIsClone(valArrObj[0], { p: 3 });
 })
 
-// shift
+test('Array.prototype.shift', () => {
+  const valArr = new ValueArray(1, 2, 3);
+  const first = valArr.shift();
+  expectValueEquals(first, 1);
+  expectValueEquals(valArr, new ValueArray(2, 3));
+  // external clone
+  const valArrObj = new ValueArray({ p: 1 }, { p: 2 }, { p: 3 });
+  const firstObj = valArrObj.shift();
+  const valArrObjExpect = new ValueArray({ p: 2 }, { p: 3 });
+  expectValueEquals(firstObj, { p: 1 });
+  expectIsClone(valArrObj, valArrObjExpect);
+})
+
 // slice
 // some()
 //    sort()
