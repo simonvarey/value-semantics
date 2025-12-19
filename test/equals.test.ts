@@ -246,11 +246,13 @@ test('equating typed arrays', () => {
   const array2 = new Uint8Array([1, 2]);
   const array3 = new Uint8Array([3]);
   const array4 = new Uint8Array([3, 4]);
+  const array5 = new Uint16Array([1, 2]);
   expect(equals(array1, array2)).toBeTruthy();
   expect(equals(array1, array3)).toBeFalsy();
   expect(equals(array1, array4)).toBeFalsy();
   expect(equals(array1, 0)).toBeFalsy();
   expect(equals(array1, {})).toBeFalsy();
+  expect(equals(array1, array5)).toBeFalsy();
 });
 
 test('equating data views & array buffers', () => {
