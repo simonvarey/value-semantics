@@ -503,16 +503,22 @@ test('Array.prototype.shift', () => {
 
 test('Array.prototype.slice', () => {
   const valArr = new ValueArray(1, 2, 3, 4, 5);
-  valArr.slice(1, 3);
-  expectValueEquals(valArr, new ValueArray(2, 3));
+  const slice = valArr.slice(1, 3);
+  expectValueEquals(slice, new ValueArray(2, 3));
   // external clone
   const valArrObj = new ValueArray({ p: 1 }, { p: 2 }, { p: 3 }, { p: 4 }, { p: 5 });
-  clone(valArrObj.slice(1, 3));
-  expectIsClone(valArrObj, new ValueArray({ p: 2 }, { p: 3 }));
-  expectIsClone(valArrObj[0], { p: 2 });
+  const sliceObj = clone(valArrObj.slice(1, 3));
+  expectIsClone(sliceObj, new ValueArray({ p: 2 }, { p: 3 }));
+  expectIsClone(sliceObj[0], { p: 2 });
 })
 
-// some()
+// No change
+test('Array.prototype.some', () => {
+  const valArr = new ValueArray(1, 2, 3, 4);
+  expect(valArr.some((val) => val == 2)).toBeTruthy();
+  expect(valArr.some((val) => val == 5)).toBeFalsy();
+})
+
 //    sort()
 //    splice()
 //    toLocaleString()
