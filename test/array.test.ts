@@ -512,14 +512,30 @@ test('Array.prototype.slice', () => {
   expectIsClone(sliceObj[0], { p: 2 });
 })
 
-// No change
 test('Array.prototype.some', () => {
   const valArr = new ValueArray(1, 2, 3, 4);
   expect(valArr.some((val) => val == 2)).toBeTruthy();
   expect(valArr.some((val) => val == 5)).toBeFalsy();
+  // external clone
+  const valArrObj = new ValueArray({ p: 1 }, { p: 2 }, { p: 3 }, { p: 4 }, { p: 5 });
+  const sliceObj = clone(valArrObj.slice(1, 3));
+  expectIsClone(sliceObj, new ValueArray({ p: 2 }, { p: 3 }));
+  expectIsClone(sliceObj[0], { p: 2 });
 })
 
-//    sort()
+// No change
+test('Array.prototype.sort', () => {
+  const valArr = new ValueArray(4, 2, 1, 3);
+  valArr.sort();
+  expectIsClone(valArr, new ValueArray(1, 2, 3, 4));
+  const valArrSparse = new ValueArray(...[4, , 2, 1, 3]);
+  valArrSparse.sort();
+  expectIsClone(valArrSparse, new ValueArray(...[1, 2, 3, 4, ,]));
+  const valArrObj = new ValueArray({ p: 2 }, { p: 3 }, { p: 1 });
+  valArrObj.sort((a, b) => a.p - b.p);
+  expectIsClone(valArrObj, new ValueArray({ p: 1 }, { p: 2 }, { p: 3 }));
+})
+
 //    splice()
 //    toLocaleString()
 //    toReversed()
