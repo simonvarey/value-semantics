@@ -126,6 +126,7 @@ class ValueArray<M> extends Array<M> {
     return false;
   }
 
+  // equals
   indexOf(needle: M, fromIndex?: number): number {
     if (Number.isNaN(needle)) {
       return -1;
@@ -142,6 +143,7 @@ class ValueArray<M> extends Array<M> {
     return -1;
   }
 
+  // equals
   lastIndexOf(needle: M, fromIndex?: number): number {
     if (Number.isNaN(needle)) {
       return -1;
@@ -156,6 +158,31 @@ class ValueArray<M> extends Array<M> {
     }
 
     return -1;
+  }
+
+  // clone
+  splice(start?: number, deleteCount?: number, ...items: M[]): typeof this {
+    let editStart = this.length;
+    let deletedElements;
+    let endElements;
+    if (!(start === undefined || start >= this.length)) {
+      editStart = normalizeIndex(start, this.length);
+      if (editStart !== this.length) {
+        let editEnd = editStart;
+        if (deleteCount && deleteCount > 0) {
+          editEnd += deleteCount;
+          deletedElements = this.slice(editStart, editEnd)
+        }
+        endElements = this.slice(editEnd);
+        this.length = editStart;
+      }
+    }
+    this.push(...items.map((item) => clone(item)));
+    if (deletedElements) {
+      this.push(...deletedElements)
+    }
+    const thisConstructor = Object.getPrototypeOf(this).constructor;
+    return deletedElements ? new thisConstructor(...deletedElements) : new thisConstructor();
   }
 }
 
