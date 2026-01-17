@@ -6,8 +6,8 @@
 
 // * Imports *
 
-import { clone, customizeClone } from "./clone";
-import { equals } from "./equals";
+import { clone, customizeClone } from './clone';
+import { equals } from './equals';
 
 // * Helpers *
 
@@ -169,7 +169,13 @@ class ValueArray<M> extends Array<M> {
       editStart = normalizeIndex(start, this.length);
       if (editStart !== this.length) {
         let editEnd = editStart;
-        if (deleteCount && deleteCount > 0) {
+        if (deleteCount === undefined && items.length === 0) {
+          deleteCount = this.length;
+        }
+        if (deleteCount !== undefined && deleteCount > this.length) {
+          deleteCount = this.length;
+        }
+        if (deleteCount !== undefined && deleteCount > 0) {
           editEnd += deleteCount;
           deletedElements = this.slice(editStart, editEnd)
         }
@@ -178,8 +184,8 @@ class ValueArray<M> extends Array<M> {
       }
     }
     this.push(...items.map((item) => clone(item)));
-    if (deletedElements) {
-      this.push(...deletedElements)
+    if (endElements) {
+      this.push(...endElements)
     }
     const thisConstructor = Object.getPrototypeOf(this).constructor;
     return deletedElements ? new thisConstructor(...deletedElements) : new thisConstructor();

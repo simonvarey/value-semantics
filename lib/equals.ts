@@ -8,7 +8,7 @@
 
 import { EQUALS_EXCLUDE_PROPS, EQUALS_INCLUDE_PROPS, EqualsVisited, EQUALS_METHOD, TYPED_ARRAYS, 
   getAllKeys, getKeys, PropKey, EqualMethodFunc, setMeta, getMeta, META_NOT_FOUND, Constructor, 
-  ClassDecorator_, ValueSemanticsError, isGenerator, isAsyncGenerator } from "./common";
+  ClassDecorator_, ValueSemanticsError, isGenerator, isAsyncGenerator } from './common';
 
 // * Helpers *
 
@@ -368,7 +368,7 @@ export function equalscyc(lhs: unknown, rhs: unknown, visited: EqualsVisited): b
     checkRefEqualsProp(lhs, rhs);
     checkRefEqualsProp(rhs, lhs);
   } catch (except) {
-    if (typeof except === "boolean") {
+    if (typeof except === 'boolean') {
       return setVisited(lhs, rhs, visited, except);
     } else {
       throw except;

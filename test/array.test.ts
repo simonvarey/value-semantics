@@ -536,7 +536,68 @@ test('Array.prototype.sort', () => {
   expectIsClone(valArrObj, new ValueArray({ p: 1 }, { p: 2 }, { p: 3 }));
 })
 
-//    splice()
+// Adapted from code samples in 
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/splice
+test('Array.prototype.splice', () => {
+  // Primitive elements
+  const months = new ValueArray('Jan', 'March', 'April', 'June');
+  months.splice(1, 0, 'Feb');
+  expectIsClone(months, new ValueArray('Jan', 'Feb', 'March', 'April', 'June'));
+  months.splice(4, 1, 'May');
+  expectIsClone(months, new ValueArray('Jan', 'Feb', 'March', 'April', 'May'));
+
+  const fish0 = new ValueArray('angel', 'clown', 'mandarin', 'sturgeon');
+  const fishRemoved0 = fish0.splice(2, 0, 'drum');
+  expectIsClone(fish0, new ValueArray('angel', 'clown', 'drum', 'mandarin', 'sturgeon'));
+  expectIsClone(fishRemoved0, new ValueArray());
+  const fish1 = new ValueArray('angel', 'clown', 'mandarin', 'sturgeon');
+  const fishRemoved1 = fish1.splice(2, 0, 'drum', 'guitar');
+  expectIsClone(fish1, new ValueArray('angel', 'clown', 'drum', 'guitar', 'mandarin', 'sturgeon'));
+  expectIsClone(fishRemoved1, new ValueArray());
+  const fish2 = new ValueArray('clown', 'mandarin', 'sturgeon');
+  const fishRemoved2 = fish2.splice(0, 0, 'angel');
+  expectIsClone(fish2, new ValueArray('angel', 'clown', 'mandarin', 'sturgeon'));
+  expectIsClone(fishRemoved2, new ValueArray());
+  const fish3 = new ValueArray('angel', 'clown', 'mandarin');
+  const fishRemoved3 = fish3.splice(fish3.length, 0, 'sturgeon');
+  expectIsClone(fish3, new ValueArray('angel', 'clown', 'mandarin', 'sturgeon'));
+  expectIsClone(fishRemoved3, new ValueArray());
+  const fish4 = new ValueArray('angel', 'clown', 'drum', 'mandarin', 'sturgeon');
+  const fishRemoved4 = fish4.splice(3, 1);
+  expectIsClone(fish4, new ValueArray('angel', 'clown', 'drum', 'sturgeon'));
+  expectIsClone(fishRemoved4, new ValueArray('mandarin'));
+  const fish5 = new ValueArray('angel', 'clown', 'drum', 'sturgeon');
+  const fishRemoved5 = fish5.splice(2, 1, 'trumpet');
+  expectIsClone(fish5, new ValueArray('angel', 'clown', 'trumpet', 'sturgeon'));
+  expectIsClone(fishRemoved5, new ValueArray('drum'));
+  const fish6 = new ValueArray('angel', 'clown', 'trumpet', 'sturgeon');
+  const fishRemoved6 = fish6.splice(0, 2, 'parrot', 'anemone', 'blue');
+  expectIsClone(fish6, new ValueArray('parrot', 'anemone', 'blue', 'trumpet', 'sturgeon'));
+  expectIsClone(fishRemoved6, new ValueArray('angel', 'clown'));
+  const fish7 = new ValueArray('parrot', 'anemone', 'blue', 'trumpet', 'sturgeon');
+  const fishRemoved7 = fish7.splice(2, 2);
+  expectIsClone(fish7, new ValueArray('parrot', 'anemone','sturgeon'));
+  expectIsClone(fishRemoved7, new ValueArray('blue', 'trumpet'));
+  const fish8 = new ValueArray('angel', 'clown', 'mandarin', 'sturgeon');
+  const fishRemoved8 = fish8.splice(-2, 1);
+  expectIsClone(fish8, new ValueArray('angel', 'clown', 'sturgeon'));
+  expectIsClone(fishRemoved8, new ValueArray('mandarin'));
+  const fish9 = new ValueArray('angel', 'clown', 'mandarin', 'sturgeon');
+  const fishRemoved9 = fish9.splice(2);
+  expectIsClone(fish9, new ValueArray('angel', 'clown'));
+  expectIsClone(fishRemoved9, new ValueArray('mandarin', 'sturgeon'));
+
+  const sparseArr = new ValueArray(...[1, , 3, 4, , 6]);
+  const sparseArrRemoved = sparseArr.splice(1, 2);
+  expectIsClone(sparseArr, new ValueArray(...[1, 4, , 6]));
+  expectIsClone(sparseArrRemoved, new ValueArray(...[, 3]));
+
+  // Object elements
+  const valArrObj = new ValueArray({ a: 1 }, { a: 2 }, { a: 3 }, { a: 4 });
+  const valArrObjRemoved = valArrObj.splice(0, 2, { a: 5 }, { a: 6 }, { a: 7 });
+  expectIsClone(valArrObj, new ValueArray({ a: 5 }, { a: 6 }, { a: 7 }, { a: 3 }, { a: 4 }));
+  expectIsClone(valArrObjRemoved, new ValueArray({ a: 1 }, { a: 2 }));
+})
 
 // No change
 test('Array.prototype.toLocaleString', () => {
