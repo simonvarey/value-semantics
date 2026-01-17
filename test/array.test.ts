@@ -594,9 +594,11 @@ test('Array.prototype.splice', () => {
 
   // Object elements
   const valArrObj = new ValueArray({ a: 1 }, { a: 2 }, { a: 3 }, { a: 4 });
-  const valArrObjRemoved = valArrObj.splice(0, 2, { a: 5 }, { a: 6 }, { a: 7 });
+  const addedElement = { a: 5 }
+  const valArrObjRemoved = valArrObj.splice(0, 2, addedElement, { a: 6 }, { a: 7 });
   expectIsClone(valArrObj, new ValueArray({ a: 5 }, { a: 6 }, { a: 7 }, { a: 3 }, { a: 4 }));
   expectIsClone(valArrObjRemoved, new ValueArray({ a: 1 }, { a: 2 }));
+  expectIsClone(valArrObj[0], addedElement);
 })
 
 // No change
