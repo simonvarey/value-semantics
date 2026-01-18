@@ -62,7 +62,7 @@ function flattenIntoArray<M, A extends Array<M>, B extends Array<M>>(
 class ValueArray<M> extends Array<M> {
 
   // clone
-  copyWithin(target: number, start: number, end?: number): typeof this {
+  copyWithin(target: number, start: number, end?: number): this {
     if (target >= this.length) {
       return this;
     }
@@ -161,7 +161,7 @@ class ValueArray<M> extends Array<M> {
   }
 
   // clone
-  splice(start?: number, deleteCount?: number, ...items: M[]): typeof this {
+  splice(start?: number, deleteCount?: number, ...items: M[]): this {
     let editStart = this.length;
     let deletedElements;
     let endElements;
@@ -189,6 +189,12 @@ class ValueArray<M> extends Array<M> {
     }
     const thisConstructor = Object.getPrototypeOf(this).constructor;
     return deletedElements ? new thisConstructor(...deletedElements) : new thisConstructor();
+  }
+
+  toReversed(): this {
+    const reversed = clone(this);
+    reversed.reverse();
+    return reversed;
   }
 }
 

@@ -593,12 +593,14 @@ test('Array.prototype.splice', () => {
   expectIsClone(sparseArrRemoved, new ValueArray(...[, 3]));
 
   // Object elements
-  const valArrObj = new ValueArray({ a: 1 }, { a: 2 }, { a: 3 }, { a: 4 });
+  const originalElement = { a: 3 };
+  const valArrObj = new ValueArray({ a: 1 }, { a: 2 }, originalElement, { a: 4 });
   const addedElement = { a: 5 }
   const valArrObjRemoved = valArrObj.splice(0, 2, addedElement, { a: 6 }, { a: 7 });
   expectIsClone(valArrObj, new ValueArray({ a: 5 }, { a: 6 }, { a: 7 }, { a: 3 }, { a: 4 }));
   expectIsClone(valArrObjRemoved, new ValueArray({ a: 1 }, { a: 2 }));
   expectIsClone(valArrObj[0], addedElement);
+  expect(valArrObj[3]).toEqual(originalElement);
 })
 
 // No change
@@ -607,8 +609,31 @@ test('Array.prototype.toLocaleString', () => {
   expect(valArr.toLocaleString()).toEqual('a,1,,[object Object]');
 })
 
+// Adapted from code samples in 
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/toReversed
+test('Array.prototype.toReversed', () => {
+  // Primitive elements
+  const valArr = new ValueArray(1, 2, 3);
+  const reversed = valArr.toReversed();
+  expectIsClone(reversed, new ValueArray(3, 2, 1));
+  expectIsClone(valArr, new ValueArray(1, 2, 3));
 
-//    toReversed()
+  const valArrSparse0 = new ValueArray(...[1, , 3]);
+  expectIsClone(valArrSparse0.toReversed(), new ValueArray(3, undefined, 1));
+  expectIsClone(valArrSparse0, new ValueArray(...[1, , 3]));
+  const valArrSparse1 = new ValueArray(...[1, , 3, 4]);
+  expectIsClone(valArrSparse1.toReversed(), new ValueArray(4, 3, undefined, 1));
+  expectIsClone(valArrSparse1, new ValueArray(...[1, , 3, 4]));
+
+  // Object elements
+  const obj = { p: 1 }
+  const valArrObj = new ValueArray(obj, { p: 2 }, { p: 3 });
+  const reversedObj = clone(valArrObj.toReversed());
+  expectIsClone(reversedObj, new ValueArray({ p: 3 }, { p: 2 }, { p: 1 }));
+  expectIsClone(reversedObj[2], obj);
+  expectIsClone(valArrObj, new ValueArray({ p: 1 }, { p: 2 }, { p: 3 }));
+})
+
 //    toSorted()
 //    toSpliced()
 //    toString()
