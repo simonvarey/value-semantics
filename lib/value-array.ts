@@ -196,6 +196,12 @@ class ValueArray<M> extends Array<M> {
     reversed.reverse();
     return reversed;
   }
+
+  toSorted(compareFn?: (a: M, b: M) => number): this {
+    const sorted = clone(this);
+    sorted.sort(compareFn);
+    return sorted;
+  }
 }
 
 export { ValueArray }
