@@ -634,7 +634,36 @@ test('Array.prototype.toReversed', () => {
   expectIsClone(valArrObj, new ValueArray({ p: 1 }, { p: 2 }, { p: 3 }));
 })
 
-//    toSorted()
+// Adapted from code samples in 
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/toSorted
+test('Array.prototype.toSorted', () => {
+  // Primitive elements
+  const months = new ValueArray('Mar', 'Jan', 'Feb', 'Dec');
+  const sortedMonths = months.toSorted();
+  expectIsClone(sortedMonths, new ValueArray('Dec', 'Feb', 'Jan', 'Mar'));
+  expectIsClone(months, new ValueArray('Mar', 'Jan', 'Feb', 'Dec'));
+
+  const valArr = new ValueArray(1, 10, 21, 2);
+  const sortedValArr = valArr.toSorted((a, b) => a - b);
+  expectIsClone(sortedValArr, new ValueArray(1, 2, 10, 21));
+  expectIsClone(valArr, new ValueArray(1, 10, 21, 2));
+  
+  const valArrSparse0 = new ValueArray(...['a', 'c', , 'b']);
+  expectIsClone(valArrSparse0.toSorted(), new ValueArray('a', 'b', 'c', undefined));
+  expectIsClone(valArrSparse0, new ValueArray(...['a', 'c', , 'b']));
+  const valArrSparse1 = new ValueArray(...[, undefined, 'a', 'b']);
+  expectIsClone(valArrSparse1.toSorted(), new ValueArray('a', 'b', undefined, undefined));
+  expectIsClone(valArrSparse1, new ValueArray(...[, undefined, 'a', 'b']));
+
+  // Object elements
+  const obj = { p: 2 }
+  const valArrObj = new ValueArray(obj, { p: 3 }, { p: 1 });
+  const sortedObj = valArrObj.toSorted((a, b) => a.p - b.p);
+  expectIsClone(sortedObj, new ValueArray({ p: 1 }, { p: 2 }, { p: 3 }));
+  expectIsClone(sortedObj[1], obj);
+  expectIsClone(valArrObj, new ValueArray({ p: 2 }, { p: 3 }, { p: 1 }));
+})
+
 //    toSpliced()
 //    toString()
  //   unshift()
