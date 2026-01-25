@@ -202,6 +202,12 @@ class ValueArray<M> extends Array<M> {
     sorted.sort(compareFn);
     return sorted;
   }
+
+  toSpliced(start?: number, deleteCount?: number, ...items: M[]): this {
+    const spliced = clone(this);
+    spliced.splice(start, deleteCount, ...items);
+    return spliced;
+  }
 }
 
 export { ValueArray }
