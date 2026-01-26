@@ -664,7 +664,34 @@ test('Array.prototype.toSorted', () => {
   expectIsClone(valArrObj, new ValueArray({ p: 2 }, { p: 3 }, { p: 1 }));
 })
 
-//    toSpliced()
+// Adapted from code samples in 
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/toSpliced
+test('Array.prototype.toSpliced', () => {
+  // Primitive elements
+  const months = new ValueArray('Jan', 'Mar', 'Apr', 'May');
+  const splicedMonths0 = months.toSpliced(1, 0, 'Feb');
+  expectIsClone(splicedMonths0, new ValueArray('Jan', 'Feb', 'Mar', 'Apr', 'May'));
+  const splicedMonths1 = splicedMonths0.toSpliced(2, 2);
+  expectIsClone(splicedMonths1, new ValueArray('Jan', 'Feb', 'May'));
+  const splicedMonths2 = splicedMonths1.toSpliced(1, 1, 'Feb', 'Mar');
+  expectIsClone(splicedMonths2, new ValueArray('Jan', 'Feb', 'Mar', 'May'));
+  expectIsClone(months, new ValueArray('Jan', 'Mar', 'Apr', 'May'));
+
+  const valArrSparse = new ValueArray(...[1, , 3, 4, , 6]);
+  expectIsClone(valArrSparse.toSpliced(1, 2), new ValueArray(1, 4, undefined, 6));
+  expectIsClone(valArrSparse, new ValueArray(...[1, , 3, 4, , 6]));
+
+  // Object elements
+  const originalElement = { a: 3 };
+  const valArrObj = new ValueArray({ a: 1 }, { a: 2 }, originalElement, { a: 4 });
+  const addedElement = { a: 5 }
+  const valArrObjSpliced = valArrObj.toSpliced(0, 2, addedElement, { a: 6 }, { a: 7 });
+  expectIsClone(valArrObjSpliced, new ValueArray({ a: 5 }, { a: 6 }, { a: 7 }, { a: 3 }, { a: 4 }));
+  expectIsClone(valArrObjSpliced[0], addedElement);
+  expect(valArrObjSpliced[3]).toEqual(originalElement);
+})
+
+
 //    toString()
  //   unshift()
  //   values()
