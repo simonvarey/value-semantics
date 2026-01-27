@@ -691,8 +691,12 @@ test('Array.prototype.toSpliced', () => {
   expect(valArrObjSpliced[3]).toEqual(originalElement);
 })
 
+// No change
+test('Array.prototype.toString', () => {
+  const valArr = new ValueArray<any>('a', 1, undefined, { b: 2 });
+  expect(valArr.toString()).toBe('a,1,,[object Object]');
+})
 
-//    toString()
  //   unshift()
  //   values()
   //  with()
