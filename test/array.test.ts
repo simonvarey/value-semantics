@@ -450,9 +450,10 @@ test('Array.prototype.push', () => {
   expectValueEquals(valArr, new ValueArray(1, 2, 3, 4));
   // external clone
   const valArrObj = new ValueArray({ p: 1 }, { p: 2 }, { p: 3 });
-  valArrObj.push({ p: 4 });
-  const valArrObjExpect = new ValueArray({ p: 1 }, { p: 2 }, { p: 3 }, { p: 4 });
-  expectIsClone(valArrObj, valArrObjExpect);
+  const lastObj = { p: 4 };
+  valArrObj.push(clone(lastObj));
+  expectIsClone(valArrObj, new ValueArray({ p: 1 }, { p: 2 }, { p: 3 }, { p: 4 }));
+  expectIsClone(valArrObj[3], lastObj);
 })
 
 test('Array.prototype.reduce', () => {
@@ -494,11 +495,11 @@ test('Array.prototype.shift', () => {
   expectValueEquals(first, 1);
   expectValueEquals(valArr, new ValueArray(2, 3));
   // external clone
-  const valArrObj = new ValueArray({ p: 1 }, { p: 2 }, { p: 3 });
-  const firstObj = valArrObj.shift();
-  const valArrObjExpect = new ValueArray({ p: 2 }, { p: 3 });
-  expectValueEquals(firstObj, { p: 1 });
-  expectIsClone(valArrObj, valArrObjExpect);
+  const firstObj = { p: 1 };
+  const valArrObj = new ValueArray(firstObj, { p: 2 }, { p: 3 });
+  const firstObjClone = clone(valArrObj.shift());
+  expectValueEquals(firstObjClone, { p: 1 });
+  expectIsClone(valArrObj, new ValueArray({ p: 2 }, { p: 3 }));
 })
 
 test('Array.prototype.slice', () => {
@@ -697,7 +698,18 @@ test('Array.prototype.toString', () => {
   expect(valArr.toString()).toBe('a,1,,[object Object]');
 })
 
- //   unshift()
+test('Array.prototype.unshift', () => {
+  const valArr = new ValueArray(1, 2, 3);
+  valArr.unshift(0);
+  expectIsClone(valArr, new ValueArray(0, 1, 2, 3));
+  // external clone
+  const valArrObj = new ValueArray({ p: 1 }, { p: 2 }, { p: 3 });
+  const firstObj = { p: 0 };
+  valArrObj.unshift(clone(firstObj));
+  expectIsClone(valArrObj, new ValueArray({ p: 0 }, { p: 1 }, { p: 2 }, { p: 3 }));
+  expectIsClone(valArrObj[0], firstObj);
+})
+
  //   values()
   //  with()
  //   [Symbol.iterator]()
