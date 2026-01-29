@@ -710,7 +710,18 @@ test('Array.prototype.unshift', () => {
   expectIsClone(valArrObj[0], firstObj);
 })
 
- //   values()
+test('Array.prototype.values', () => {
+  const valArr = new ValueArray<any>('a', 1, undefined, { b: 2 });
+  expectValueEquals(
+    new ValueArray(...valArr.values()), new ValueArray<any>('a', 1, undefined, { b: 2 }));
+  // external clone
+  const firstObj = { p: 0 };
+  const valArrObj = new ValueArray(firstObj, { p: 1 }, { p: 2 }, { p: 3 });
+  const valArrObjClone = new ValueArray(...clone(valArrObj).values())
+  expectIsClone(valArrObj, valArrObjClone);
+  expectIsClone(valArrObjClone[0], firstObj);
+})
+
   //  with()
  //   [Symbol.iterator]()
 //length
