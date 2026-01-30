@@ -208,6 +208,18 @@ class ValueArray<M> extends Array<M> {
     spliced.splice(start, deleteCount, ...items);
     return spliced;
   }
+
+  with(index: number, value: M): this {
+    if (index < 0) {
+      index += this.length;
+    }
+    if (index < 0 || index >= this.length) {
+      throw new RangeError('invalid or out-of-range index');
+    }
+    const newArray = clone(this);
+    newArray[index] = clone(value);
+    return newArray;
+  }
 }
 
 export { ValueArray }

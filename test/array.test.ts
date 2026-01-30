@@ -135,7 +135,7 @@ test('Array.concat', () => {
 
 // Adapted from code samples in 
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/copyWithin
-test('Array.copyWithin', () => {
+test('ValueArray.copyWithin', () => {
   // Primitive elements
   const array1 = new ValueArray('a', 'b', 'c', 'd', 'e');
   array1.copyWithin(0, 3, 4);
@@ -192,7 +192,7 @@ test('Array.every', () => {
 
 // Adapted from code samples in 
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/fill
-test('Array.fill', () => {
+test('ValueArray.fill', () => {
   // Primitive elements
   const array1 = new ValueArray(1, 2, 3, 4);
   array1.fill(0, 2, 4);
@@ -232,7 +232,7 @@ test('Array.fill', () => {
   expectValueEquals(array3, new ValueArray({ hi: 'hi' }, { }, { }));
 })
 
-test('Array.prototype.filter', () => {
+test('Array.filter', () => {
   const valArr1 = new ValueArray('a', 'b', 'c');
   const filterArr1 = valArr1.filter((val) => val === 'b');
   expect(filterArr1).toBeInstanceOf(ValueArray);
@@ -243,7 +243,7 @@ test('Array.prototype.filter', () => {
   expectIsClone(valArr2[1], filterArr2[0]);
 })
 
-test('Array.prototype.find', () => {
+test('Array.find', () => {
   const valArr1 = new ValueArray(1, 2, 3);
   const find1 = valArr1.find((val) => val % 2 === 0);
   expect(find1).toBe(2);
@@ -254,13 +254,13 @@ test('Array.prototype.find', () => {
 })
 
 // No change
-test('Array.prototype.findIndex', () => {
+test('Array.findIndex', () => {
   const valArr = new ValueArray(1, 2, 3);
   const idx = valArr.findIndex((val) => val === 2);
   expect(idx).toBe(1);
 })
 
-test('Array.prototype.findLast', () => {
+test('Array.findLast', () => {
   const valArr1 = new ValueArray(1, 2, 3, 4);
   const find1 = valArr1.findLast((val) => val % 2 === 0);
   expect(find1).toBe(4);
@@ -271,13 +271,13 @@ test('Array.prototype.findLast', () => {
 })
 
 // No change
-test('Array.prototype.findLastIndex', () => {
+test('Array.findLastIndex', () => {
   const valArr = new ValueArray(1, 2, 3, 4);
   const idx = valArr.findLastIndex((val) => val % 2 === 0);
   expect(idx).toBe(3);
 })
 
-test('Array.prototype.flat', () => {
+test('Array.flat', () => {
   const valArr = va('a', 'b', va('c', 'd', va('e', 'f', va('g', 'h'))));
   const flat1 = valArr.flat();
   expectValueEquals(flat1, new ValueArray<any>('a', 'b', 'c', 'd', va('e', 'f', va('g', 'h'))));
@@ -298,7 +298,7 @@ test('Array.prototype.flat', () => {
   expectIsClone(valArrObj[2][2], flat6[4]);
 })
 
-test('Array.prototype.flatMap', () => {
+test('Array.flatMap', () => {
   const valArr = new ValueArray(1, 2, 3);
   const fmArr = valArr.flatMap((val) => val % 2 === 0 ? val : [val, val]);
   expectValueEquals(fmArr, new ValueArray(1, 1, 2, 3, 3));
@@ -312,7 +312,7 @@ test('Array.prototype.flatMap', () => {
 })
 
 // No change
-test('Array.prototype.forEach', () => {
+test('Array.forEach', () => {
   let testIter = 0;
   const valArr = new ValueArray(1, 2, 3, 4);
   valArr.forEach((element) => { testIter += element; });
@@ -321,7 +321,7 @@ test('Array.prototype.forEach', () => {
 
 // Adapted from code samples in 
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/includes
-test('Array.prototype.includes', () => {
+test('ValueArray.includes', () => {
   // Primitive elements
   const pets = new ValueArray('cat', 'dog', 'bat');
   expect(pets.includes('cat')).toBeTruthy();
@@ -353,7 +353,7 @@ test('Array.prototype.includes', () => {
 
 // Adapted from code samples in 
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/indexOf
-test('Array.prototype.indexOf', () => {
+test('ValueArray.indexOf', () => {
   // Primitive elements
   const animals = new ValueArray('ant', 'bison', 'camel', 'duck', 'bison');
   expect(animals.indexOf('bison')).toBe(1);
@@ -385,20 +385,20 @@ test('Array.prototype.indexOf', () => {
 })
 
 // No change
-test('Array.prototype.join', () => {
+test('Array.join', () => {
   const valArr = new ValueArray<any>('a', 1, undefined, { b: 2 });
   expect(valArr.join('/')).toBe('a/1//[object Object]');
 })
 
 // No change
-test('Array.prototype.keys', () => {
+test('Array.keys', () => {
   const valArr = new ValueArray<any>('a', 1, undefined, { b: 2 });
   expect([...valArr.keys()]).toEqual([0, 1, 2, 3]);
 })
 
 // Adapted from code samples in 
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/lastIndexOf
-test('array.equals.lastIndexOf', () => {
+test('ValueArray.lastIndexOf', () => {
   const animals = new ValueArray('Dodo', 'Tiger', 'Penguin', 'Dodo');
   expect(animals.lastIndexOf('Dodo')).toBe(3);
   expect(animals.lastIndexOf('Tiger')).toBe(1);
@@ -428,7 +428,7 @@ test('array.equals.lastIndexOf', () => {
   expect(new ValueArray({a: 0}).lastIndexOf({a: 0})).toBe(0);
 })
 
-test('Array.prototype.map', () => {
+test('Array.map', () => {
   const valArr = new ValueArray(1, 2, 3);
   const map = valArr.map((val) => val + 1)
   expectValueEquals(map, new ValueArray(2, 3, 4));
@@ -439,12 +439,12 @@ test('Array.prototype.map', () => {
 })
 
 // No change
-test('Array.prototype.pop', () => {
+test('Array.pop', () => {
   const valArr = new ValueArray<any>('a', 1, undefined, { b: 2 });
   expect(valArr.pop()).toEqual({ b: 2 });
 })
 
-test('Array.prototype.push', () => {
+test('Array.push', () => {
   const valArr = new ValueArray(1, 2, 3);
   valArr.push(4);
   expectValueEquals(valArr, new ValueArray(1, 2, 3, 4));
@@ -456,7 +456,7 @@ test('Array.prototype.push', () => {
   expectIsClone(valArrObj[3], lastObj);
 })
 
-test('Array.prototype.reduce', () => {
+test('Array.reduce', () => {
   const valArr = new ValueArray(1, 2, 3);
   const sum = valArr.reduce((acc, num) => acc + num, 0);
   expectValueEquals(sum, 6);
@@ -467,7 +467,7 @@ test('Array.prototype.reduce', () => {
   expectIsClone(expectObj, largestObj);
 })
 
-test('Array.prototype.reduceRight', () => {
+test('Array.reduceRight', () => {
   const valArr = new ValueArray(1, 2, 3);
   const sum = valArr.reduceRight((acc, num) => acc + num, 0);
   expectValueEquals(sum, 6);
@@ -478,7 +478,7 @@ test('Array.prototype.reduceRight', () => {
   expectIsClone(expectObj, largestObj);
 })
 
-test('Array.prototype.reverse', () => {
+test('Array.reverse', () => {
   const valArr = new ValueArray(1, 2, 3);
   valArr.reverse();
   expectValueEquals(valArr, new ValueArray(3, 2, 1));
@@ -489,7 +489,7 @@ test('Array.prototype.reverse', () => {
   expectIsClone(valArrObj[0], { p: 3 });
 })
 
-test('Array.prototype.shift', () => {
+test('Array.shift', () => {
   const valArr = new ValueArray(1, 2, 3);
   const first = valArr.shift();
   expectValueEquals(first, 1);
@@ -502,7 +502,7 @@ test('Array.prototype.shift', () => {
   expectIsClone(valArrObj, new ValueArray({ p: 2 }, { p: 3 }));
 })
 
-test('Array.prototype.slice', () => {
+test('Array.slice', () => {
   const valArr = new ValueArray(1, 2, 3, 4, 5);
   const slice = valArr.slice(1, 3);
   expectValueEquals(slice, new ValueArray(2, 3));
@@ -513,7 +513,7 @@ test('Array.prototype.slice', () => {
   expectIsClone(sliceObj[0], { p: 2 });
 })
 
-test('Array.prototype.some', () => {
+test('Array.some', () => {
   const valArr = new ValueArray(1, 2, 3, 4);
   expect(valArr.some((val) => val == 2)).toBeTruthy();
   expect(valArr.some((val) => val == 5)).toBeFalsy();
@@ -525,7 +525,7 @@ test('Array.prototype.some', () => {
 })
 
 // No change
-test('Array.prototype.sort', () => {
+test('Array.sort', () => {
   const valArr = new ValueArray(4, 2, 1, 3);
   valArr.sort();
   expectIsClone(valArr, new ValueArray(1, 2, 3, 4));
@@ -539,7 +539,7 @@ test('Array.prototype.sort', () => {
 
 // Adapted from code samples in 
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/splice
-test('Array.prototype.splice', () => {
+test('ValueArray.splice', () => {
   // Primitive elements
   const months = new ValueArray('Jan', 'March', 'April', 'June');
   months.splice(1, 0, 'Feb');
@@ -605,14 +605,14 @@ test('Array.prototype.splice', () => {
 })
 
 // No change
-test('Array.prototype.toLocaleString', () => {
+test('Array.toLocaleString', () => {
   const valArr = new ValueArray<any>('a', 1, undefined, { b: 2 });
   expect(valArr.toLocaleString()).toEqual('a,1,,[object Object]');
 })
 
 // Adapted from code samples in 
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/toReversed
-test('Array.prototype.toReversed', () => {
+test('ValueArray.toReversed', () => {
   // Primitive elements
   const valArr = new ValueArray(1, 2, 3);
   const reversed = valArr.toReversed();
@@ -637,7 +637,7 @@ test('Array.prototype.toReversed', () => {
 
 // Adapted from code samples in 
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/toSorted
-test('Array.prototype.toSorted', () => {
+test('ValueArray.toSorted', () => {
   // Primitive elements
   const months = new ValueArray('Mar', 'Jan', 'Feb', 'Dec');
   const sortedMonths = months.toSorted();
@@ -667,7 +667,7 @@ test('Array.prototype.toSorted', () => {
 
 // Adapted from code samples in 
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/toSpliced
-test('Array.prototype.toSpliced', () => {
+test('ValueArray.toSpliced', () => {
   // Primitive elements
   const months = new ValueArray('Jan', 'Mar', 'Apr', 'May');
   const splicedMonths0 = months.toSpliced(1, 0, 'Feb');
@@ -693,12 +693,12 @@ test('Array.prototype.toSpliced', () => {
 })
 
 // No change
-test('Array.prototype.toString', () => {
+test('Array.toString', () => {
   const valArr = new ValueArray<any>('a', 1, undefined, { b: 2 });
   expect(valArr.toString()).toBe('a,1,,[object Object]');
 })
 
-test('Array.prototype.unshift', () => {
+test('Array.unshift', () => {
   const valArr = new ValueArray(1, 2, 3);
   valArr.unshift(0);
   expectIsClone(valArr, new ValueArray(0, 1, 2, 3));
@@ -710,19 +710,20 @@ test('Array.prototype.unshift', () => {
   expectIsClone(valArrObj[0], firstObj);
 })
 
-test('Array.prototype.values', () => {
-  const valArr = new ValueArray<any>('a', 1, undefined, { b: 2 });
-  expectValueEquals(
-    new ValueArray(...valArr.values()), new ValueArray<any>('a', 1, undefined, { b: 2 }));
-  // external clone
-  const firstObj = { p: 0 };
-  const valArrObj = new ValueArray(firstObj, { p: 1 }, { p: 2 }, { p: 3 });
-  const valArrObjClone = new ValueArray(...clone(valArrObj).values())
-  expectIsClone(valArrObj, valArrObjClone);
-  expectIsClone(valArrObjClone[0], firstObj);
+test('ValueArray.with', () => {
+  // Primitive value
+  const valArr = new ValueArray('a', 'b', 'c', 'd', 'e');
+  const withArr = valArr.with(2, 'f');
+  expectIsClone(withArr, new ValueArray('a', 'b', 'f', 'd', 'e'));
+  // External clone
+  const valArrObj = new ValueArray<any>({ a: 1 }, { b: 2 }, { c: 3 }, { d: 4 }, { e: 5 });
+  const newObj = { f: 6 }
+  const withArrObj = valArrObj.with(3, clone(newObj));
+  expectIsClone(withArrObj[3], newObj);
 })
 
-  //  with()
+
  //   [Symbol.iterator]()
 //length
 //[Symbol.unscopables]
+// brackets
