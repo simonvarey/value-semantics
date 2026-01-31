@@ -710,11 +710,16 @@ test('Array.unshift', () => {
   expectIsClone(valArrObj[0], firstObj);
 })
 
+// Adapted from code samples in 
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/with
 test('ValueArray.with', () => {
   // Primitive value
   const valArr = new ValueArray('a', 'b', 'c', 'd', 'e');
   const withArr = valArr.with(2, 'f');
   expectIsClone(withArr, new ValueArray('a', 'b', 'f', 'd', 'e'));
+
+  const sparseArr = new ValueArray(...[1, , 3, 4, , 6]);
+  expectIsClone(sparseArr.with(0, 2), new ValueArray(2, undefined, 3, 4, undefined, 6));
   // External clone
   const valArrObj = new ValueArray<any>({ a: 1 }, { b: 2 }, { c: 3 }, { d: 4 }, { e: 5 });
   const newObj = { f: 6 }
