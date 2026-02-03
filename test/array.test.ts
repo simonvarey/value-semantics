@@ -717,7 +717,23 @@ test('Array.unshift', () => {
   expectIsClone(valArrObj[0], firstObj);
 })
 
-// values
+test('Array.values', () => {
+  const valArr = new ValueArray<number>(1, 2);
+  const values = [];
+  for (const member of clone(valArr).values()) {
+    values.push(member);
+  }
+  expect(valArr[0]).equals(values[0]);
+  expect(valArr[1]).equals(values[1]);
+  // External clone
+  const valArrObj = new ValueArray<object>({ a: 1 }, { b: 2 });
+  const valuesObj = [];
+  for (const member of clone(valArrObj).values()) {
+    valuesObj.push(member);
+  }
+  expectIsClone(valArrObj[0], valuesObj[0]);
+  expectIsClone(valArrObj[1], valuesObj[1]);
+})
 
 // Adapted from code samples in 
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/with
