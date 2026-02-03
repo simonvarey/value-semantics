@@ -175,14 +175,21 @@ test('ValueArray.copyWithin', () => {
 })
 
 test('Array.entries', () => {
-  // External clone
-  const valArr = new ValueArray<object>({ a: 1 }, { b: 2 });
-  const clones = [];
-  for (const member of clone(valArr)) {
-    clones.push(member);
+  const valArr = new ValueArray<number>(1, 2);
+  const entries = [];
+  for (const member of clone(valArr).entries()) {
+    entries.push(member);
   }
-  expectIsClone(valArr[0], clones[0]);
-  expectIsClone(valArr[1], clones[1]);
+  expect(valArr[0]).equals(entries[0][1]);
+  expect(valArr[1]).equals(entries[1][1]);
+  // External clone
+  const valArrObj = new ValueArray<object>({ a: 1 }, { b: 2 });
+  const entriesObj = [];
+  for (const member of clone(valArrObj).entries()) {
+    entriesObj.push(member);
+  }
+  expectIsClone(valArrObj[0], entriesObj[0][1]);
+  expectIsClone(valArrObj[1], entriesObj[1][1]);
 })
 
 // No change
@@ -710,6 +717,8 @@ test('Array.unshift', () => {
   expectIsClone(valArrObj[0], firstObj);
 })
 
+// values
+
 // Adapted from code samples in 
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/with
 test('ValueArray.with', () => {
@@ -727,8 +736,25 @@ test('ValueArray.with', () => {
   expectIsClone(withArrObj[3], newObj);
 })
 
+test('Array.[Symbol.iterator]', () => {
+  const valArr = new ValueArray<number>(1, 2);
+  const clones = [];
+  for (const member of clone(valArr)) {
+    clones.push(member);
+  }
+  expect(valArr[0]).equals(clones[0]);
+  expect(valArr[1]).equals(clones[1]);
+  // External clone
+  const valArrObj = new ValueArray<object>({ a: 1 }, { b: 2 });
+  const clonesObj = [];
+  for (const member of clone(valArrObj)) {
+    clonesObj.push(member);
+  }
+  expectIsClone(valArrObj[0], clonesObj[0]);
+  expectIsClone(valArrObj[1], clonesObj[1]);
+})
 
- //   [Symbol.iterator]()
+
 //length
 //[Symbol.unscopables]
 // brackets
