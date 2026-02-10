@@ -86,7 +86,7 @@ test('Array.fromAsync', async () => {
 
 // No change
 test('Array.isArray', () => {
-  const arr = [{ a: 1 }, { b: 2 }];;
+  const arr = [{ a: 1 }, { b: 2 }];
   const valArr = new ValueArray(...arr);
   expect(Array.isArray(valArr)).toBeTruthy();
   expect(ValueArray.isArray(valArr)).toBeTruthy();
@@ -94,7 +94,7 @@ test('Array.isArray', () => {
 
 test('Array.of', () => {
   // External clone
-  const arr = [{ a: 1 }, { b: 2 }];;
+  const arr = [{ a: 1 }, { b: 2 }];
   const orig = ValueArray.of(...arr);
   expect(orig).toBeInstanceOf(ValueArray);
   const copy = clone(orig);
@@ -770,7 +770,12 @@ test('Array.[Symbol.iterator]', () => {
   expectIsClone(valArrObj[1], clonesObj[1]);
 })
 
+// No change
+test('Array.length', () => {
+  const valArr = new ValueArray({ a: 1 }, { b: 2 });
+  expect(valArr.length).toBe(2);
+})
 
-//length
+
 //[Symbol.unscopables]
 // brackets
