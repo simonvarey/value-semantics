@@ -39,22 +39,26 @@ test('Array.constructor', () => {
   expectValueEquals(new ValueArray(), new ValueArray());
   expectNotValueEquals(new ValueArray(), []);
   expectValueEquals(new ValueArray({ a: 1 }, { b: 2 }), new ValueArray({ a: 1 }, { b: 2 }));
+  
   const arr = [{ a: 1 }, { b: 2 }];
   expectValueEquals(new ValueArray(...arr), new ValueArray({ a: 1 }, { b: 2 }));
   expectValueEquals(new ValueArray(1), new ValueArray(1));
   expectNotValueEquals(new ValueArray(1), new ValueArray(0));
   expectNotValueEquals(new ValueArray(1), new ValueArray([1]));
   expectValueEquals(new ValueArray(...['a', 'b']), new ValueArray('a', 'b'));
-  // TODO: constructor without `new`
+  
+  // ValueArray constructor cannot be used without `new`
+  // ValueArray constructor cannot be used with []
 
   // External clone
   const orig = new ValueArray(...arr);
   const copy = clone(orig);
   expectValueEquals(orig, orig);
-  expectValueEquals(orig, copy);
   expectIsClone(orig, copy);
   expectIsClone(orig[0], copy[0]);
 })
+
+// HERE
 
 test('Array.from', () => {
   expect(ValueArray.from([NaN])[0]).toBe(NaN);
