@@ -776,6 +776,26 @@ test('Array.length', () => {
   expect(valArr.length).toBe(2);
 })
 
+test('Array[Symbol.unscopables]', () => {
+  const unscopables = new ValueArray()[Symbol.unscopables];
+  expect(unscopables).toEqual({
+    'at': true,
+    'copyWithin': true,
+    'entries': true,
+    'fill': true,
+    'find': true,
+    'findIndex': true,
+    'findLast': true,
+    'findLastIndex': true,
+    'flat': true,
+    'flatMap': true,
+    'includes': true,
+    'keys': true,
+    'toReversed': true,
+    'toSorted': true,
+    'toSpliced': true,
+    'values': true,
+  });
+})
 
-//[Symbol.unscopables]
 // brackets
