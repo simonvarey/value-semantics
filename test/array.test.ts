@@ -109,11 +109,12 @@ test('Array[Symbol.species]', () => {
 })
 
 test('Array.at', () => {
+  const valArr = new ValueArray('a', 'b');
+  expect(valArr.at(1)).toBe('b');
   // External clone
-  const valArr = new ValueArray({ a: 1 }, { b: 2 });
-  const copy = clone(valArr.at(1));
-  expectValueEquals(valArr[1], copy);
-  expectIsClone(valArr[1], copy);
+  const valArrObj = new ValueArray({ a: 1 }, { b: 2 });
+  const elementObj = clone(valArrObj.at(1));
+  expectIsClone(valArrObj[1], elementObj);
 })
 
 test('Array.concat', () => {
@@ -798,4 +799,18 @@ test('Array[Symbol.unscopables]', () => {
   });
 })
 
-// brackets
+test('Array[]', () => {
+  // Primitive value
+  const valArr = new ValueArray('a', 'b');
+  expect(valArr[1]).toBe('b');
+  valArr[2] = 'c';
+  expect(valArr[2]).toBe('c');
+
+  // External clone
+  const valArrObj = new ValueArray<any>({ a: 1 }, { b: 2 });
+  const readObj = clone(valArrObj[1]);
+  expectIsClone(valArrObj[1], readObj);
+  const writeObj = { c: 3 };
+  valArrObj[2] = clone(writeObj);
+  expectIsClone(valArrObj[2], writeObj);
+})
