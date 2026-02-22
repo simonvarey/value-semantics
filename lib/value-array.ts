@@ -135,7 +135,7 @@ class ValueArray<M> extends Array<M> {
     fromIndex = normalizeIndexWithDefault(fromIndex, this.length, 0);
     
     for (let idx = fromIndex; idx < this.length; idx++) {
-      if (equals(needle, this[idx])) {
+      if (equals(needle, this[idx]) && this.hasOwnProperty(idx)) {
         return idx;
       }
     }
@@ -152,7 +152,7 @@ class ValueArray<M> extends Array<M> {
     fromIndex = normalizeIndexWithDefaultAndMax(fromIndex, this.length, this.length - 1, this.length - 1);
     
     for (let idx = fromIndex; idx >= 0; idx--) {
-      if (equals(needle, this[idx])) {
+      if (equals(needle, this[idx]) && this.hasOwnProperty(idx)) {
         return idx;
       }
     }
