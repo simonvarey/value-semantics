@@ -499,13 +499,12 @@ test('ValueArray.lastIndexOf', () => {
   expect(new ValueArray({a: 0}).lastIndexOf({a: 0})).toBe(0);
 })
 
-// HERE
-
 test('Array.map', () => {
+  // Primitive values
   const valArr = new ValueArray(1, 2, 3);
   const map = valArr.map((val) => val + 1)
   expectValueEquals(map, new ValueArray(2, 3, 4));
-  // external clone
+  // External clone
   const valArrObj = new ValueArray({ p: 1 }, { p: 2 }, { p: 3 }, { p: 4 }, { p: 5 }, { p: 6 });
   const mapObj = valArrObj.map((obj) => clone(obj));
   expectIsClone(valArrObj, mapObj);
@@ -518,22 +517,24 @@ test('Array.pop', () => {
 })
 
 test('Array.push', () => {
+  // Primitive values
   const valArr = new ValueArray(1, 2, 3);
   valArr.push(4);
   expectValueEquals(valArr, new ValueArray(1, 2, 3, 4));
-  // external clone
+  // External clone
   const valArrObj = new ValueArray({ p: 1 }, { p: 2 }, { p: 3 });
   const lastObj = { p: 4 };
   valArrObj.push(clone(lastObj));
-  expectIsClone(valArrObj, new ValueArray({ p: 1 }, { p: 2 }, { p: 3 }, { p: 4 }));
+  expectValueEquals(valArrObj, new ValueArray({ p: 1 }, { p: 2 }, { p: 3 }, { p: 4 }));
   expectIsClone(valArrObj[3], lastObj);
 })
 
 test('Array.reduce', () => {
+  // Primitive values
   const valArr = new ValueArray(1, 2, 3);
   const sum = valArr.reduce((acc, num) => acc + num, 0);
   expectValueEquals(sum, 6);
-  // external clone
+  // External clone
   const expectObj = { p: 3 };
   const valArrObj = new ValueArray({ p: 1 }, { p: 2 }, expectObj);
   const largestObj = valArrObj.reduce((prev, obj) => prev.p > obj.p ? prev : clone(obj), { p: 0 });
@@ -541,125 +542,147 @@ test('Array.reduce', () => {
 })
 
 test('Array.reduceRight', () => {
+  // Primitive values
   const valArr = new ValueArray(1, 2, 3);
   const sum = valArr.reduceRight((acc, num) => acc + num, 0);
   expectValueEquals(sum, 6);
-  // external clone
+  // External clone
   const expectObj = { p: 3 };
   const valArrObj = new ValueArray({ p: 1 }, { p: 2 }, expectObj);
   const largestObj = valArrObj.reduceRight((prev, obj) => prev.p > obj.p ? prev : clone(obj), { p: 0 });
   expectIsClone(expectObj, largestObj);
 })
 
+// No change
 test('Array.reverse', () => {
+  // Primitive values
   const valArr = new ValueArray(1, 2, 3);
   valArr.reverse();
   expectValueEquals(valArr, new ValueArray(3, 2, 1));
-  // external clone
-  const valArrObj = new ValueArray({ p: 1 }, { p: 2 }, { p: 3 });
-  clone(valArrObj.reverse());
-  expectIsClone(valArrObj, new ValueArray({ p: 3 }, { p: 2 }, { p: 1 }));
-  expectIsClone(valArrObj[0], { p: 3 });
+  // Object values
+  const lastObj = { p: 3 };
+  const valArrObj = new ValueArray({ p: 1 }, { p: 2 }, lastObj);
+  const reversed = clone(valArrObj.reverse());
+  expectValueEquals(valArrObj, new ValueArray({ p: 3 }, { p: 2 }, { p: 1 }));
+  expect(valArrObj[0] === lastObj).toBeTruthy();
+  expectIsClone(reversed[0], lastObj);
 })
 
 test('Array.shift', () => {
+  // Primitive values
   const valArr = new ValueArray(1, 2, 3);
   const first = valArr.shift();
   expectValueEquals(first, 1);
   expectValueEquals(valArr, new ValueArray(2, 3));
-  // external clone
+  // External clone
   const firstObj = { p: 1 };
   const valArrObj = new ValueArray(firstObj, { p: 2 }, { p: 3 });
   const firstObjClone = clone(valArrObj.shift());
-  expectValueEquals(firstObjClone, { p: 1 });
-  expectIsClone(valArrObj, new ValueArray({ p: 2 }, { p: 3 }));
+  expectIsClone(firstObjClone, firstObj);
+  expectValueEquals(valArrObj, new ValueArray({ p: 2 }, { p: 3 }));
 })
 
 test('Array.slice', () => {
+  // Primitive values
   const valArr = new ValueArray(1, 2, 3, 4, 5);
   const slice = valArr.slice(1, 3);
   expectValueEquals(slice, new ValueArray(2, 3));
-  // external clone
-  const valArrObj = new ValueArray({ p: 1 }, { p: 2 }, { p: 3 }, { p: 4 }, { p: 5 });
+  // External clone
+  const secondObj = { p: 2 };
+  const valArrObj = new ValueArray({ p: 1 }, secondObj, { p: 3 }, { p: 4 }, { p: 5 });
   const sliceObj = clone(valArrObj.slice(1, 3));
-  expectIsClone(sliceObj, new ValueArray({ p: 2 }, { p: 3 }));
-  expectIsClone(sliceObj[0], { p: 2 });
+  expectValueEquals(sliceObj, new ValueArray({ p: 2 }, { p: 3 }));
+  expectIsClone(sliceObj[0], secondObj);
 })
 
 test('Array.some', () => {
+  // Primitive values
   const valArr = new ValueArray(1, 2, 3, 4);
   expect(valArr.some((val) => val == 2)).toBeTruthy();
   expect(valArr.some((val) => val == 5)).toBeFalsy();
-  // external clone
+  // External clone
   const valArrObj = new ValueArray({ p: 1 }, { p: 2 }, { p: 3 }, { p: 4 }, { p: 5 });
   const sliceObj = clone(valArrObj.slice(1, 3));
-  expectIsClone(sliceObj, new ValueArray({ p: 2 }, { p: 3 }));
+  expectValueEquals(sliceObj, new ValueArray({ p: 2 }, { p: 3 }));
   expectIsClone(sliceObj[0], { p: 2 });
 })
 
 // No change
 test('Array.sort', () => {
+  // Primitive values
   const valArr = new ValueArray(4, 2, 1, 3);
   valArr.sort();
-  expectIsClone(valArr, new ValueArray(1, 2, 3, 4));
-  const valArrSparse = new ValueArray(...[4, , 2, 1, 3]);
+  expectValueEquals(valArr, new ValueArray(1, 2, 3, 4));
+
+  const valArrSparse = new ValueArray(5);
+  valArrSparse[0] = 4;
+  valArrSparse[2] = 2;
+  valArrSparse[3] = 1;
+  valArrSparse[4] = 3;
   valArrSparse.sort();
-  expectIsClone(valArrSparse, new ValueArray(...[1, 2, 3, 4, ,]));
+  const valArrSparseExpected = new ValueArray(5);
+  valArrSparseExpected[0] = 1;
+  valArrSparseExpected[1] = 2;
+  valArrSparseExpected[2] = 3;
+  valArrSparseExpected[3] = 4;
+  expectValueEquals(valArrSparse, valArrSparseExpected);
+
+  // Object values
   const valArrObj = new ValueArray({ p: 2 }, { p: 3 }, { p: 1 });
   valArrObj.sort((a, b) => a.p - b.p);
-  expectIsClone(valArrObj, new ValueArray({ p: 1 }, { p: 2 }, { p: 3 }));
+  expectValueEquals(valArrObj, new ValueArray({ p: 1 }, { p: 2 }, { p: 3 }));
 })
 
 // Adapted from code samples in 
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/splice
 test('ValueArray.splice', () => {
   // Primitive elements
-  const months = new ValueArray('Jan', 'March', 'April', 'June');
-  months.splice(1, 0, 'Feb');
-  expectIsClone(months, new ValueArray('Jan', 'Feb', 'March', 'April', 'June'));
-  months.splice(4, 1, 'May');
-  expectIsClone(months, new ValueArray('Jan', 'Feb', 'March', 'April', 'May'));
+  const valArr = new ValueArray('Jan', 'March', 'April', 'June');
+  valArr.splice(1, 0, 'Feb');
+  expectValueEquals(valArr, new ValueArray('Jan', 'Feb', 'March', 'April', 'June'));
+  valArr.splice(4, 1, 'May');
+  expectValueEquals(valArr, new ValueArray('Jan', 'Feb', 'March', 'April', 'May'));
 
-  const fish0 = new ValueArray('angel', 'clown', 'mandarin', 'sturgeon');
-  const fishRemoved0 = fish0.splice(2, 0, 'drum');
-  expectIsClone(fish0, new ValueArray('angel', 'clown', 'drum', 'mandarin', 'sturgeon'));
-  expectIsClone(fishRemoved0, new ValueArray());
-  const fish1 = new ValueArray('angel', 'clown', 'mandarin', 'sturgeon');
-  const fishRemoved1 = fish1.splice(2, 0, 'drum', 'guitar');
-  expectIsClone(fish1, new ValueArray('angel', 'clown', 'drum', 'guitar', 'mandarin', 'sturgeon'));
-  expectIsClone(fishRemoved1, new ValueArray());
-  const fish2 = new ValueArray('clown', 'mandarin', 'sturgeon');
-  const fishRemoved2 = fish2.splice(0, 0, 'angel');
-  expectIsClone(fish2, new ValueArray('angel', 'clown', 'mandarin', 'sturgeon'));
-  expectIsClone(fishRemoved2, new ValueArray());
-  const fish3 = new ValueArray('angel', 'clown', 'mandarin');
-  const fishRemoved3 = fish3.splice(fish3.length, 0, 'sturgeon');
-  expectIsClone(fish3, new ValueArray('angel', 'clown', 'mandarin', 'sturgeon'));
-  expectIsClone(fishRemoved3, new ValueArray());
-  const fish4 = new ValueArray('angel', 'clown', 'drum', 'mandarin', 'sturgeon');
-  const fishRemoved4 = fish4.splice(3, 1);
-  expectIsClone(fish4, new ValueArray('angel', 'clown', 'drum', 'sturgeon'));
-  expectIsClone(fishRemoved4, new ValueArray('mandarin'));
-  const fish5 = new ValueArray('angel', 'clown', 'drum', 'sturgeon');
-  const fishRemoved5 = fish5.splice(2, 1, 'trumpet');
-  expectIsClone(fish5, new ValueArray('angel', 'clown', 'trumpet', 'sturgeon'));
-  expectIsClone(fishRemoved5, new ValueArray('drum'));
-  const fish6 = new ValueArray('angel', 'clown', 'trumpet', 'sturgeon');
-  const fishRemoved6 = fish6.splice(0, 2, 'parrot', 'anemone', 'blue');
-  expectIsClone(fish6, new ValueArray('parrot', 'anemone', 'blue', 'trumpet', 'sturgeon'));
-  expectIsClone(fishRemoved6, new ValueArray('angel', 'clown'));
-  const fish7 = new ValueArray('parrot', 'anemone', 'blue', 'trumpet', 'sturgeon');
-  const fishRemoved7 = fish7.splice(2, 2);
-  expectIsClone(fish7, new ValueArray('parrot', 'anemone','sturgeon'));
-  expectIsClone(fishRemoved7, new ValueArray('blue', 'trumpet'));
-  const fish8 = new ValueArray('angel', 'clown', 'mandarin', 'sturgeon');
-  const fishRemoved8 = fish8.splice(-2, 1);
-  expectIsClone(fish8, new ValueArray('angel', 'clown', 'sturgeon'));
-  expectIsClone(fishRemoved8, new ValueArray('mandarin'));
-  const fish9 = new ValueArray('angel', 'clown', 'mandarin', 'sturgeon');
-  const fishRemoved9 = fish9.splice(2);
-  expectIsClone(fish9, new ValueArray('angel', 'clown'));
-  expectIsClone(fishRemoved9, new ValueArray('mandarin', 'sturgeon'));
+  const valArr0 = new ValueArray('angel', 'clown', 'mandarin', 'sturgeon');
+  const valArrRemoved0 = valArr0.splice(2, 0, 'drum');
+  expectValueEquals(valArr0, new ValueArray('angel', 'clown', 'drum', 'mandarin', 'sturgeon'));
+  expectValueEquals(valArrRemoved0, new ValueArray());
+  const valArr1 = new ValueArray('angel', 'clown', 'mandarin', 'sturgeon');
+  const valArrRemoved1 = valArr1.splice(2, 0, 'drum', 'guitar');
+  expectValueEquals(valArr1, new ValueArray('angel', 'clown', 'drum', 'guitar', 'mandarin', 'sturgeon'));
+  expectValueEquals(valArrRemoved1, new ValueArray());
+  const valArr2 = new ValueArray('clown', 'mandarin', 'sturgeon');
+  const valArrRemoved2 = valArr2.splice(0, 0, 'angel');
+  expectValueEquals(valArr2, new ValueArray('angel', 'clown', 'mandarin', 'sturgeon'));
+  expectValueEquals(valArrRemoved2, new ValueArray());
+  const valArr3 = new ValueArray('angel', 'clown', 'mandarin');
+  const valArrRemoved3 = valArr3.splice(valArr3.length, 0, 'sturgeon');
+  expectValueEquals(valArr3, new ValueArray('angel', 'clown', 'mandarin', 'sturgeon'));
+  expectValueEquals(valArrRemoved3, new ValueArray());
+  const valArr4 = new ValueArray('angel', 'clown', 'drum', 'mandarin', 'sturgeon');
+  const valArrRemoved4 = valArr4.splice(3, 1);
+  expectValueEquals(valArr4, new ValueArray('angel', 'clown', 'drum', 'sturgeon'));
+  expectValueEquals(valArrRemoved4, new ValueArray('mandarin'));
+  const valArr5 = new ValueArray('angel', 'clown', 'drum', 'sturgeon');
+  const valArrRemoved5 = valArr5.splice(2, 1, 'trumpet');
+  expectValueEquals(valArr5, new ValueArray('angel', 'clown', 'trumpet', 'sturgeon'));
+  expectValueEquals(valArrRemoved5, new ValueArray('drum'));
+  const valArr6 = new ValueArray('angel', 'clown', 'trumpet', 'sturgeon');
+  const valArrRemoved6 = valArr6.splice(0, 2, 'parrot', 'anemone', 'blue');
+  expectValueEquals(valArr6, new ValueArray('parrot', 'anemone', 'blue', 'trumpet', 'sturgeon'));
+  expectValueEquals(valArrRemoved6, new ValueArray('angel', 'clown'));
+  const valArr7 = new ValueArray('parrot', 'anemone', 'blue', 'trumpet', 'sturgeon');
+  const valArrRemoved7 = valArr7.splice(2, 2);
+  expectValueEquals(valArr7, new ValueArray('parrot', 'anemone','sturgeon'));
+  expectValueEquals(valArrRemoved7, new ValueArray('blue', 'trumpet'));
+  const valArr8 = new ValueArray('angel', 'clown', 'mandarin', 'sturgeon');
+  const valArrRemoved8 = valArr8.splice(-2, 1);
+  expectValueEquals(valArr8, new ValueArray('angel', 'clown', 'sturgeon'));
+  expectValueEquals(valArrRemoved8, new ValueArray('mandarin'));
+  const valArr9 = new ValueArray('angel', 'clown', 'mandarin', 'sturgeon');
+  const valArrRemoved9 = valArr9.splice(2);
+  expectValueEquals(valArr9, new ValueArray('angel', 'clown'));
+  expectValueEquals(valArrRemoved9, new ValueArray('mandarin', 'sturgeon'));
 
   const sparseArr = new ValueArray(6);
   sparseArr[0] = 1;
@@ -681,8 +704,8 @@ test('ValueArray.splice', () => {
   const valArrObj = new ValueArray({ a: 1 }, { a: 2 }, originalElement, { a: 4 });
   const addedElement = { a: 5 }
   const valArrObjRemoved = valArrObj.splice(0, 2, addedElement, { a: 6 }, { a: 7 });
-  expectIsClone(valArrObj, new ValueArray({ a: 5 }, { a: 6 }, { a: 7 }, { a: 3 }, { a: 4 }));
-  expectIsClone(valArrObjRemoved, new ValueArray({ a: 1 }, { a: 2 }));
+  expectValueEquals(valArrObj, new ValueArray({ a: 5 }, { a: 6 }, { a: 7 }, { a: 3 }, { a: 4 }));
+  expectValueEquals(valArrObjRemoved, new ValueArray({ a: 1 }, { a: 2 }));
   expectIsClone(valArrObj[0], addedElement);
   expect(valArrObj[3]).toEqual(originalElement);
 })
@@ -699,78 +722,113 @@ test('ValueArray.toReversed', () => {
   // Primitive elements
   const valArr = new ValueArray(1, 2, 3);
   const reversed = valArr.toReversed();
-  expectIsClone(reversed, new ValueArray(3, 2, 1));
-  expectIsClone(valArr, new ValueArray(1, 2, 3));
+  expectValueEquals(reversed, new ValueArray(3, 2, 1));
+  expectValueEquals(valArr, new ValueArray(1, 2, 3));
 
-  const valArrSparse0 = new ValueArray(...[1, , 3]);
-  expectIsClone(valArrSparse0.toReversed(), new ValueArray(3, undefined, 1));
-  expectIsClone(valArrSparse0, new ValueArray(...[1, , 3]));
-  const valArrSparse1 = new ValueArray(...[1, , 3, 4]);
-  expectIsClone(valArrSparse1.toReversed(), new ValueArray(4, 3, undefined, 1));
-  expectIsClone(valArrSparse1, new ValueArray(...[1, , 3, 4]));
+  const valArrSparse0 = new ValueArray(3);
+  valArrSparse0[0] = 1;
+  valArrSparse0[2] = 3;
+  expectValueEquals(valArrSparse0.toReversed(), new ValueArray(3, undefined, 1));
+  const valArrSparseExpect0 = new ValueArray(3);
+  valArrSparseExpect0[0] = 1;
+  valArrSparseExpect0[2] = 3;
+  expectIsClone(valArrSparse0, valArrSparseExpect0);
+  const valArrSparse1 = new ValueArray(4);
+  valArrSparse1[0] = 1;
+  valArrSparse1[2] = 3;
+  valArrSparse1[3] = 4;
+  expectValueEquals(valArrSparse1.toReversed(), new ValueArray(4, 3, undefined, 1));
+  const valArrSparseExpect1 = new ValueArray(4);
+  valArrSparseExpect1[0] = 1;
+  valArrSparseExpect1[2] = 3;
+  valArrSparseExpect1[3] = 4;
+  expectIsClone(valArrSparse1, valArrSparseExpect1);
 
   // Object elements
-  const obj = { p: 1 }
-  const valArrObj = new ValueArray(obj, { p: 2 }, { p: 3 });
+  const firstObj = { p: 1 }
+  const valArrObj = new ValueArray(firstObj, { p: 2 }, { p: 3 });
   const reversedObj = clone(valArrObj.toReversed());
-  expectIsClone(reversedObj, new ValueArray({ p: 3 }, { p: 2 }, { p: 1 }));
-  expectIsClone(reversedObj[2], obj);
-  expectIsClone(valArrObj, new ValueArray({ p: 1 }, { p: 2 }, { p: 3 }));
+  expectValueEquals(reversedObj, new ValueArray({ p: 3 }, { p: 2 }, { p: 1 }));
+  expectIsClone(reversedObj[2], firstObj);
+  expectValueEquals(valArrObj, new ValueArray({ p: 1 }, { p: 2 }, { p: 3 }));
 })
 
 // Adapted from code samples in 
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/toSorted
 test('ValueArray.toSorted', () => {
   // Primitive elements
-  const months = new ValueArray('Mar', 'Jan', 'Feb', 'Dec');
-  const sortedMonths = months.toSorted();
-  expectIsClone(sortedMonths, new ValueArray('Dec', 'Feb', 'Jan', 'Mar'));
-  expectIsClone(months, new ValueArray('Mar', 'Jan', 'Feb', 'Dec'));
+  const valArr0 = new ValueArray('Mar', 'Jan', 'Feb', 'Dec');
+  const valArrSorted0 = valArr0.toSorted();
+  expectValueEquals(valArrSorted0, new ValueArray('Dec', 'Feb', 'Jan', 'Mar'));
+  expectValueEquals(valArr0, new ValueArray('Mar', 'Jan', 'Feb', 'Dec'));
 
   const valArr = new ValueArray(1, 10, 21, 2);
   const sortedValArr = valArr.toSorted((a, b) => a - b);
-  expectIsClone(sortedValArr, new ValueArray(1, 2, 10, 21));
-  expectIsClone(valArr, new ValueArray(1, 10, 21, 2));
+  expectValueEquals(sortedValArr, new ValueArray(1, 2, 10, 21));
+  expectValueEquals(valArr, new ValueArray(1, 10, 21, 2));
   
-  const valArrSparse0 = new ValueArray(...['a', 'c', , 'b']);
-  expectIsClone(valArrSparse0.toSorted(), new ValueArray('a', 'b', 'c', undefined));
-  expectIsClone(valArrSparse0, new ValueArray(...['a', 'c', , 'b']));
-  const valArrSparse1 = new ValueArray(...[, undefined, 'a', 'b']);
-  expectIsClone(valArrSparse1.toSorted(), new ValueArray('a', 'b', undefined, undefined));
-  expectIsClone(valArrSparse1, new ValueArray(...[, undefined, 'a', 'b']));
+  const valArrSparse0 = new ValueArray(4);
+  valArrSparse0[0] = 'a';
+  valArrSparse0[1] = 'c';
+  valArrSparse0[3] = 'b';
+  const valArrSparseExpect0 = new ValueArray(4);
+  valArrSparseExpect0[0] = 'a';
+  valArrSparseExpect0[1] = 'c';
+  valArrSparseExpect0[3] = 'b';
+  expectValueEquals(valArrSparse0.toSorted(), new ValueArray('a', 'b', 'c', undefined));
+  expectValueEquals(valArrSparse0, valArrSparseExpect0);
+  const valArrSparse1 = new ValueArray(4);
+  valArrSparse1[1] = undefined;
+  valArrSparse1[2] = 'a';
+  valArrSparse1[3] = 'b';
+  const valArrSparseExpect1 = new ValueArray(4);
+  valArrSparseExpect1[1] = undefined;
+  valArrSparseExpect1[2] = 'a';
+  valArrSparseExpect1[3] = 'b';
+  expectValueEquals(valArrSparse1.toSorted(), new ValueArray('a', 'b', undefined, undefined));
+  expectValueEquals(valArrSparse1, valArrSparseExpect1);
 
   // Object elements
-  const obj = { p: 2 }
-  const valArrObj = new ValueArray(obj, { p: 3 }, { p: 1 });
+  const firstObj = { p: 2 }
+  const valArrObj = new ValueArray(firstObj, { p: 3 }, { p: 1 });
   const sortedObj = valArrObj.toSorted((a, b) => a.p - b.p);
-  expectIsClone(sortedObj, new ValueArray({ p: 1 }, { p: 2 }, { p: 3 }));
-  expectIsClone(sortedObj[1], obj);
-  expectIsClone(valArrObj, new ValueArray({ p: 2 }, { p: 3 }, { p: 1 }));
+  expectValueEquals(sortedObj, new ValueArray({ p: 1 }, { p: 2 }, { p: 3 }));
+  expectIsClone(sortedObj[1], firstObj);
+  expectValueEquals(valArrObj, new ValueArray({ p: 2 }, { p: 3 }, { p: 1 }));
 })
 
 // Adapted from code samples in 
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/toSpliced
 test('ValueArray.toSpliced', () => {
   // Primitive elements
-  const months = new ValueArray('Jan', 'Mar', 'Apr', 'May');
-  const splicedMonths0 = months.toSpliced(1, 0, 'Feb');
-  expectIsClone(splicedMonths0, new ValueArray('Jan', 'Feb', 'Mar', 'Apr', 'May'));
-  const splicedMonths1 = splicedMonths0.toSpliced(2, 2);
-  expectIsClone(splicedMonths1, new ValueArray('Jan', 'Feb', 'May'));
-  const splicedMonths2 = splicedMonths1.toSpliced(1, 1, 'Feb', 'Mar');
-  expectIsClone(splicedMonths2, new ValueArray('Jan', 'Feb', 'Mar', 'May'));
-  expectIsClone(months, new ValueArray('Jan', 'Mar', 'Apr', 'May'));
+  const valArr = new ValueArray('Jan', 'Mar', 'Apr', 'May');
+  const splicedValArr0 = valArr.toSpliced(1, 0, 'Feb');
+  expectValueEquals(splicedValArr0, new ValueArray('Jan', 'Feb', 'Mar', 'Apr', 'May'));
+  const splicedValArr1 = splicedValArr0.toSpliced(2, 2);
+  expectValueEquals(splicedValArr1, new ValueArray('Jan', 'Feb', 'May'));
+  const splicedValArr2 = splicedValArr1.toSpliced(1, 1, 'Feb', 'Mar');
+  expectValueEquals(splicedValArr2, new ValueArray('Jan', 'Feb', 'Mar', 'May'));
+  expectValueEquals(valArr, new ValueArray('Jan', 'Mar', 'Apr', 'May'));
 
-  const valArrSparse = new ValueArray(...[1, , 3, 4, , 6]);
-  expectIsClone(valArrSparse.toSpliced(1, 2), new ValueArray(1, 4, undefined, 6));
-  expectIsClone(valArrSparse, new ValueArray(...[1, , 3, 4, , 6]));
+  const valArrSparse = new ValueArray(6);
+  valArrSparse[0] = 1;
+  valArrSparse[2] = 3;
+  valArrSparse[3] = 4;
+  valArrSparse[5] = 6; 
+  const valArrSparseExpect = new ValueArray(6);
+  valArrSparseExpect[0] = 1;
+  valArrSparseExpect[2] = 3;
+  valArrSparseExpect[3] = 4;
+  valArrSparseExpect[5] = 6;
+  expectValueEquals(valArrSparse.toSpliced(1, 2), new ValueArray(1, 4, undefined, 6));
+  expectValueEquals(valArrSparse, valArrSparseExpect);
 
   // Object elements
   const originalElement = { a: 3 };
   const valArrObj = new ValueArray({ a: 1 }, { a: 2 }, originalElement, { a: 4 });
   const addedElement = { a: 5 }
   const valArrObjSpliced = valArrObj.toSpliced(0, 2, addedElement, { a: 6 }, { a: 7 });
-  expectIsClone(valArrObjSpliced, new ValueArray({ a: 5 }, { a: 6 }, { a: 7 }, { a: 3 }, { a: 4 }));
+  expectValueEquals(valArrObjSpliced, new ValueArray({ a: 5 }, { a: 6 }, { a: 7 }, { a: 3 }, { a: 4 }));
   expectIsClone(valArrObjSpliced[0], addedElement);
   expect(valArrObjSpliced[3]).toEqual(originalElement);
 })
@@ -780,6 +838,8 @@ test('Array.toString', () => {
   const valArr = new ValueArray<any>('a', 1, undefined, { b: 2 });
   expect(valArr.toString()).toBe('a,1,,[object Object]');
 })
+
+// HERE
 
 test('Array.unshift', () => {
   const valArr = new ValueArray(1, 2, 3);
