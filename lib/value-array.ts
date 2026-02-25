@@ -31,31 +31,6 @@ function normalizeIndexWithDefaultAndMax(
   return Math.min(normalizeIndexWithDefault(idx, length, default_), max);
 }
 
-// Based on https://github.com/ljharb/es-abstract/blob/main/2024/FlattenIntoArray.js which is MIT licenced
-function flattenIntoArray<M, A extends Array<M>, B extends Array<M>>(
-  target: A, source: B, sourceLen: number, start: number, depth: number
-): number {
-	let targetIndex = start;
-	let sourceIndex = 0;
-	while (sourceIndex < sourceLen) {
-		if (sourceIndex.toString() in source) {
-			const element = source[sourceIndex];
-			if (depth > 0 && Array.isArray(element)) {
-				targetIndex = flattenIntoArray(target, element, element.length, targetIndex, depth - 1);
-			} else {
-				/*if (targetIndex >= MAX_SAFE_INTEGER) {
-					throw new $TypeError('index too large');
-				}*/
-        target[sourceIndex] = element;
-				targetIndex += 1;
-			}
-		}
-		sourceIndex += 1;
-	}
-
-	return targetIndex;
-}
-
 // * Main Class *
 
 @customizeClone('iterate', { runConstructor: true, addMethod: 'push' }) 
