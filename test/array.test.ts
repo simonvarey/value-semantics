@@ -839,22 +839,22 @@ test('Array.toString', () => {
   expect(valArr.toString()).toBe('a,1,,[object Object]');
 })
 
-// HERE
-
 test('Array.unshift', () => {
+  // Primitive elements
   const valArr = new ValueArray(1, 2, 3);
   valArr.unshift(0);
-  expectIsClone(valArr, new ValueArray(0, 1, 2, 3));
-  // external clone
+  expectValueEquals(valArr, new ValueArray(0, 1, 2, 3));
+  // External clone
   const valArrObj = new ValueArray({ p: 1 }, { p: 2 }, { p: 3 });
   const firstObj = { p: 0 };
   valArrObj.unshift(clone(firstObj));
-  expectIsClone(valArrObj, new ValueArray({ p: 0 }, { p: 1 }, { p: 2 }, { p: 3 }));
+  expectValueEquals(valArrObj, new ValueArray({ p: 0 }, { p: 1 }, { p: 2 }, { p: 3 }));
   expectIsClone(valArrObj[0], firstObj);
 })
 
 test('Array.values', () => {
-  const valArr = new ValueArray<number>(1, 2);
+  // Primitive elements
+  const valArr = new ValueArray(1, 2);
   const values = [];
   for (const member of clone(valArr).values()) {
     values.push(member);
@@ -862,7 +862,7 @@ test('Array.values', () => {
   expect(valArr[0]).equals(values[0]);
   expect(valArr[1]).equals(values[1]);
   // External clone
-  const valArrObj = new ValueArray<object>({ a: 1 }, { b: 2 });
+  const valArrObj = new ValueArray({ a: 1 }, { b: 2 });
   const valuesObj = [];
   for (const member of clone(valArrObj).values()) {
     valuesObj.push(member);
@@ -879,8 +879,13 @@ test('ValueArray.with', () => {
   const withArr = valArr.with(2, 'f');
   expectIsClone(withArr, new ValueArray('a', 'b', 'f', 'd', 'e'));
 
-  const sparseArr = new ValueArray(...[1, , 3, 4, , 6]);
-  expectIsClone(sparseArr.with(0, 2), new ValueArray(2, undefined, 3, 4, undefined, 6));
+  const valArrSparse = new ValueArray(6);
+  valArrSparse[0] = 1;
+  valArrSparse[2] = 3;
+  valArrSparse[3] = 4;
+  valArrSparse[5] = 6; 
+  expectValueEquals(valArrSparse.with(0, 2), new ValueArray(2, undefined, 3, 4, undefined, 6));
+
   // External clone
   const valArrObj = new ValueArray<any>({ a: 1 }, { b: 2 }, { c: 3 }, { d: 4 }, { e: 5 });
   const newObj = { f: 6 }
@@ -889,7 +894,8 @@ test('ValueArray.with', () => {
 })
 
 test('Array.[Symbol.iterator]', () => {
-  const valArr = new ValueArray<number>(1, 2);
+  // Primitive value
+  const valArr = new ValueArray(1, 2);
   const clones = [];
   for (const member of clone(valArr)) {
     clones.push(member);
@@ -897,7 +903,7 @@ test('Array.[Symbol.iterator]', () => {
   expect(valArr[0]).equals(clones[0]);
   expect(valArr[1]).equals(clones[1]);
   // External clone
-  const valArrObj = new ValueArray<object>({ a: 1 }, { b: 2 });
+  const valArrObj = new ValueArray({ a: 1 }, { b: 2 });
   const clonesObj = [];
   for (const member of clone(valArrObj)) {
     clonesObj.push(member);
@@ -915,22 +921,22 @@ test('Array.length', () => {
 test('Array[Symbol.unscopables]', () => {
   const unscopables = new ValueArray()[Symbol.unscopables];
   expect(unscopables).toEqual({
-    'at': true,
-    'copyWithin': true,
-    'entries': true,
-    'fill': true,
-    'find': true,
-    'findIndex': true,
-    'findLast': true,
-    'findLastIndex': true,
-    'flat': true,
-    'flatMap': true,
-    'includes': true,
-    'keys': true,
-    'toReversed': true,
-    'toSorted': true,
-    'toSpliced': true,
-    'values': true,
+    at: true,
+    copyWithin: true,
+    entries: true,
+    fill: true,
+    find: true,
+    findIndex: true,
+    findLast: true,
+    findLastIndex: true,
+    flat: true,
+    flatMap: true,
+    includes: true,
+    keys: true,
+    toReversed: true,
+    toSorted: true,
+    toSpliced: true,
+    values: true
   });
 })
 
@@ -942,7 +948,7 @@ test('Array[]', () => {
   expect(valArr[2]).toBe('c');
 
   // External clone
-  const valArrObj = new ValueArray<any>({ a: 1 }, { b: 2 });
+  const valArrObj = new ValueArray<object>({ a: 1 }, { b: 2 });
   const readObj = clone(valArrObj[1]);
   expectIsClone(valArrObj[1], readObj);
   const writeObj = { c: 3 };
