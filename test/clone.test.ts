@@ -404,6 +404,22 @@ test('clone class instance with iterate semantics', () => {
   const instanceClone = clone(instance);
   expect(instanceClone instanceof IterateExample).toBeTruthy();
   expect(instanceClone.members[0]).toBe('a');
+
+  expect(() => {
+    @customize.clone('iterate', { addMethod: 'add' })
+    class IterateNoInteratorExample { }
+  }).toThrowError(
+    /^A non-iterable class cannot be decorated with 'iterate' semantics$/
+  )
+
+  expect(() => {
+    @customize.clone('iterate', { addMethod: 'add' })
+    class IterateNoAddExample {
+      [Symbol.iterator](): void { }
+    }
+  }).toThrowError(
+    /^The specified `addMethod` does not exist on this class$/
+  )
 })
 
 // * Reference Cycles *
