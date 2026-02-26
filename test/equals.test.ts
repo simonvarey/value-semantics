@@ -425,5 +425,17 @@ test('equating class instances with iterate semantics', () => {
   }
   const instance1 = new IterateExample(['a', 'b']);
   const instance2 = new IterateExample(['a', 'b']);
+  const instance3 = new IterateExample(['a']);
+  const instance4 = new IterateExample(['a', 'c']);
   expect(equals(instance1, instance2)).toBeTruthy();
+  expect(equals(instance1, instance3)).toBeFalsy();
+  expect(equals(instance1, instance4)).toBeFalsy();
+  expect(equals(instance1, {})).toBeFalsy();
+
+  expect(() => {
+    @customize.equals('iterate')
+    class C {}
+  }).toThrowError(
+    /^A non-iterable class cannot be decorated with 'iterate' semantics$/
+  )
 })
