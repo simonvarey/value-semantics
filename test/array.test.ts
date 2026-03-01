@@ -195,8 +195,22 @@ test('ValueArray.copyWithin', () => {
   const valArr5 = new ValueArray(1, 2, 3, 4, 5).copyWithin(-2, -3, -1);
   expectValueEquals(valArr5, new ValueArray(1, 2, 3, 3, 4));
 
-  const valArr6 = new ValueArray(...[1, , 3]).copyWithin(2, 1, 2);
-  expectValueEquals(valArr6, new ValueArray(...[1, , ,]));
+  const valArrSparse = new ValueArray(3);
+  valArrSparse[0] = 1;
+  valArrSparse[2] = 3;
+  const valArr6 = valArrSparse.copyWithin(2, 1, 2);
+  const valArrSparseExpect = new ValueArray(3);
+  valArrSparseExpect[0] = 1;
+  expectValueEquals(valArr6, valArrSparseExpect);
+
+  const valArr7 = new ValueArray(1, 2, 3, 4, 5).copyWithin(10, 0);
+  expectValueEquals(valArr7, new ValueArray(1, 2, 3, 4, 5));
+
+  const valArr8 = new ValueArray(1, 2, 3, 4, 5).copyWithin(0, 10);
+  expectValueEquals(valArr8, new ValueArray(1, 2, 3, 4, 5));
+
+  const valArr9 = new ValueArray(1, 2, 3, 4, 5).copyWithin(0, 4, 1);
+  expectValueEquals(valArr9, new ValueArray(1, 2, 3, 4, 5));
 
   // Object elements
   const valArrObj1 = new ValueArray({a: 1}, {b: 2}, {c: 3}, {d: 4}, {e: 5});
@@ -406,7 +420,10 @@ test('ValueArray.includes', () => {
   expect(valArr2.includes('c', -100)).toBeTruthy();
   expect(valArr2.includes('a', -2)).toBeFalsy();
 
-  expect(new ValueArray(...[1, , 3]).includes(undefined)).toBeTruthy();
+  const sparseArr = new ValueArray(3);
+  sparseArr[0] = 1;
+  sparseArr[2] = 3;
+  expect(sparseArr.includes(undefined)).toBeTruthy();
 
   // Object elements
   const valArrObj = new ValueArray({ a: 0 }, { b: 1 }, { c: 2 });
