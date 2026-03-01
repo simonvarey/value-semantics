@@ -166,24 +166,28 @@ class ValueArray<M> extends Array<M> {
     return deletedElements ? new thisConstructor(...deletedElements) : new thisConstructor();
   }
 
+  // clone
   toReversed(): this {
     const reversed = clone(this);
     reversed.reverse();
     return reversed;
   }
 
+  // clone
   toSorted(compareFn?: (a: M, b: M) => number): this {
     const sorted = clone(this);
     sorted.sort(compareFn);
     return sorted;
   }
 
+  // clone
   toSpliced(start?: number, deleteCount?: number, ...items: M[]): this {
     const spliced = clone(this);
     spliced.splice(start, deleteCount, ...items);
     return spliced;
   }
 
+  // clone
   with(index: number, value: M): this {
     if (index < 0) {
       index += this.length;

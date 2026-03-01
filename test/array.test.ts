@@ -716,6 +716,11 @@ test('ValueArray.splice', () => {
   sparseArrRemovedExpect[1] = 3;
   expectValueEquals(sparseArrRemoved, sparseArrRemovedExpect);
 
+  const valArr10 = new ValueArray(1, 2, 3, 4, 5);
+  const valArrRemoved10 = valArr10.splice(2, 6);
+  expectValueEquals(valArr10, new ValueArray(1, 2));
+  expectValueEquals(valArrRemoved10, new ValueArray(3, 4, 5));
+
   // Object elements
   const originalElement = { a: 3 };
   const valArrObj = new ValueArray({ a: 1 }, { a: 2 }, originalElement, { a: 4 });
