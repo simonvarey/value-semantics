@@ -897,9 +897,13 @@ test('Array.values', () => {
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/with
 test('ValueArray.with', () => {
   // Primitive value
-  const valArr = new ValueArray('a', 'b', 'c', 'd', 'e');
-  const withArr = valArr.with(2, 'f');
-  expectIsClone(withArr, new ValueArray('a', 'b', 'f', 'd', 'e'));
+  const valArr0 = new ValueArray('a', 'b', 'c', 'd', 'e');
+  const withArr0 = valArr0.with(2, 'f');
+  expectValueEquals(withArr0, new ValueArray('a', 'b', 'f', 'd', 'e'));
+
+  const valArr1 = new ValueArray('a', 'b', 'c', 'd', 'e');
+  const withArr1 = valArr1.with(-2, 'f');
+  expectValueEquals(withArr1, new ValueArray('a', 'b', 'c', 'f', 'e'));
 
   const valArrSparse = new ValueArray(6);
   valArrSparse[0] = 1;
@@ -907,6 +911,20 @@ test('ValueArray.with', () => {
   valArrSparse[3] = 4;
   valArrSparse[5] = 6; 
   expectValueEquals(valArrSparse.with(0, 2), new ValueArray(2, undefined, 3, 4, undefined, 6));
+
+  const valArr2 = new ValueArray('a', 'b', 'c', 'd', 'e');
+  expect(() => {
+    const withArr2 = valArr2.with(10, 'f');
+  }).toThrowError(
+    /^invalid or out-of-range index$/
+  )
+
+  const valArr3 = new ValueArray('a', 'b', 'c', 'd', 'e');
+  expect(() => {
+    const withArr3 = valArr3.with(-10, 'f');
+  }).toThrowError(
+    /^invalid or out-of-range index$/
+  )
 
   // External clone
   const valArrObj = new ValueArray<any>({ a: 1 }, { b: 2 }, { c: 3 }, { d: 4 }, { e: 5 });
