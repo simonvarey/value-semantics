@@ -156,6 +156,44 @@ test('clones a typed array & shared array buffer', () => {
   expect(arrClone[0]).toBe(1);
 });
 
+test('error: cannot clone a generator', () => {
+  expect(() => {
+    function* genFunc(): Generator {
+      yield 1;
+      yield 2;
+    }
+    const gen = genFunc();
+    const genClone = clone(gen);
+  }).toThrowError(
+    /^Generator objects cannot be cloned$/
+  )
+})
+
+test('error: cannot clone an async generator', () => {
+  expect(() => {
+    async function* genFunc(): AsyncGenerator {
+      yield 1;
+      yield 2;
+    }
+    const gen = genFunc();
+    const genClone = clone(gen); // Needed to throw error
+  }).toThrowError(
+    /^Generator objects cannot be cloned$/
+  )
+})
+
+test('clones a promise', async () => {
+  const promise = new Promise((resolve, _reject) => {
+    setTimeout(() => { resolve({ a: 1 }); }, 10);
+  });
+  const promiseClone = clone(promise);
+  expect(promiseClone).toBe(promiseClone);
+  const result = await promise;
+  const resultOfClone = await promiseClone;
+  expect(resultOfClone).toStrictEqual({ a: 1 });
+  expect(resultOfClone).toBe(result);
+})
+
 // Wrapper Objects
 
 test('clones a wrapped boolean', () => {
@@ -337,6 +375,51 @@ test('constructorParams are implictly excluded', () => {
   expect(instance.constructorField2).toBe(11);
   expect(instanceClone.constructorField1).toBe(3);
   expect(instanceClone.constructorField2).toBe(11);
+})
+
+
+test('clone class instance with iterate semantics', () => {
+  @customize.clone('iterate', { runConstructor: true, addMethod: 'push' })
+  class ArraySuperExample<M> extends Array<M> { }
+  const arr = new ArraySuperExample(1, 2);
+  const arrClone = clone(arr);
+  expect(arrClone instanceof ArraySuperExample).toBeTruthy();
+  expect(arrClone[1]).toBe(2);
+
+  @customize.clone('iterate', { runConstructor: true, addMethod: 'add' })
+  class IterateExample {
+    public members: string[] = [];
+
+    [Symbol.iterator](): Iterator<string> {
+      return this.members[Symbol.iterator]();
+    }
+
+    add(member: string): void {
+      this.members.push(member);
+    }
+  }
+  const instance = new IterateExample();
+  instance.add('a');
+  instance.add('b');
+  const instanceClone = clone(instance);
+  expect(instanceClone instanceof IterateExample).toBeTruthy();
+  expect(instanceClone.members[0]).toBe('a');
+
+  expect(() => {
+    @customize.clone('iterate', { addMethod: 'add' })
+    class IterateNoInteratorExample { }
+  }).toThrowError(
+    /^A non-iterable class cannot be decorated with 'iterate' semantics$/
+  )
+
+  expect(() => {
+    @customize.clone('iterate', { addMethod: 'add' })
+    class IterateNoAddExample {
+      [Symbol.iterator](): void { }
+    }
+  }).toThrowError(
+    /^The specified `addMethod` does not exist on this class$/
+  )
 })
 
 // * Reference Cycles *

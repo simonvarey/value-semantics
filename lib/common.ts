@@ -23,7 +23,7 @@ export function getMeta<T>(target: object, key: PropKey): T | typeof META_NOT_FO
 }
 
 export function setMeta(
-  target: Constructor<unknown> | BigIntConstructor | SymbolConstructor, key: PropKey, value: unknown
+  target: Constructor | BigIntConstructor | SymbolConstructor, key: PropKey, value: unknown
 ): void {
   target[Symbol.metadata] ??= {};
   target[Symbol.metadata]![key] = value;
@@ -106,19 +106,24 @@ export function getKeys(
 
 // * Customization: Decorators *
 
-export type Constructor<Instance> = { new(...args: any[]): Instance; };
+export type Constructor = abstract new (...args: any) => any;
 
-export type ClassDecorator_<I> = (
-  constructor: Constructor<I>, context: ClassDecoratorContext
-) => Constructor<I> | void;
+export type ClassDecorator_<C> = (
+  constructor: C, context: ClassDecoratorContext
+) => C | void;
 
 // * Errors *
 
-export type ValueSemanticsErrorType = 'ErrorOnClone' | 'IncludeAndExclude';
+export type ValueSemanticsErrorType = 'ErrorOnClone' | 'IncludeAndExclude' | 'IterateNonIterable'
+  | 'IterateNoAddMethod' | 'ErrorOnGeneratorClone' | 'FunctionValueEquals';
 
 export const ERROR_MSGS: Record<ValueSemanticsErrorType, string> = {
   'ErrorOnClone': 'Instances of class % cannot be cloned',
-  'IncludeAndExclude': 'A field cannot be decorated with both `@include` and `@exclude`'
+  'IncludeAndExclude': 'A field cannot be decorated with both `@include` and `@exclude`',
+  'IterateNonIterable': "A non-iterable class cannot be decorated with 'iterate' semantics",
+  'IterateNoAddMethod': 'The specified `addMethod` does not exist on this class',
+  'ErrorOnGeneratorClone': 'Generator objects cannot be cloned',
+  'FunctionValueEquals': "The class % is a subtype of `Function`, and therefore cannot be decorated with 'value' `equals` semantics'",
 }
 
 export class ValueSemanticsError extends Error {
@@ -126,4 +131,24 @@ export class ValueSemanticsError extends Error {
     const msg = ERROR_MSGS[type].replace('%', arg);
     super(msg);
   }
+}
+
+// * Generators *
+
+function findProtoInInstanceChain(proto: Function, instance: object): boolean {
+  const ersatzConstructor = function() {};
+  ersatzConstructor.prototype = proto;
+  return instance instanceof ersatzConstructor;
+}
+
+const GENERATOR_PROTO = (function* () {}.constructor).prototype.prototype;
+
+export function isGenerator(instance: object): boolean {
+  return findProtoInInstanceChain(GENERATOR_PROTO, instance);
+}
+
+const ASYNC_GENERATOR_PROTO = (async function* () {}.constructor).prototype.prototype;
+
+export function isAsyncGenerator(instance: object): boolean {
+  return findProtoInInstanceChain(ASYNC_GENERATOR_PROTO, instance);
 }

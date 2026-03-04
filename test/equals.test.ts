@@ -3,16 +3,38 @@ import { customize, equals } from '../lib/main'
 
 // * Primitives *
 
-test('equate nulls', () => {
-  expect(equals(null, null)).toBeTruthy();
+test('equating booleans', () => {
+  expect(equals(true, true)).toBeTruthy();
+  expect(equals(true, false)).toBeFalsy();
 })
 
-test('equate null and number', () => {
+test('equating undefined', () => {
+  expect(equals(undefined, undefined)).toBeTruthy();
+  expect(equals(undefined, {})).toBeFalsy();
+})
+
+test('equating symbols', () => {
+  const sym1 = Symbol();
+  const sym2 = Symbol();
+  expect(equals(sym1, sym1)).toBeTruthy();
+  expect(equals(sym1, sym2)).toBeFalsy();
+  expect(equals(sym1, {})).toBeFalsy();
+  expect(equals(Symbol.for('x'), Symbol.for('x'))).toBeTruthy();
+  expect(equals(Symbol.for('x'), sym1)).toBeFalsy();
+})
+
+test('equating nulls', () => {
+  expect(equals(null, null)).toBeTruthy();
+  expect(equals(null, Object.create(null))).toBeFalsy();
+  expect(equals(null, {})).toBeFalsy();
+})
+
+test('equating null and number', () => {
   expect(equals(null, 1)).toBeFalsy();
   expect(equals(1, null)).toBeFalsy();
 })
 
-test('equate numbers', () => {
+test('equating numbers', () => {
   expect(equals(1, 1)).toBeTruthy();
   expect(equals(1, 2)).toBeFalsy();
   expect(equals(3, 1)).toBeFalsy();
@@ -21,43 +43,102 @@ test('equate numbers', () => {
   expect(equals(NaN, 1)).toBeFalsy();
 })
 
-test('equate strings', () => {
+test('equating bigints', () => {
+  expect(equals(1n, 1n)).toBeTruthy();
+  expect(equals(1n, 2n)).toBeFalsy();
+  expect(equals(3n, 1n)).toBeFalsy();
+  expect(equals(1n, BigInt(1))).toBeTruthy();
+  expect(equals(BigInt(1), 1n)).toBeTruthy();
+  expect(equals(BigInt(1), BigInt(1))).toBeTruthy();
+  const wrappedBigInt = Object(10n);
+  expect(equals(wrappedBigInt, 10n)).toBeTruthy();
+  expect(equals(10n, wrappedBigInt)).toBeTruthy();
+})
+
+test('equating strings', () => {
   expect(equals('a', 'a')).toBeTruthy();
   expect(equals('b', 'c')).toBeFalsy();
 })
 
-test('equate empty object and null', () => {
+test('equating empty object and null', () => {
   expect(equals({}, null)).toBeFalsy();
   expect(equals(null, {})).toBeFalsy();
 })
 
-test('equate arrays', () => {
+test('equating arrays', () => {
   expect(equals([1, 'a'], [1, 'a'])).toBeTruthy();
   expect(equals([1, 'a'], [1])).toBeFalsy();
 })
 
-test('equate arrays and numbers', () => {
+test('equating arrays and numbers', () => {
   expect(equals([1, 'a'], 1)).toBeFalsy();
 })
 
-test('equate array and empty object', () => {
+test('equating arrays and empty objects', () => {
   expect(equals([1, 'a'], {})).toBeFalsy();
 })
 
-test('equate function with itself', () => {
-  const func = function (param: number): number { return param; };
-  expect(equals(func, func)).toBeTruthy();
+test('equating functions', () => {
+  const func1 = function func (param: number): number { return param; };
+  const func2 = function func (param: number): number { return param; };
+  expect(equals(func1, func1)).toBeTruthy();
+  expect(equals(func1, func2)).toBeFalsy();
+
+  const func3 = new Function('a', 'b', 'return a + b;');
+  const func4 = new Function('a', 'b', 'return a + b;');
+  const func5 = new Function('a', 'b', 'return a - b;');
+  expect(equals(func3, func3)).toBeTruthy();
+  expect(equals(func3, func4)).toBeFalsy();
+  expect(equals(func3, func5)).toBeFalsy();
+
+  class FunctionSub extends Function {}
+  const sub1a = new FunctionSub('a', 'b', 'return a + b;');
+  const sub1b = new FunctionSub('a', 'b', 'return a + b;');
+  const sub2 = new FunctionSub('a', 'b', 'return a - b;');
+  const sub3 = new FunctionSub('a', 'return a;');
+  expect(typeof sub1a === 'function').toBeTruthy();
+  expect(sub1a instanceof Function).toBeTruthy();
+  expect(sub1a instanceof FunctionSub).toBeTruthy();
+  expect(sub1a(1, 2)).toBe(3);
+  expect(equals(sub1a.valueOf(), sub1a)).toBeTruthy();
+  expect(equals(sub1a, sub1a)).toBeTruthy();
+  expect(equals(sub1a, sub1b)).toBeFalsy();
+  expect(equals(sub1a, sub2)).toBeFalsy();
+  expect(equals(sub1a, sub3)).toBeFalsy();
+
+  @customize.equals('ref')
+  class FunctionRef extends Function {}
+  const ref1a = new FunctionRef('a', 'b', 'return a + b;');
+  const ref1b = new FunctionRef('a', 'b', 'return a + b;');
+  const ref2 = new FunctionRef('a', 'b', 'return a - b;');
+  const ref3 = new FunctionRef('a', 'return a;');
+  expect(typeof ref1a === 'function').toBeTruthy();
+  expect(ref1a instanceof Function).toBeTruthy();
+  expect(ref1a instanceof FunctionRef).toBeTruthy();
+  expect(sub1a(1, 2)).toBe(3);
+  expect(equals(ref1a.valueOf(), ref1a)).toBeTruthy();
+  expect(equals(ref1a, ref1a)).toBeTruthy();
+  expect(equals(ref1a, ref1b)).toBeFalsy();
+  expect(equals(ref1a, ref2)).toBeFalsy();
+  expect(equals(ref1a, ref3)).toBeFalsy();
+
+  expect(() => {
+    @customize.equals('value')
+    class FunctionVal extends Function {}
+  }).toThrowError(
+    /^The class FunctionVal is a subtype of `Function`, and therefore cannot be decorated with 'value' `equals` semantics'$/
+  )
 })
 
 // * Objects *
 
 // Object Literals
 
-test('object literal equals object literal', () => {
+test('equating object literals', () => {
   expect(equals({ a: 1 }, { a: 1 })).toBeTruthy();
 })
 
-test('object literal equals null prototype object', () => {
+test('equating object literals and null prototype objects', () => {
   expect(equals({ a: 1 }, Object.create(null))).toBeFalsy();
 })
 
@@ -66,7 +147,7 @@ test('equating different object literals', () => {
   expect(equals({ a: 1, b: 2 }, { a: 2 })).toBeFalsy();
 })
 
-test('null prototype object equals null prototype object', () => {
+test('equating null prototype objects', () => {
   expect(equals(Object.create(null), Object.create(null))).toBeTruthy();
 })
 
@@ -84,6 +165,16 @@ test('equating sets', () => {
   expect(equals(set1, set4)).toBeFalsy();
 })
 
+test('equating sets with value-equal members', () => {
+  const set1 = new Set([{ a: 1 }, { a: 1 }, 'z']);
+  const set2 = new Set([{ a: 1 }, 'y', 'z']);
+  const set3 = new Set([{ a: 1 }, { a: 1 }, 'z']);
+  expect(equals(set1, set2)).toBeFalsy();
+  expect(equals(set2, set1)).toBeFalsy();
+  expect(equals(set1, set3)).toBeTruthy();
+  expect(equals(set3, set1)).toBeTruthy();
+})
+
 test('equating maps', () => {
   const map1 = new Map([[1, 'a']]);
   const map2 = new Map([[1, 'a']]);
@@ -96,6 +187,19 @@ test('equating maps', () => {
   expect(equals(map1, {})).toBeFalsy();
   expect(equals(map4, map3)).toBeFalsy();
   expect(equals(map5, map3)).toBeFalsy();
+})
+
+test('equating maps with value-equal keys', () => {
+  const entry1: [unknown, unknown] = [{ a: 1 }, 'z'];
+  const entry2: [unknown, unknown] = [{ a: 1 }, 'z'];
+  const entry3: [unknown, unknown] = [{ a: 1 }, 'y'];
+  const map1 = new Map([entry1, entry2]);
+  const map2 = new Map([entry1, entry3]);
+  const map3 = new Map([entry1, entry2]);
+  expect(equals(map1, map2)).toBeFalsy();
+  expect(equals(map2, map1)).toBeFalsy();
+  expect(equals(map1, map3)).toBeTruthy();
+  expect(equals(map3, map1)).toBeTruthy();
 })
 
 test('equating regexps', () => {
@@ -137,16 +241,18 @@ test('equating weakrefs', () => {
   expect(ref3.deref()!.b).toBe(2);
 })
 
-test('equating typed array', () => {
+test('equating typed arrays', () => {
   const array1 = new Uint8Array([1, 2]);
   const array2 = new Uint8Array([1, 2]);
   const array3 = new Uint8Array([3]);
   const array4 = new Uint8Array([3, 4]);
+  const array5 = new Uint16Array([1, 2]);
   expect(equals(array1, array2)).toBeTruthy();
   expect(equals(array1, array3)).toBeFalsy();
   expect(equals(array1, array4)).toBeFalsy();
   expect(equals(array1, 0)).toBeFalsy();
   expect(equals(array1, {})).toBeFalsy();
+  expect(equals(array1, array5)).toBeFalsy();
 });
 
 test('equating data views & array buffers', () => {
@@ -193,22 +299,44 @@ test('equating data views & shared array buffers', () => {
   expect(equals(view1, {})).toBeFalsy();
 });
 
+test('equating generators', () => {
+  function* genFunc1(): Generator {
+    yield 1;
+    yield 2;
+  }
+  function* genFunc2(): Generator {
+    yield 1;
+    yield 2;
+  }
+  const gen1 = genFunc1();
+  const gen2 = genFunc2();
+  expect(equals(gen1, gen1)).toBeTruthy();
+  expect(equals(gen1, gen2)).toBeFalsy();
+})
+
+test('equating async generators', () => {
+  async function* genFunc1(): AsyncGenerator {
+    yield 1;
+    yield 2;
+  }
+  async function* genFunc2(): AsyncGenerator {
+    yield 1;
+    yield 2;
+  }
+  const gen1 = genFunc1();
+  const gen2 = genFunc2();
+  expect(equals(gen1, gen1)).toBeTruthy();
+  expect(equals(gen1, gen2)).toBeFalsy();
+})
+
 // Circular Objects 
 
-test('circular object', () => {
+test('equating circular objects', () => {
   const a0: any = { b: null };
   a0.b = a0;
   const a1: any = { b: null };
   a1.b = a1;
   expect(equals(a0, a1)).toBeTruthy();
-})
-
-// Wrapped Primitive
-
-test('wrapped bigint', () => {
-  const wrappedBigInt = Object(10n);
-  expect(equals(wrappedBigInt, 10n)).toBeTruthy();
-  expect(equals(10n, wrappedBigInt)).toBeTruthy();
 })
 
 // * Classes *
@@ -278,4 +406,36 @@ test('equating class instances with reference semantics', () => {
   const instanceL = new StrictEqualsExample();
   const instanceR = new StrictEqualsExample();
   expect(equals(instanceL, instanceR)).toBeFalsy();
+})
+
+test('equating class instances with iterate semantics', () => {
+  @customize.equals('iterate')
+  class ArraySuperExample<M> extends Array<M> { }
+  const arr1 = new ArraySuperExample(1, 2);
+  const arr2 = new ArraySuperExample(1, 2);
+  expect(equals(arr1, arr2)).toBeTruthy();
+
+  @customize.equals('iterate')
+  class IterateExample {
+    constructor(public members: string[]) { };
+
+    [Symbol.iterator](): Iterator<string> {
+      return this.members[Symbol.iterator]();
+    }
+  }
+  const instance1 = new IterateExample(['a', 'b']);
+  const instance2 = new IterateExample(['a', 'b']);
+  const instance3 = new IterateExample(['a']);
+  const instance4 = new IterateExample(['a', 'c']);
+  expect(equals(instance1, instance2)).toBeTruthy();
+  expect(equals(instance1, instance3)).toBeFalsy();
+  expect(equals(instance1, instance4)).toBeFalsy();
+  expect(equals(instance1, {})).toBeFalsy();
+
+  expect(() => {
+    @customize.equals('iterate')
+    class C {}
+  }).toThrowError(
+    /^A non-iterable class cannot be decorated with 'iterate' semantics$/
+  )
 })

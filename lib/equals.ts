@@ -6,22 +6,54 @@
 
 // * Imports *
 
-import { Constructor, EQUALS_EXCLUDE_PROPS, EQUALS_INCLUDE_PROPS, ClassDecorator_, EqualsVisited, 
-  EQUALS_METHOD, TYPED_ARRAYS, getAllKeys, getKeys, PropKey, EqualMethodFunc, setMeta, getMeta, 
-  META_NOT_FOUND } from "./common";
+import { EQUALS_EXCLUDE_PROPS, EQUALS_INCLUDE_PROPS, EqualsVisited, EQUALS_METHOD, TYPED_ARRAYS, 
+  getAllKeys, getKeys, PropKey, EqualMethodFunc, setMeta, getMeta, META_NOT_FOUND, Constructor, 
+  ClassDecorator_, ValueSemanticsError, isGenerator, isAsyncGenerator } from './common';
 
 // * Helpers *
 
-// Constants
+// Constants & Types
 
 export const REF_EQUALS = Symbol.for('ref-equals');
 
-const WrappedPrimitives = [Boolean, Number, BigInt, String, Symbol];
+type IterateEquatable<I, M> = I & Iterable<M>
+
+// Primitive values and Wrapper Objects
+
+type Primitive = boolean | number | BigInt | string | symbol | undefined;
+
+function isPrimitive(val: unknown): val is Primitive {
+  return ['boolean', 'number', 'bigint', 'string', 'symbol', 'undefined'].includes(typeof val)
+    || val == null;
+}
+
+const WRAPPER_OBJECT_CONSTRUCTORS = [
+  Boolean, Number, BigInt, String, Symbol
+];
+
+type WrapperObject = typeof WRAPPER_OBJECT_CONSTRUCTORS[number];
+
+// Exported for Testing
+export function isPrimitiveWrapper(obj: object): obj is WrapperObject {
+  return WRAPPER_OBJECT_CONSTRUCTORS.some((prim) => obj instanceof prim);
+}
+
+// Exported for Testing
+export function isWrapperObject(obj: unknown): obj is WrapperObject {
+  return WRAPPER_OBJECT_CONSTRUCTORS.some(
+    (WrapPrim) => Object.getPrototypeOf(obj) === WrapPrim.prototype
+  );
+}
 
 // Utility Functions
 
-function zip<TL, TR>(lArray: TL[], rArray: TR[]): [TL, TR][] {
-  return lArray.map((l, i) => { return [l, rArray[i]]; });
+function zip<EL, ER>(lArray: EL[], rArray: ER[]): [EL, ER][] {
+  const ret: [EL, ER][] = [];
+  // NOTE: `for..of` required for sparse arrays, as `map` skips empty slots
+  for (const [arrIndex, lElement] of lArray.entries()) {
+    ret.push([lElement, rArray[arrIndex]]);
+  }
+  return ret;
 }
 
 // Metadata Helpers
@@ -55,7 +87,7 @@ function checkVisited(fst: object, snd: object, visited: EqualsVisited): boolean
   return null;
 }
 
-function setVisited(fst: object, snd: object, visited: EqualsVisited, res: boolean) {
+function setVisited(fst: object, snd: object, visited: EqualsVisited, res: boolean): boolean {
   let fstVisited = visited.get(fst);
   if (fstVisited === undefined) {
     fstVisited = new Map();
@@ -68,43 +100,43 @@ function setVisited(fst: object, snd: object, visited: EqualsVisited, res: boole
     visited.set(snd, sndVisited);
   }
   sndVisited!.set(fst, res);
+  return res;
 }
 
 // * Builtins *
 
 // Definition Helpers
 
-const defineEqualsMethod = <C extends Constructor<unknown>>(
+const defineEqualsMethod = <C extends Constructor>(
   target: C, value: EqualMethodFunc<InstanceType<C>>
 ) => {
   setMeta(target, EQUALS_METHOD, value);
 };
 
-const defineRefEquals = (target: Constructor<unknown>) => {
+const defineRefEquals = (target: Constructor) => {
   setMeta(target, REF_EQUALS, true);
 };
 
 // Equality Helpers
 
-function checkExactPrototype<C extends Constructor<unknown>>(
-  subject: unknown, constructor: C
-): subject is InstanceType<C> {
-  return Object.getPrototypeOf(subject) === constructor.prototype;
+function checkSamePrototype<L extends object>(lhs: L, rhs: unknown): rhs is L {
+  return Object.getPrototypeOf(lhs) === Object.getPrototypeOf(rhs);
 }
 
-function wrappedPrimitiveEquals(obj: object, prim: unknown): boolean {
-  for (const Wrapped of WrappedPrimitives) {
-      if (obj instanceof Wrapped) {
-        return obj.valueOf() === prim;
-    }
-  }
-  return false;
+function sameValueZero(lhs: unknown, rhs: unknown): boolean {
+  return lhs === rhs || (Number.isNaN(lhs) && Number.isNaN(rhs));
+}
+
+function sameValueZeroPrimitive(lhs: Primitive, rhs: Primitive): boolean {
+  return sameValueZero(lhs, rhs);
 }
 
 function checkSetMembers(lhs: Set<unknown>, rhs: Set<unknown>, visited: EqualsVisited): boolean {
+  const rhsArray = [...rhs];
   outer: for (const l of lhs) {
-    for (const r of rhs) {
+    for (const [rIndex, r] of rhsArray.entries()) {
       if (equalscyc(l, r, visited)) {
+        rhsArray.splice(rIndex, 1);
         continue outer;
       }
     }
@@ -115,14 +147,15 @@ function checkSetMembers(lhs: Set<unknown>, rhs: Set<unknown>, visited: EqualsVi
 
 function checkMapMembers(
   lhs: Map<unknown, unknown>, rhs: Map<unknown, unknown>, visited: EqualsVisited
-): boolean {  
+): boolean {
+  const rhsKeysArray = [...rhs.keys()];
   outer: for (const lKey of lhs.keys()) {
-    for (const rKey of rhs.keys()) {
+    for (const [rIndex, rKey] of rhsKeysArray.entries()) {
       if (equalscyc(lKey, rKey, visited)) {
-        if (!(equalscyc(lhs.get(lKey), rhs.get(rKey), visited))) {
-          return false;
+        if (equalscyc(lhs.get(lKey), rhs.get(rKey), visited)) {
+          rhsKeysArray.splice(rIndex, 1);
+          continue outer;
         }
-        continue outer;
       }
     }
     return false;
@@ -135,7 +168,7 @@ function checkMapMembers(
 defineEqualsMethod(
   Array, 
   function(this: unknown[], other: object, visited: EqualsVisited): boolean {
-    if (!checkExactPrototype(other, Array)) {
+    if (!checkSamePrototype(this, other)) {
       return false;
     }
     if (this.length !== other.length) {
@@ -148,7 +181,7 @@ defineEqualsMethod(
 defineEqualsMethod(
   Set, 
   function(this: Set<unknown>, other: object, visited: EqualsVisited): boolean {
-    if (!checkExactPrototype(other, Set)) {
+    if (!checkSamePrototype(this, other)) {
       return false;
     }
     if (this.size !== other.size) {
@@ -161,7 +194,7 @@ defineEqualsMethod(
 defineEqualsMethod(
   Map, 
   function(this: Map<unknown, unknown>, other: object, visited: EqualsVisited): boolean {
-    if (!checkExactPrototype(other, Map)) {
+    if (!checkSamePrototype(this, other)) {
       return false;
     }
     if (this.size !== other.size) {
@@ -174,7 +207,7 @@ defineEqualsMethod(
 defineEqualsMethod(
   RegExp, 
   function(this: RegExp, other: object, _visited: EqualsVisited): boolean {
-    if (!checkExactPrototype(other, RegExp)) {
+    if (!checkSamePrototype(this, other)) {
       return false;
     }
     return this.toString() === other.toString();
@@ -184,7 +217,7 @@ defineEqualsMethod(
 defineEqualsMethod(
   Date, 
   function(this: Date, other: object, _visited: EqualsVisited): boolean {
-    if (!checkExactPrototype(other, Date)) {
+    if (!checkSamePrototype(this, other)) {
       return false;
     }
     return +this === +other;
@@ -194,7 +227,7 @@ defineEqualsMethod(
 defineEqualsMethod(
   ArrayBuffer, 
   function(this: ArrayBuffer, other: object, _visited: EqualsVisited): boolean {
-    if (!checkExactPrototype(other, ArrayBuffer)) {
+    if (!checkSamePrototype(this, other)) {
       return false;
     }
     if (this.byteLength !== other.byteLength) {
@@ -214,7 +247,7 @@ defineEqualsMethod(
 defineEqualsMethod(
   SharedArrayBuffer, 
   function(this: SharedArrayBuffer, other: object, _visited: EqualsVisited): boolean {
-    if (!checkExactPrototype(other, SharedArrayBuffer)) {
+    if (!checkSamePrototype(this, other)) {
       return false;
     }
     if (this.byteLength !== other.byteLength) {
@@ -234,7 +267,7 @@ defineEqualsMethod(
 defineEqualsMethod(
   DataView, 
   function(this: DataView, other: object, _visited: EqualsVisited): boolean {
-    if (!checkExactPrototype(other, DataView)) {
+    if (!checkSamePrototype(this, other)) {
       return false;
     }
     if (this.byteLength !== other.byteLength) {
@@ -253,7 +286,7 @@ for (const typedArray of TYPED_ARRAYS) {
   defineEqualsMethod(
     typedArray, 
     function(this: InstanceType<typeof typedArray>, other: object, _visited: EqualsVisited): boolean {
-      if (!checkExactPrototype(other, typedArray)) {
+      if (!checkSamePrototype(this, other)) {
         return false;
       }
       if (this.byteLength !== other.byteLength) {
@@ -272,15 +305,17 @@ for (const typedArray of TYPED_ARRAYS) {
 defineEqualsMethod(
   WeakRef, 
   function(this: WeakRef<WeakKey>, other: object, visited: EqualsVisited): boolean {
-    if (!checkExactPrototype(other, WeakRef)) {
+    if (!checkSamePrototype(this, other)) {
       return false;
     }
     return equalscyc(this.deref(), other.deref(), visited);
   }
 );
 
+defineRefEquals(Function);
 defineRefEquals(WeakSet);
 defineRefEquals(WeakMap);
+defineRefEquals(Promise);
 
 // * Main Equals Function *
 
@@ -297,7 +332,7 @@ export function equals(lhs: unknown, rhs: unknown): boolean {
 
 export function equalscyc(lhs: unknown, rhs: unknown, visited: EqualsVisited): boolean {
   // Quick return for reference-equals / primitives
-  if (lhs === rhs) {
+  if (sameValueZero(lhs, rhs)) {
     return true;
   }
   // Null
@@ -305,19 +340,19 @@ export function equalscyc(lhs: unknown, rhs: unknown, visited: EqualsVisited): b
     return false;
   }
   // LHS non-object
-  if (typeof lhs !== 'object') {
-    if (typeof lhs === 'number' && isNaN(lhs)) {
-      return typeof rhs === 'number' && isNaN(rhs);
-    }
-    if (typeof rhs === 'object') {
-      return wrappedPrimitiveEquals(rhs, lhs);
+  if (isPrimitive(lhs)) {
+    if (isWrapperObject(rhs)) {
+      return sameValueZeroPrimitive(rhs.valueOf() as Primitive, lhs);
     }
     return false;
   }
   // LHS object
   // RHS non-object
-  if (typeof rhs !== 'object') {
-    return wrappedPrimitiveEquals(lhs, rhs);
+  if (isPrimitive(rhs)) {
+    if (isWrapperObject(lhs)) {
+      return sameValueZeroPrimitive(lhs.valueOf() as Primitive, rhs);
+    }
+    return false;
   }
   // Already visited objects
   const lrVisited = checkVisited(lhs, rhs, visited);
@@ -326,70 +361,90 @@ export function equalscyc(lhs: unknown, rhs: unknown, visited: EqualsVisited): b
   }
   // Set as equal initially - this prevents infinite recursion
   setVisited(lhs, rhs, visited, true);
-  // Objects with REF_EQUALS or EQUALS_METHOD
+  // Objects with customized equals implementations
   try {
     checkEqualsMethod(lhs, rhs, visited);
     checkEqualsMethod(rhs, lhs, visited);
     checkRefEqualsProp(lhs, rhs);
     checkRefEqualsProp(rhs, lhs);
   } catch (except) {
-    if (typeof except === "boolean") {
-      setVisited(lhs, rhs, visited, except);
-      return except;
+    if (typeof except === 'boolean') {
+      return setVisited(lhs, rhs, visited, except);
     } else {
       throw except;
     }
   }
+  // Generator Objects
+  if (isGenerator(lhs) || isGenerator(rhs) || isAsyncGenerator(lhs) || isAsyncGenerator(rhs)) {
+    return setVisited(lhs, rhs, visited, false);
+  }
   // Other Objects
-  if (Object.getPrototypeOf(lhs) !== Object.getPrototypeOf(rhs)) {
-    setVisited(lhs, rhs, visited, false);
-    return false;
+  if (!checkSamePrototype(lhs, rhs)) {
+    return setVisited(lhs, rhs, visited, false);
   }
   const lhsKeys = getAllKeys(lhs);
   const rhsKeys = getAllKeys(rhs);
   if (lhsKeys.size !== rhsKeys.size) {
-    return false;
+    return setVisited(lhs, rhs, visited, false);
   }
   if (lhsKeys.intersection(rhsKeys).size !== lhsKeys.size) {
-    return false;
+    return setVisited(lhs, rhs, visited, false);
   }
   for (const key of lhsKeys) {
     if (!(equalscyc(lhs[key as keyof typeof lhs], rhs[key as keyof typeof rhs], visited))) {
-      setVisited(lhs, rhs, visited, false);
-      return false;
+      return setVisited(lhs, rhs, visited, false);
     }
   }
-  setVisited(lhs, rhs, visited, true);
-  return true;
+  // Primitive Wrappers
+  if (isPrimitiveWrapper(lhs) // and therefore isPrimitiveWrapper(rhs)
+    && typeof lhs.valueOf === 'function' // and therefore typeof rhs.valueOf === 'function'
+  ) {
+    if (!sameValueZeroPrimitive(lhs.valueOf() as Primitive, rhs.valueOf() as Primitive)) {
+      return setVisited(lhs, rhs, visited, false);
+    }
+  }
+  return setVisited(lhs, rhs, visited, true);
 }
 
 // * Equals Customization Decorators *
 
+// Helper 
+
+function checkProtoChain(haystack: object, needle: object): boolean {
+  let current = haystack;
+  while (current !== null) {
+    if (current === needle) {
+      return true;
+    }
+    current = Object.getPrototypeOf(current);
+  }
+  return false;
+}
+
 // Types
 
-export const EQUALS_SEMANTICS = ['value', 'ref'] as const;
+export const EQUALS_SEMANTICS = ['value', 'ref', 'iterate'] as const;
 export type EqualsSemantics = typeof EQUALS_SEMANTICS[number];
 
 export type CustomizeEqualsOptions = {
   propDefault?: 'include' | 'exclude'
 }
 
-// Helpers
-
-function checkExactSamePrototype<I>(lhs: I, rhs: unknown): rhs is I {
-  return Object.getPrototypeOf(lhs) === Object.getPrototypeOf(rhs);
-}
-
 // Class Decorator
 
-export function customizeEquals<I extends object>(options?: CustomizeEqualsOptions): ClassDecorator_<I>
-export function customizeEquals<I extends object>(
+export function customizeEquals<C extends Constructor>(
+  options?: CustomizeEqualsOptions
+): ClassDecorator_<C>
+export function customizeEquals<C extends Constructor>(
   semantics: 'value', options?: CustomizeEqualsOptions
-): ClassDecorator_<I>
-export function customizeEquals<I extends object>(semantics: 'ref'): ClassDecorator_<I>
-export function customizeEquals<I extends object>(
+): ClassDecorator_<C>
+export function customizeEquals<C extends Constructor>(semantics: 'ref'): ClassDecorator_<C>
+export function customizeEquals<C extends Constructor>(semantics: 'iterate'): ClassDecorator_<C>
+export function customizeEquals<C extends Constructor>(
   semanticsOrOpts?: EqualsSemantics | CustomizeEqualsOptions, options?: CustomizeEqualsOptions
-): ClassDecorator_<I> {
+): ClassDecorator_<C> {
+  type I = InstanceType<C>;
+
   const semantics: EqualsSemantics = typeof semanticsOrOpts === 'string' ? semanticsOrOpts : 'value';
   
   if (!options) {
@@ -401,24 +456,75 @@ export function customizeEquals<I extends object>(
   }
   const opts: Required<CustomizeEqualsOptions> = { propDefault: 'include', ...options };
 
-  return function(_constructor: Constructor<I>, context: ClassDecoratorContext): void {
+  return function(constructor: C, context: ClassDecoratorContext): void {
     if (semantics === 'ref') {
       context.metadata[REF_EQUALS] = true;
       return;
     };
 
-    context.metadata[EQUALS_METHOD] = function(this: I, other: object, visited: EqualsVisited): boolean {
-      if (!checkExactSamePrototype(this, other)) {
-        return false;
+    const valueEqualsMeth = function(this: I, other: object, visited: EqualsVisited): boolean {
+      setVisited(this, other, visited, true);
+      if (!checkSamePrototype(this, other)) {
+        return setVisited(this, other, visited, false);
       }
       const equalsProps = getKeys(this, opts.propDefault, 'equals');
       for (const key of equalsProps) {
         if (!(equalscyc(this[key as keyof I], other[key as keyof I], visited))) {
-          return false;
+          return setVisited(this, other, visited, false);
         }
       }
+      if (isPrimitiveWrapper(this) // and therefore isPrimitiveWrapper(rhs)
+        && typeof (this as WrapperObject).valueOf === 'function' 
+        && typeof other.valueOf === 'function'
+      ) { 
+        if (!sameValueZeroPrimitive(
+          (this as WrapperObject).valueOf() as Primitive, 
+          other.valueOf() as Primitive)
+        ) {
+          return setVisited(this, other, visited, false);
+        }
+      }
+      return setVisited(this, other, visited, true);
+    };
+
+    const iterateEqualsMeth = function<M>(
+      this: IterateEquatable<I, M>, other: object, visited: EqualsVisited
+    ): boolean {
+      setVisited(this, other, visited, true);
+      if (!checkSamePrototype(this, other)) {
+        setVisited(this, other, visited, false);
+        return false;
+      }
+      const thisIterator = this[Symbol.iterator]();
+      const otherIterator = other[Symbol.iterator]();
+      let thisResult: IteratorResult<M>;
+      let otherResult: IteratorResult<M>;
+      do {
+        thisResult = thisIterator.next();
+        otherResult = otherIterator.next();
+        if (thisResult.done !== otherResult.done) {
+          setVisited(this, other, visited, false);
+          return false;
+        }
+        if (!equalscyc(thisResult.value, otherResult.value, visited)) {
+          setVisited(this, other, visited, false);
+          return false;
+        }
+      } while (!thisResult.done)
       return true;
     };
+
+    if (semantics === 'iterate') {
+      if (!(Symbol.iterator in constructor.prototype)) {
+        throw new ValueSemanticsError('IterateNonIterable');
+      }
+      context.metadata[EQUALS_METHOD] = iterateEqualsMeth;
+    } else {
+      if (checkProtoChain(constructor, Function)) {
+        throw new ValueSemanticsError('FunctionValueEquals', context.name ?? '(Anonymous class)');
+      }
+      context.metadata[EQUALS_METHOD] = valueEqualsMeth;
+    }
   }
 }
 
