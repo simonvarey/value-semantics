@@ -89,7 +89,7 @@ export namespace value {
 // @public (undocumented)
 export class ValueArray<M> extends Array<M> {
     // (undocumented)
-    copyWithin(target: number, start: number, end?: number): typeof ValueArray;
+    copyWithin(target: number, start: number, end?: number): this;
     // (undocumented)
     fill(value: M, start?: number, end?: number): this;
     // (undocumented)
@@ -98,6 +98,16 @@ export class ValueArray<M> extends Array<M> {
     indexOf(needle: M, fromIndex?: number): number;
     // (undocumented)
     lastIndexOf(needle: M, fromIndex?: number): number;
+    // (undocumented)
+    splice(start?: number, deleteCount?: number, ...items: M[]): this;
+    // (undocumented)
+    toReversed(): this;
+    // (undocumented)
+    toSorted(compareFn?: (a: M, b: M) => number): this;
+    // (undocumented)
+    toSpliced(start?: number, deleteCount?: number, ...items: M[]): this;
+    // (undocumented)
+    with(index: number, value: M): this;
 }
 
 // (No @packageDocumentation comment for this package)

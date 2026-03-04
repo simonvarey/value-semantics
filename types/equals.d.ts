@@ -1,8 +1,9 @@
-import { EqualsVisited, Constructor, ClassDecorator_ } from "./common";
+import { EqualsVisited, Constructor, ClassDecorator_ } from './common';
 export declare const REF_EQUALS: unique symbol;
-declare const WRAPPED_PRIMITIVE_CONSTRUCTORS: (SymbolConstructor | BigIntConstructor | BooleanConstructor | NumberConstructor | StringConstructor)[];
-type WrappedPrimitive = typeof WRAPPED_PRIMITIVE_CONSTRUCTORS[number];
-export declare function isWrappedPrimSubtype(obj: object): obj is WrappedPrimitive;
+declare const WRAPPER_OBJECT_CONSTRUCTORS: (SymbolConstructor | BigIntConstructor | BooleanConstructor | NumberConstructor | StringConstructor)[];
+type WrapperObject = typeof WRAPPER_OBJECT_CONSTRUCTORS[number];
+export declare function isPrimitiveWrapper(obj: object): obj is WrapperObject;
+export declare function isWrapperObject(obj: unknown): obj is WrapperObject;
 /**
  * Compares two values for value-equality.
  * @param lhs - The first value to compare.
