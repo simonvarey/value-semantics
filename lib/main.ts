@@ -25,7 +25,12 @@ export namespace customize {
   export const clone = customizeClone;
   export const equals = customizeEquals;
 
-  export function value<C extends Constructor>(options?: CustomizeValueOptions): ClassDecorator_<C> // No Semantics
+  export function value<C extends Constructor>(constructor: C, context: ClassDecoratorContext): void {
+    customize.clone()(constructor, context);
+    customize.equals()(constructor, context);
+  }
+
+  /*export function value<C extends Constructor>(options?: CustomizeValueOptions): ClassDecorator_<C> // No Semantics
   export function value<C extends Constructor>( // Clone Semantics
     cloneSemantics: 'deep', options?: CustomizeValueOptions
   ): ClassDecorator_<C>
@@ -125,7 +130,7 @@ export namespace customize {
         customize.equals(equalsSemantics)(constructor, context);
       }
     }
-  }
+  }*/
 }
 
 export namespace value {

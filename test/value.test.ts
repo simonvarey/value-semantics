@@ -4,7 +4,7 @@ import { expect, test } from 'vitest'
 // * Equals *
 
 test('equating class instances with value semantics', () => {
-  @customize.value()
+  @customize.value
   class ClassExample { }
   const instanceL = new ClassExample();
   const instanceR = new ClassExample();
@@ -14,7 +14,7 @@ test('equating class instances with value semantics', () => {
 })
 
 test('equating class instances with class fields', () => {
-  @customize.value()
+  @customize.value
   class Example {
     constructor(public eg: string) { }
   }
@@ -24,7 +24,7 @@ test('equating class instances with class fields', () => {
 })
 
 test('excludes a class field from comparison', () => {
-  @customize.value()
+  @customize.value
   class ExcludeExample {
     @value.exclude public excludeField: string;
     constructor(excludeField: string) {
@@ -36,7 +36,7 @@ test('excludes a class field from comparison', () => {
   expect(equals(instanceL, instanceR)).toBeTruthy();
 })
 
-test('includes a class field in comparison', () => {
+/*test('includes a class field in comparison', () => {
   @customize.value({ propDefault: 'exclude' })
   class IncludeExample {
     @value.include public includeField: string;
@@ -68,14 +68,14 @@ test('equating class instances with reference semantics', () => {
   const instanceL = new StrictEqualsExample();
   const instanceR = new StrictEqualsExample();
   expect(equals(instanceL, instanceR)).toBeFalsy();
-})
+})*/
 
 // * Clone *
 
 // Non-constructor classes
 
 test('clones a class instance without using a constructor function', () => {
-  @customize.value()
+  @customize.value
   class ClassExample { }
   const instance = new ClassExample();
   const instanceClone = clone(instance);
@@ -83,7 +83,7 @@ test('clones a class instance without using a constructor function', () => {
 })
 
 test('excludes a class field from cloning', () => {
-  @customize.value()
+  @customize.value
   class ExcludeExample {
     @value.exclude public excludeField: string;
     constructor(excludeField: string) {
@@ -95,7 +95,7 @@ test('excludes a class field from cloning', () => {
   expect(instanceClone.excludeField).toBeUndefined();
 })
 
-test('includes a class field in cloning', () => {
+/*test('includes a class field in cloning', () => {
   @customize.value({ propDefault: 'exclude' })
   class IncludeExample {
     @value.include public includeField: string;
@@ -130,10 +130,10 @@ test('error: cannot clone errorOnClone class', () => {
   }).toThrowError(
     /^Instances of class NoCloneExample cannot be cloned$/
   )
-})
+})*/
 
 test('changing cloned class instances', () => {
-  @customize.value()
+  @customize.value
   class Example {
     constructor(public eg: string) { }
   }
@@ -153,7 +153,7 @@ test('changing cloned class instances', () => {
 
 // Constructor Classes
 
-test('clones a class instance using a constructor function', () => {
+/*test('clones a class instance using a constructor function', () => {
   @customize.value({runConstructor: true})
   class ConstructorExample {
     constructor() { }
@@ -178,10 +178,10 @@ test('clones a class instance using a constructor function with arguments', () =
   const instanceClone = clone(instance);
   expect(instanceClone instanceof ConstructorExample).toBeTruthy();
   expect(instanceClone.constructorField).toBe('ctor');
-})
+})*/
 
 test('subclass inherits clone implementation', () => {
-  @customize.value()
+  @customize.value
   class ExcludeExample {
     @value.exclude public excludeField: string;
     constructor(excludeField: string) {
@@ -197,7 +197,7 @@ test('subclass inherits clone implementation', () => {
 
 // * Equals and Clone *
 
-test('equating and cloning class instances with value and deep clone semantics', () => {
+/*test('equating and cloning class instances with value and deep clone semantics', () => {
   @customize.value('deep', 'value', { runConstructor: false })
   class ValueClassExample { }
   const instanceL = new ValueClassExample();
@@ -213,4 +213,4 @@ test('equating and cloning class instances with ref and returnOriginal semantics
   const instanceL = new ValueClassExample();
   const instanceR = new ValueClassExample();
   expect(equals(instanceL, instanceR)).toBeFalsy();
-})
+})*/
