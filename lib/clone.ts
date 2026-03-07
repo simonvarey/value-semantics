@@ -214,10 +214,10 @@ export function clonecyc<T>(source: T, visited: CloneVisited): T {
 
 // Helpers
 
-export const CLONE_SEMANTICS = ['deep', 'iterate', 'returnOriginal', 'errorOnClone'] as const;
-export type CloneSemantics = typeof CLONE_SEMANTICS[number];
+const CLONE_SEMANTICS = ['deep', 'iterate', 'returnOriginal', 'errorOnClone'] as const;
+type CloneSemantics = typeof CLONE_SEMANTICS[number];
 
-export type CustomizeCloneOptions = {
+type CustomizeCloneOptions = {
   runConstructor?: boolean,
   propDefault?: 'include' | 'exclude'
 }
