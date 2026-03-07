@@ -36,40 +36,6 @@ test('excludes a class field from comparison', () => {
   expect(equals(instanceL, instanceR)).toBeTruthy();
 })
 
-/*test('includes a class field in comparison', () => {
-  @customize.value({ propDefault: 'exclude' })
-  class IncludeExample {
-    @value.include public includeField: string;
-    constructor(includeField: string) {
-      this.includeField = includeField;
-    }
-  }
-  const instanceL = new IncludeExample('incl0');
-  const instanceR = new IncludeExample('incl1');
-  expect(equals(instanceL, instanceR)).toBeFalsy();
-})
-
-test('excludes all properties in comparison', () => {
-  @customize.value('value', { propDefault: 'exclude' })
-  class ExcludeAllExample {
-    public excludeField: string;
-    constructor(excludeField: string) {
-      this.excludeField = excludeField;
-    }
-  }
-  const instance0 = new ExcludeAllExample('excl0');
-  const instance1 = new ExcludeAllExample('excl1');
-  expect(equals(instance0, instance1)).toBeTruthy();
-})
-
-test('equating class instances with reference semantics', () => {
-  @customize.value('ref')
-  class StrictEqualsExample { }
-  const instanceL = new StrictEqualsExample();
-  const instanceR = new StrictEqualsExample();
-  expect(equals(instanceL, instanceR)).toBeFalsy();
-})*/
-
 // * Clone *
 
 // Non-constructor classes
@@ -95,43 +61,6 @@ test('excludes a class field from cloning', () => {
   expect(instanceClone.excludeField).toBeUndefined();
 })
 
-/*test('includes a class field in cloning', () => {
-  @customize.value({ propDefault: 'exclude' })
-  class IncludeExample {
-    @value.include public includeField: string;
-    constructor(includeField: string) {
-      this.includeField = includeField;
-    }
-  }
-  const instance = new IncludeExample('incl');
-  const instanceClone = clone(instance);
-  expect(instanceClone.includeField).toBe('incl');
-})
-
-test('excludes all properties in cloning', () => {
-  @customize.value({ propDefault: 'exclude' })
-  class ExcludeAllExample {
-    public excludeField: string;
-    constructor(excludeField: string) {
-      this.excludeField = excludeField;
-    }
-  }
-  const instance = new ExcludeAllExample('excl');
-  const instanceClone = clone(instance);
-  expect(instanceClone.excludeField).toBeUndefined();
-})
-
-test('error: cannot clone errorOnClone class', () => {
-  expect(() => {
-    @customize.value('errorOnClone')
-    class NoCloneExample { }
-    const instance = new NoCloneExample();
-    const copy = clone(instance); //Needed to throw
-  }).toThrowError(
-    /^Instances of class NoCloneExample cannot be cloned$/
-  )
-})*/
-
 test('changing cloned class instances', () => {
   @customize.value
   class Example {
@@ -153,33 +82,6 @@ test('changing cloned class instances', () => {
 
 // Constructor Classes
 
-/*test('clones a class instance using a constructor function', () => {
-  @customize.value({runConstructor: true})
-  class ConstructorExample {
-    constructor() { }
-  }
-  const instance = new ConstructorExample();
-  const instanceClone = clone(instance);
-  expect(instanceClone instanceof ConstructorExample).toBeTruthy();
-})
-
-test('clones a class instance using a constructor function with arguments', () => {
-  @customize.value({ runConstructor: true })
-  class ConstructorExample {
-    @clone.constructorParam public constructorField: string;
-    constructor(constructorField: string) {
-      if (constructorField === undefined) {
-        throw new Error('Constructor not run')
-      }
-      this.constructorField = constructorField;
-    }
-  }
-  const instance = new ConstructorExample('ctor');
-  const instanceClone = clone(instance);
-  expect(instanceClone instanceof ConstructorExample).toBeTruthy();
-  expect(instanceClone.constructorField).toBe('ctor');
-})*/
-
 test('subclass inherits clone implementation', () => {
   @customize.value
   class ExcludeExample {
@@ -197,8 +99,9 @@ test('subclass inherits clone implementation', () => {
 
 // * Equals and Clone *
 
-/*test('equating and cloning class instances with value and deep clone semantics', () => {
-  @customize.value('deep', 'value', { runConstructor: false })
+test('equating and cloning class instances with value and deep clone semantics', () => {
+  @customize.clone('deep', { runConstructor: false })
+  @customize.equals('value')
   class ValueClassExample { }
   const instanceL = new ValueClassExample();
   const instanceR = new ValueClassExample();
@@ -208,9 +111,10 @@ test('subclass inherits clone implementation', () => {
 })
 
 test('equating and cloning class instances with ref and returnOriginal semantics', () => {
-  @customize.value('ref', 'returnOriginal')
+  @customize.clone('returnOriginal')
+  @customize.equals('ref')
   class ValueClassExample { }
   const instanceL = new ValueClassExample();
   const instanceR = new ValueClassExample();
   expect(equals(instanceL, instanceR)).toBeFalsy();
-})*/
+})

@@ -423,10 +423,10 @@ function checkProtoChain(haystack: object, needle: object): boolean {
 
 // Types
 
-export const EQUALS_SEMANTICS = ['value', 'ref', 'iterate'] as const;
-export type EqualsSemantics = typeof EQUALS_SEMANTICS[number];
+const EQUALS_SEMANTICS = ['value', 'ref', 'iterate'] as const;
+type EqualsSemantics = typeof EQUALS_SEMANTICS[number];
 
-export type CustomizeEqualsOptions = {
+type CustomizeEqualsOptions = {
   propDefault?: 'include' | 'exclude'
 }
 

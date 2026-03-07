@@ -315,7 +315,7 @@ test('changing cloned class instances', () => {
 // Constructor Classes
 
 test('clones a class instance using a constructor function', () => {
-  @customize.clone({runConstructor: true})
+  @customize.clone({ runConstructor: true })
   class ConstructorExample {
     constructor() { }
   }
