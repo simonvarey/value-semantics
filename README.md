@@ -2,7 +2,7 @@
 
 **The JavaScript/TypeScript Value Semantics Toolkit**
 
-> All the functions you need to program as if objects in JavaScript had value semantics, including comprehensive and highly customizable deep cloning and equality functions.
+> All the functions you need to program as if objects in JavaScript had value semantics, including comprehensive and highly customizable deep cloning and equality functions, and arrays with value semantics.
 
 <span class="badge-npmversion"><a href="https://npmjs.org/package/value-semantics" title="View this project on NPM"><img src="https://img.shields.io/npm/v/value-semantics.svg" alt="NPM version" /></a></span>
 <span class="badge-licence"><a href="https://opensource.org/license/mit" title="View this project's license"><img src="https://img.shields.io/npm/l/value-semantics.svg" alt="License" /></a></span>
@@ -67,6 +67,11 @@ console.assert(equals(rect1, rect2));
 rect2.orientation = 90;
 console.assert(equals(rect1, rect2));
 console.assert(rect1.orientation === 0);
+```
+
+`value-semantics` also includes a `ValueArray` class. This is a subclass of `Array` which overrides several `Array` methods with their value-typed equivalents. For example, `ValueArray.prototype.includes` makes comparisons using `equals` and `ValueArray.prototype.fill` creates new elements using `clone`.
+
+```ts
 
 ```
 
@@ -82,9 +87,7 @@ Run `npm install value-semantics` to install this library.
 clone<T>(source: T): T
 ```
 
-Use the `clone` function to create a deep clone of a JavaScript value. Roughly, the clone of an object 
-will have the same prototype and the same (enumerable, own) property keys as the original, and the 
-respective values for those keys are clones of the values of the original keys. Clones are independent of their originals, in the sense that any changes to a clone will not propagate to the original object, and vice versa.
+Use the `clone` function to create a deep clone of a JavaScript value. Roughly, the clone of an object will have the same prototype and the same (enumerable, own) property keys as the original, and the respective values for those keys are clones of the values of the original keys. Clones are independent of their originals, in the sense that any changes to a clone will not propagate to the original object, and vice versa.
 
 ```ts
 const obj = { a: 1, b: [2, 3], c: new Date(2000, 0, 1), d: { e: 4 } };
@@ -103,9 +106,7 @@ console.assert(obj.b[1] === 3);
 equals(lhs: unknown, rhs: unknown): boolean 
 ```
 
-Use the `equals` function to compare two JavaScript values for value-equality. Broadly speaking, this 
-function considers two objects equal when they both have the same prototype, same (enumerable, own) 
-property keys and the respective values for those keys are value-equal. This function can be customized for user-created classes, as discussed below.
+Use the `equals` function to compare two JavaScript values for value-equality. Broadly speaking, this function considers two objects equal when they both have the same prototype, same (enumerable, own) property keys and the respective values for those keys are value-equal. This function can be customized for user-created classes, as discussed below.
 
 ```ts
 const obj1 = { a: 1, b: [2, 3], c: new Date(2000, 0, 1), d: { e: 4 } };
