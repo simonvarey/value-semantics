@@ -22,11 +22,11 @@
 
 `value-semantics`, the JavaScript/TypeScript value semantics toolkit, is a TypeScript utility library which allows (almost) every JavaScript object to be treated as if it had value semantics, including user-defined classes and builtin exotic objects. The toolkit's `clone` function allows objects to be copy-assigned like primitive values, rather than alias-assigned like objects typically are in JavaScript, while the toolkit's `equals` function allows objects to be compared by value-equality, rather than reference-equality. Easy customization of these functions for user-defined classes, such as excluding properties from cloning/comparison and setting arguments for cloning constructors, is possible using decorators. Of course, these functions are not limited to mimicking value semantics, but can be used anywhere deep cloning or equality comparisons are desired.
 
-```ts
+```ts:doctestEqualsClone@import.meta.vitest
 // Compare objects by value-equality
 const lincolnBirthDate = new Date(1809, 1, 12);
 const darwinBirthDate = new Date(1809, 1, 12);
-console.assert(equals(lincolnBirthDate, darwinBirthDate));
+expect(equals(lincolnBirthDate, darwinBirthDate)).toBeTruthy();
 
 // Deep clone objects to avoid unwanted aliasing and to pass function parameters 
 //   by value
@@ -39,13 +39,13 @@ function scale(vector: Vector, scale: number): Vector {
 
 const vector1 = { x: 2, y: 3 };
 const vector2 = scale(clone(vector1), 2);
-console.assert(equals(vector2, { x: 4, y: 6 }));
-console.assert(equals(vector1, { x: 2, y: 3 }));
+expect(equals(vector2, { x: 4, y: 6 })).toBeTruthy();
+expect(equals(vector1, { x: 2, y: 3 })).toBeTruthy();
 
 // Customize `equals` and `clone` implementations on user-defined classes using 
 //   decorators
-@customize.value({ runConstructor: true }) // Customize `equals` and `clone` implementations
-//   simultaneously using the `@customize.value` decorator
+@customize.clone({ runConstructor: true })
+@customize.equals()
 class Rectangle {
   @clone.constructorParam private height: number; // Specify which properties 
   //   should be used as parameters for the cloning constructor
@@ -62,11 +62,11 @@ class Rectangle {
 
 const rect1 = new Rectangle(10, 20);
 const rect2 = clone(rect1);
-console.assert(rect1 !== rect2);
-console.assert(equals(rect1, rect2));
+expect(rect1 !== rect2).toBeTruthy();
+expect(equals(rect1, rect2)).toBeTruthy();
 rect2.orientation = 90;
-console.assert(equals(rect1, rect2));
-console.assert(rect1.orientation === 0);
+expect(equals(rect1, rect2)).toBeTruthy();
+expect(rect1.orientation === 0).toBeTruthy();
 ```
 
 `value-semantics` also includes a `ValueArray` class. This is a subclass of `Array` which overrides several `Array` methods with their value-typed equivalents. For example, `ValueArray.prototype.includes` makes comparisons using `equals` and `ValueArray.prototype.fill` creates new elements using `clone`.

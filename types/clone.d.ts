@@ -9,9 +9,7 @@ export declare function copyProps<T extends Object>(props: Set<PropKey>, target:
  */
 export declare function clone<T>(source: T): T;
 export declare function clonecyc<T>(source: T, visited: CloneVisited): T;
-export declare const CLONE_SEMANTICS: readonly ["deep", "iterate", "returnOriginal", "errorOnClone"];
-export type CloneSemantics = typeof CLONE_SEMANTICS[number];
-export type CustomizeCloneOptions = {
+type CustomizeCloneOptions = {
     runConstructor?: boolean;
     propDefault?: 'include' | 'exclude';
 };
@@ -32,3 +30,4 @@ export declare namespace clone {
     function exclude<C, V>(_target: undefined, context: ClassFieldDecoratorContext<C, V>): void;
     function constructorParam<C, V>(_target: undefined, context: ClassFieldDecoratorContext<C, V>): void;
 }
+export {};
