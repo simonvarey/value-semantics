@@ -439,3 +439,11 @@ test('equating class instances with iterate semantics', () => {
     /^A non-iterable class cannot be decorated with 'iterate' semantics$/
   )
 })
+
+test('equating built-in subclass instances with custom semantics', () => {
+  @customize.equals('ref')
+  class BuiltinExample extends Set { }
+  const instanceL = new BuiltinExample([1, 2, 3]);
+  const instanceR = new BuiltinExample([1, 2, 3]);
+  expect(equals(instanceL, instanceR)).toBeFalsy();
+})

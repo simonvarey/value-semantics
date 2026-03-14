@@ -312,6 +312,16 @@ test('changing cloned class instances', () => {
   expect(copy.eg).toBe('new');
 })
 
+test('clones a built-in subclass instance', () => {
+  @customize.clone('returnOriginal')
+  class BuiltInExample extends Array { }
+  const instance = BuiltInExample.from(['a', 'b']);
+  const instanceClone = clone(instance);
+  expect(instanceClone instanceof BuiltInExample).toBeTruthy();
+  expect(instanceClone instanceof Array).toBeTruthy();
+  expect(instance).toBe(instanceClone);
+})
+
 // Constructor Classes
 
 test('clones a class instance using a constructor function', () => {
