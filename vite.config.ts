@@ -2,7 +2,7 @@ import { defineConfig } from 'vitest/config';
 import { doctest } from './test/doctest';
 
 export default defineConfig({
-  plugins: [doctest({ markdownSetup: 'import { equals, clone, customize } from "./lib/main";\n' })],
+  plugins: [doctest({ markdownSetup: 'import { equals, clone, customize, ValueArray } from "./lib/main";\n' })],
   build: {
     lib: {
       entry: './lib/main.ts',
