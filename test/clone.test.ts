@@ -365,6 +365,18 @@ test('subclass inherits clone implementation', () => {
   expect(instanceClone.excludeField).toBeUndefined();
 })
 
+test('subclass customization overrides superclass implementation', () => {
+  @customize.clone('errorOnClone')
+  class SuperClassExample { }
+
+  @customize.clone('returnOriginal')
+  class SubClassExample extends SuperClassExample { }
+
+  const instance = new SubClassExample();
+  const instanceClone = clone(instance); // Expect no error to occur
+  expect(instance).toBe(instanceClone);
+})
+
 test('constructorParams are implictly excluded', () => {
   @customize.clone({ runConstructor: true })
   class ConstructorExample {
