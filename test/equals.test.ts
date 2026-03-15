@@ -385,6 +385,7 @@ test('includes a class field in comparison', () => {
   const instanceL = new IncludeExample('incl0');
   const instanceR = new IncludeExample('incl1');
   expect(equals(instanceL, instanceR)).toBeFalsy();
+  expect(equals(instanceL, {})).toBeFalsy();
 })
 
 test('excludes all properties in comparison', () => {
