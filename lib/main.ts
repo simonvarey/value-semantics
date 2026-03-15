@@ -19,11 +19,6 @@ export { ValueArray } from './value-array';
 export namespace customize {
   export const clone = customizeClone;
   export const equals = customizeEquals;
-
-  export function value<C extends Constructor>(constructor: C, context: ClassDecoratorContext): void {
-    customize.clone()(constructor, context);
-    customize.equals()(constructor, context);
-  }
 }
 
 export namespace value {

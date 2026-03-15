@@ -27,10 +27,6 @@ export namespace customize {
     //
     // (undocumented)
     equals: typeof customizeEquals;
-    // Warning: (ae-forgotten-export) The symbol "Constructor" needs to be exported by the entry point main.d.ts
-    //
-    // (undocumented)
-    export function value<C extends Constructor>(constructor: C, context: ClassDecoratorContext): void;
 }
 
 // @public
