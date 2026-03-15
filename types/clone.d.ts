@@ -1,5 +1,4 @@
 import { PropKey, CloneVisited, ClassDecorator_, Constructor } from './common';
-export declare const ERROR_ON_CLONE: unique symbol;
 export declare function copyProps<T extends Object>(props: Set<PropKey>, target: T, source: T, visited: CloneVisited): void;
 /**
  * Creates a deep clone of a provided value.

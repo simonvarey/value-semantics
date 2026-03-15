@@ -1,5 +1,4 @@
 import { EqualsVisited, Constructor, ClassDecorator_ } from './common';
-export declare const REF_EQUALS: unique symbol;
 declare const WRAPPER_OBJECT_CONSTRUCTORS: (SymbolConstructor | BigIntConstructor | BooleanConstructor | NumberConstructor | StringConstructor)[];
 type WrapperObject = typeof WRAPPER_OBJECT_CONSTRUCTORS[number];
 export declare function isPrimitiveWrapper(obj: object): obj is WrapperObject;
