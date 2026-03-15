@@ -23,7 +23,7 @@ test('equating class instances with class fields', () => {
   expect(equals(instance0, instance1)).toBeTruthy();
 })
 
-test('excludes a class field from comparison', () => {
+test('excludes a class field from comparison using value.exclude', () => {
   @customize.value
   class ExcludeExample {
     @value.exclude public excludeField: string;
@@ -48,7 +48,7 @@ test('clones a class instance without using a constructor function', () => {
   expect(instanceClone instanceof ClassExample).toBeTruthy();
 })
 
-test('excludes a class field from cloning', () => {
+test('excludes a class field from cloning using value.exclude', () => {
   @customize.value
   class ExcludeExample {
     @value.exclude public excludeField: string;
@@ -100,14 +100,29 @@ test('subclass inherits clone implementation', () => {
 // * Equals and Clone *
 
 test('equating and cloning class instances with value and deep clone semantics', () => {
-  @customize.clone('deep', { runConstructor: false })
-  @customize.equals('value')
-  class ValueClassExample { }
-  const instanceL = new ValueClassExample();
-  const instanceR = new ValueClassExample();
+  @customize.clone('deep', { runConstructor: true, propDefault: 'exclude' })
+  @customize.equals('value', { propDefault: 'exclude' })
+  class ValueClassExample {
+    @value.include public includeField;
+    public excludeField;
+
+    constructor(includeField: string, excludeField: string) {
+      this.includeField = includeField;
+      this.excludeField = excludeField;
+    }
+  }
+  const instanceL = new ValueClassExample('incl', 'excl1');
+  const instanceR = new ValueClassExample('incl', 'excl2');
+  const instanceR2 = new ValueClassExample('incl2', 'excl2');
   expect(equals(instanceL, instanceR)).toBeTruthy();
+  expect(equals(instanceL, instanceR2)).toBeFalsy();
   expect(equals({}, instanceR)).toBeFalsy();
   expect(equals(instanceL, 0)).toBeFalsy();
+  const cloneL = clone(instanceL);
+  expect(equals(cloneL, instanceL)).toBeTruthy();
+  expect(cloneL).not.toBe(instanceL);
+  expect(cloneL.includeField).toBe('incl');
+  expect(cloneL.excludeField).toBeUndefined();
 })
 
 test('equating and cloning class instances with ref and returnOriginal semantics', () => {
@@ -117,4 +132,5 @@ test('equating and cloning class instances with ref and returnOriginal semantics
   const instanceL = new ValueClassExample();
   const instanceR = new ValueClassExample();
   expect(equals(instanceL, instanceR)).toBeFalsy();
+  expect(instanceL).toBe(clone(instanceL));
 })

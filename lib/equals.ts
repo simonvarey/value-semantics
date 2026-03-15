@@ -14,8 +14,6 @@ import { EQUALS_EXCLUDE_PROPS, EQUALS_INCLUDE_PROPS, EqualsVisited, EQUALS_METHO
 
 // Constants & Types
 
-export const REF_EQUALS = Symbol.for('ref-equals');
-
 type IterateEquatable<I, M> = I & Iterable<M>
 
 // Primitive values and Wrapper Objects
@@ -58,20 +56,15 @@ function zip<EL, ER>(lArray: EL[], rArray: ER[]): [EL, ER][] {
 
 // Metadata Helpers
 
-function checkEqualsMethod(receiver: object, other: object, visited: EqualsVisited): void {
-  const meth = getMeta<Function>(receiver, EQUALS_METHOD);
-  if (meth === META_NOT_FOUND) {
-    return;
+// TODO: Could this error/ignore if return is not boolean?
+function checkEqualsMethod(
+  receiver: object, other: object, visited: EqualsVisited
+): boolean | typeof META_NOT_FOUND {
+  const meth = getMeta(receiver, EQUALS_METHOD);
+  if (typeof meth === 'function') {
+    return meth.call(receiver, other, visited);
   }
-  throw meth.call(receiver, other, visited);
-}
-
-function checkRefEqualsProp(receiver: object, other: object): void {
-  const val = getMeta(receiver, REF_EQUALS);
-  if (val === META_NOT_FOUND) {
-    return;
-  }
-  throw receiver === other;
+  return META_NOT_FOUND;
 }
 
 // Visited Helpers
@@ -109,12 +102,16 @@ function setVisited(fst: object, snd: object, visited: EqualsVisited, res: boole
 
 const defineEqualsMethod = <C extends Constructor>(
   target: C, value: EqualMethodFunc<InstanceType<C>>
-) => {
+): void => {
   setMeta(target, EQUALS_METHOD, value);
 };
 
-const defineRefEquals = (target: Constructor) => {
-  setMeta(target, REF_EQUALS, true);
+function refEqualsMethod<T>(this: T, other: object, _visited: EqualsVisited): boolean {
+  return this === other;
+}
+
+const defineRefEquals = (target: Constructor): void => {
+  defineEqualsMethod(target, refEqualsMethod);
 };
 
 // Equality Helpers
@@ -362,17 +359,9 @@ export function equalscyc(lhs: unknown, rhs: unknown, visited: EqualsVisited): b
   // Set as equal initially - this prevents infinite recursion
   setVisited(lhs, rhs, visited, true);
   // Objects with customized equals implementations
-  try {
-    checkEqualsMethod(lhs, rhs, visited);
-    checkEqualsMethod(rhs, lhs, visited);
-    checkRefEqualsProp(lhs, rhs);
-    checkRefEqualsProp(rhs, lhs);
-  } catch (except) {
-    if (typeof except === 'boolean') {
-      return setVisited(lhs, rhs, visited, except);
-    } else {
-      throw except;
-    }
+  const custom = checkEqualsMethod(lhs, rhs, visited);
+  if (custom !== META_NOT_FOUND) {
+    return setVisited(lhs, rhs, visited, custom);
   }
   // Generator Objects
   if (isGenerator(lhs) || isGenerator(rhs) || isAsyncGenerator(lhs) || isAsyncGenerator(rhs)) {
@@ -457,10 +446,6 @@ export function customizeEquals<C extends Constructor>(
   const opts: Required<CustomizeEqualsOptions> = { propDefault: 'include', ...options };
 
   return function(constructor: C, context: ClassDecoratorContext): void {
-    if (semantics === 'ref') {
-      context.metadata[REF_EQUALS] = true;
-      return;
-    };
 
     const valueEqualsMeth = function(this: I, other: object, visited: EqualsVisited): boolean {
       setVisited(this, other, visited, true);
@@ -519,11 +504,13 @@ export function customizeEquals<C extends Constructor>(
         throw new ValueSemanticsError('IterateNonIterable');
       }
       context.metadata[EQUALS_METHOD] = iterateEqualsMeth;
-    } else {
+    } else if (semantics === 'value') {
       if (checkProtoChain(constructor, Function)) {
         throw new ValueSemanticsError('FunctionValueEquals', context.name ?? '(Anonymous class)');
       }
       context.metadata[EQUALS_METHOD] = valueEqualsMeth;
+    } else {
+      context.metadata[EQUALS_METHOD] = refEqualsMethod;
     }
   }
 }

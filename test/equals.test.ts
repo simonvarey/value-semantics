@@ -385,6 +385,7 @@ test('includes a class field in comparison', () => {
   const instanceL = new IncludeExample('incl0');
   const instanceR = new IncludeExample('incl1');
   expect(equals(instanceL, instanceR)).toBeFalsy();
+  expect(equals(instanceL, {})).toBeFalsy();
 })
 
 test('excludes all properties in comparison', () => {
@@ -438,4 +439,12 @@ test('equating class instances with iterate semantics', () => {
   }).toThrowError(
     /^A non-iterable class cannot be decorated with 'iterate' semantics$/
   )
+})
+
+test('equating built-in subclass instances with custom semantics', () => {
+  @customize.equals('ref')
+  class BuiltinExample extends Set { }
+  const instanceL = new BuiltinExample([1, 2, 3]);
+  const instanceR = new BuiltinExample([1, 2, 3]);
+  expect(equals(instanceL, instanceR)).toBeFalsy();
 })

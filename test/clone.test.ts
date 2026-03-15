@@ -164,7 +164,7 @@ test('error: cannot clone a generator', () => {
     }
     const gen = genFunc();
     const genClone = clone(gen);
-  }).toThrowError(
+  }).toThrow(
     /^Generator objects cannot be cloned$/
   )
 })
@@ -177,8 +177,16 @@ test('error: cannot clone an async generator', () => {
     }
     const gen = genFunc();
     const genClone = clone(gen); // Needed to throw error
-  }).toThrowError(
+  }).toThrow(
     /^Generator objects cannot be cloned$/
+  )
+})
+
+test('error: cannot clone a weakset', () => {
+  expect(() => {
+    const setClone = clone(new WeakSet());
+  }).toThrow(
+    /^Instances of class WeakSet cannot be cloned$/
   )
 })
 
@@ -269,7 +277,7 @@ test('error: cannot decorate field with both include and exclude', () => {
       @clone.include @clone.exclude private _field = '';
     }
     const _instance = new IncludeExcludeExample(); // Needed for error to occur
-  }).toThrowError(
+  }).toThrow(
     /^A field cannot be decorated with both `@include` and `@exclude`$/
   )
 })
@@ -280,7 +288,7 @@ test('error: cannot clone errorOnClone class', () => {
     class ErrorOnCloneExample { }
     const instance = new ErrorOnCloneExample();
     const _instanceClone = clone(instance); // Needed for error to occur
-  }).toThrowError(
+  }).toThrow(
     /^Instances of class ErrorOnCloneExample cannot be cloned$/
   )
 })
@@ -310,6 +318,16 @@ test('changing cloned class instances', () => {
   original.eg = 'old';
   expect(original.eg).toBe('old');
   expect(copy.eg).toBe('new');
+})
+
+test('clones a built-in subclass instance', () => {
+  @customize.clone('returnOriginal')
+  class BuiltInExample extends Array { }
+  const instance = BuiltInExample.from(['a', 'b']);
+  const instanceClone = clone(instance);
+  expect(instanceClone instanceof BuiltInExample).toBeTruthy();
+  expect(instanceClone instanceof Array).toBeTruthy();
+  expect(instance).toBe(instanceClone);
 })
 
 // Constructor Classes
@@ -353,6 +371,18 @@ test('subclass inherits clone implementation', () => {
   const instance = new ExtendExample('excl');
   const instanceClone = clone(instance);
   expect(instanceClone.excludeField).toBeUndefined();
+})
+
+test('subclass customization overrides superclass implementation', () => {
+  @customize.clone('errorOnClone')
+  class SuperClassExample { }
+
+  @customize.clone('returnOriginal')
+  class SubClassExample extends SuperClassExample { }
+
+  const instance = new SubClassExample();
+  const instanceClone = clone(instance); // Expect no error to occur
+  expect(instance).toBe(instanceClone);
 })
 
 test('constructorParams are implictly excluded', () => {
@@ -408,7 +438,7 @@ test('clone class instance with iterate semantics', () => {
   expect(() => {
     @customize.clone('iterate', { addMethod: 'add' })
     class IterateNoInteratorExample { }
-  }).toThrowError(
+  }).toThrow(
     /^A non-iterable class cannot be decorated with 'iterate' semantics$/
   )
 
@@ -417,7 +447,7 @@ test('clone class instance with iterate semantics', () => {
     class IterateNoAddExample {
       [Symbol.iterator](): void { }
     }
-  }).toThrowError(
+  }).toThrow(
     /^The specified `addMethod` does not exist on this class$/
   )
 })

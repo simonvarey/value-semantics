@@ -13,10 +13,6 @@ import { CLONE_EXCLUDE_PROPS, CLONE_INCLUDE_PROPS, CLONE_METHOD, TYPED_ARRAYS, P
   ValueSemanticsError, CloneVisited, ClassDecorator_, Constructor, isGenerator, 
   isAsyncGenerator } from './common';
 
-// Symbols
-
-export const ERROR_ON_CLONE = Symbol.for('error-on-clone');
-
 // * Helper Functions *
 
 // Object Construction
@@ -134,11 +130,13 @@ for (const TypedArray of TYPED_ARRAYS) {
   );
 }
 
+function returnOriginalMeth<I>(this: I, visited: CloneVisited): I {
+  visited.set(this, this);
+  return this;
+}
+
 function defineCloneReturnOriginal<C extends Constructor>(proto: C) {
-  defineCloneMethod(proto, function(this: InstanceType<C>, visited: CloneVisited): InstanceType<C> {
-    visited.set(this, this);
-    return this;
-  })
+  defineCloneMethod(proto, returnOriginalMeth<InstanceType<C>>)
 }
 
 defineCloneReturnOriginal(Boolean);
@@ -153,10 +151,12 @@ setMeta(BigInt, CLONE_METHOD, function(this: BigInt, visited: CloneVisited): Big
 setMeta(Symbol, CLONE_METHOD, function(this: Symbol, visited: CloneVisited): Symbol {
   visited.set(this, this);
   return this;
-})
+});
 
-function defineErrorOnClone(proto: Constructor): void {
-  setMeta(proto, ERROR_ON_CLONE, proto.name);
+function defineErrorOnClone<C extends Constructor>(proto: C): void {
+  defineCloneMethod(proto, function(this: InstanceType<C>, _visited: CloneVisited): never {
+    throw new ValueSemanticsError('ErrorOnClone', proto.name);
+  })
 }
 
 defineErrorOnClone(WeakSet);
@@ -181,19 +181,14 @@ export function clonecyc<T>(source: T, visited: CloneVisited): T {
     if (source === null) {
       return null as T;
     }
-    // Error-On-Clone Objects
-    const errorOnClone = getMeta(source, ERROR_ON_CLONE);
-    if (typeof errorOnClone === 'string') {
-      throw new ValueSemanticsError('ErrorOnClone', errorOnClone);
-    }
     // Visited Objects
     if (visited.has(source)) {
       return visited.get(source);
     }
-    // Objects with customized clone method (including Return-Original objects)
+    // Objects with customized clone method (including Return-Original and Error-On-Clone objects)
     const meth = getMeta<Function>(source, CLONE_METHOD);
     if (meth !== META_NOT_FOUND) {
-      const target = meth.call(source, visited);
+      const target = meth.call(source, visited); // Will throw for Error-On-Clone objects
       return target;
     }
     // Generator Objects
@@ -265,11 +260,6 @@ export function customizeClone<C extends Constructor>(
     return target;
   }
 
-  const returnOriginalMeth = function(this: I, visited: CloneVisited): I {
-    visited.set(this, this);
-    return this;
-  }
-
   function iterateMethBuilder(
     addMethod: PropKey, runConstructor?: boolean
   ): (visited: CloneVisited) => I {
@@ -296,7 +286,9 @@ export function customizeClone<C extends Constructor>(
     } else if (semantics === 'returnOriginal') {
       context.metadata[CLONE_METHOD] = returnOriginalMeth;
     } else if (semantics === 'errorOnClone') {
-      context.metadata[ERROR_ON_CLONE] = context.name ?? '(Anonymous class)';
+      context.metadata[CLONE_METHOD] = () => {
+        throw new ValueSemanticsError('ErrorOnClone', context.name ?? '(Anonymous class)');
+      }
     } else {
       const includes = (context.metadata[CLONE_INCLUDE_PROPS] as Set<PropKey>) ?? new Set();
       const excludes = (context.metadata[CLONE_EXCLUDE_PROPS] as Set<PropKey>) ?? new Set();
