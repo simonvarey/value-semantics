@@ -17,42 +17,36 @@ export type IterateCloneOptions = {
     runConstructor?: boolean;
 };
 /**
- * This decorator can be used to customize the clone implementation of the decorated class.
- * @overload
- * @param options - Options for how to customize the deep clone semantics of this class.
- * @return A decorator which customizes the decorated class' deep clone semantics.
- */
-/**
- * This decorator can be used to customize the clone implementation of the decorated class.
- * @overload
- * @param semantics - The kind of clone semantics the class is customized to have.
- * @param options - Options for how to customize the deep clone semantics of this class.
- * @return - A decorator which customizes the decorated class' deep clone semantics.
- */
-/**
- * This decorator can be used to customize the clone implementation of the decorated class.
- * @overload
- * @param semantics - The kind of clone semantics the class is customized to have.
- * @param options - Options for how to customize the iterate clone semantics of this class.
- * @return - A decorator which customizes the decorated class' deep clone semantics.
- */
-/**
- * This decorator can be used to customize the clone implementation of the decorated class.
- * @overload
- * @param semantics - The kind of clone semantics the class is customized to have.
- * @return - A decorator which customizes the decorated class' deep clone semantics.
- */
-/**
- * This decorator can be used to customize the clone implementation of the decorated class.
- * @param semanticsOrOpts - Either the kind of clone semantics the class is customized to have
- *   (defaulting to 'deep'), or options for how to customize the deep clone semantics of this class.
- * @param options - If semantics is specified as either 'deep' or 'iterate', options for how to
- *   customize the clone semantics of this class.
- * @returns - A decorator which customizes the decorated class' deep clone semantics.
+ * This decorator can be used to set the clone semantics of the decorated class to the default
+ *   value of 'deep', and to further customize the class' clone semantics.
+ * @param options - Options for how to further customize the deep clone semantics of this class.
+ * @returns A decorator which customizes the decorated class' clone semantics.
  */
 export declare function customizeClone<C extends Constructor>(options?: CustomizeCloneOptions): ClassDecorator_<C>;
+/**
+ * This decorator can be used to set the clone semantics of the decorated class to 'deep', and
+ *   to further customize the class' clone semantics.
+ * @param semantics - The kind of clone semantics the class is customized to have, specifically 'deep'.
+ * @param options - Options for how to further customize the clone semantics of this class.
+ * @returns A decorator which customizes the decorated class' clone semantics.
+ */
 export declare function customizeClone<C extends Constructor>(semantics: 'deep', options?: CustomizeCloneOptions): ClassDecorator_<C>;
+/**
+ * This decorator can be used to set the clone semantics of the decorated class to 'iterate', and
+ *   to further customize the class' clone semantics.
+ * @param semantics - The kind of clone semantics the class is customized to have, specifically
+ *   'iterate'.
+ * @param options - Options for how to further customize the clone semantics of this class.
+ * @returns A decorator which customizes the decorated class' clone semantics.
+ */
 export declare function customizeClone<C extends Constructor>(semantics: 'iterate', options: IterateCloneOptions): ClassDecorator_<C>;
+/**
+ * This decorator can be used to set the clone semantics of the decorated class to either
+ *   'returnOriginal' or 'errorOnClone'.
+ * @param semantics - The kind of clone semantics the class is customized to have, either
+ *   'returnOriginal' or 'errorOnClone'.
+ * @returns A decorator which customizes the decorated class' clone semantics.
+ */
 export declare function customizeClone<C extends Constructor>(semantics: 'returnOriginal' | 'errorOnClone'): ClassDecorator_<C>;
 /**
  * Class field decorators which allow the class' `clone` implementations to be customized.
