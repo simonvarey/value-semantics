@@ -5,7 +5,6 @@
 // * Value-Semantics: The JavaScript/TypeScript Value Semantics Toolkit *
 
 import { customizeClone, clone } from './clone';
-import { Constructor } from './common';
 import { customizeEquals, equals } from './equals';
 
 export { clone } from './clone';
@@ -21,6 +20,11 @@ export namespace customize {
   export const equals = customizeEquals;
 }
 
+/**
+ * Class field decorators which allow fields to be included or excluded from both `equals` and 
+ *   `clone` implementations simultaneously.
+ * @public
+ */
 export namespace value {
 
   export function include<C, V>(

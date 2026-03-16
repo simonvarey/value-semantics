@@ -40,7 +40,7 @@ export namespace equals {
     export function include<C, V>(_target: undefined, context: ClassFieldDecoratorContext<C, V>): void;
 }
 
-// @public (undocumented)
+// @public
 export namespace value {
     // (undocumented)
     export function exclude<C, V>(target: undefined, context: ClassFieldDecoratorContext<C, V>): void;
