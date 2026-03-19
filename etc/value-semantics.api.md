@@ -48,27 +48,17 @@ export namespace value {
     export function include<C, V>(target: undefined, context: ClassFieldDecoratorContext<C, V>): void;
 }
 
-// @public (undocumented)
+// @public
 export class ValueArray<M> extends Array<M> {
-    // (undocumented)
     copyWithin(target: number, start: number, end?: number): this;
-    // (undocumented)
     fill(value: M, start?: number, end?: number): this;
-    // (undocumented)
     includes(needle: M, fromIndex?: number): boolean;
-    // (undocumented)
     indexOf(needle: M, fromIndex?: number): number;
-    // (undocumented)
     lastIndexOf(needle: M, fromIndex?: number): number;
-    // (undocumented)
     splice(start?: number, deleteCount?: number, ...items: M[]): this;
-    // (undocumented)
     toReversed(): this;
-    // (undocumented)
     toSorted(compareFn?: (a: M, b: M) => number): this;
-    // (undocumented)
     toSpliced(start?: number, deleteCount?: number, ...items: M[]): this;
-    // (undocumented)
     with(index: number, value: M): this;
 }
 
