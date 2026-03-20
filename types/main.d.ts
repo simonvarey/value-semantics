@@ -17,6 +17,14 @@ export declare namespace customize {
  * @public
  */
 export declare namespace value {
+    /**
+     * This class field decorator declares a property to be included for both cloning and equality
+     * comparison.
+     */
     function include<C, V>(target: undefined, context: ClassFieldDecoratorContext<C, V>): void;
+    /**
+     * This class field decorator declares a property to be excluded for both cloning and equality
+     * comparison.
+     */
     function exclude<C, V>(target: undefined, context: ClassFieldDecoratorContext<C, V>): void;
 }

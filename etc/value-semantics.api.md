@@ -37,9 +37,7 @@ export namespace equals {
 
 // @public
 export namespace value {
-    // (undocumented)
     export function exclude<C, V>(target: undefined, context: ClassFieldDecoratorContext<C, V>): void;
-    // (undocumented)
     export function include<C, V>(target: undefined, context: ClassFieldDecoratorContext<C, V>): void;
 }
 

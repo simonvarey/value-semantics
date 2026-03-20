@@ -27,6 +27,10 @@ export namespace customize {
  */
 export namespace value {
 
+  /**
+   * This class field decorator declares a property to be included for both cloning and equality 
+   * comparison.
+   */
   export function include<C, V>(
     target: undefined, context: ClassFieldDecoratorContext<C, V>
   ): void {
@@ -34,6 +38,10 @@ export namespace value {
     equals.include(target, context);
   }
 
+  /**
+   * This class field decorator declares a property to be excluded for both cloning and equality 
+   * comparison.
+   */
   export function exclude<C, V>(
     target: undefined, context: ClassFieldDecoratorContext<C, V>
   ): void {
