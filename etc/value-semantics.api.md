@@ -31,9 +31,7 @@ export function equals(lhs: unknown, rhs: unknown): boolean;
 
 // @public
 export namespace equals {
-    // (undocumented)
     export function exclude<C, V>(_target: undefined, context: ClassFieldDecoratorContext<C, V>): void;
-    // (undocumented)
     export function include<C, V>(_target: undefined, context: ClassFieldDecoratorContext<C, V>): void;
 }
 
