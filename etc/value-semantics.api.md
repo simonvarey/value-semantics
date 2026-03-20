@@ -9,11 +9,8 @@ export function clone<T>(source: T): T;
 
 // @public
 export namespace clone {
-    // (undocumented)
     export function constructorParam<C, V>(_target: undefined, context: ClassFieldDecoratorContext<C, V>): void;
-    // (undocumented)
     export function exclude<C, V>(_target: undefined, context: ClassFieldDecoratorContext<C, V>): void;
-    // (undocumented)
     export function include<C, V>(_target: undefined, context: ClassFieldDecoratorContext<C, V>): void;
 }
 
@@ -27,10 +24,6 @@ export namespace customize {
     //
     // (undocumented)
     equals: typeof customizeEquals;
-    // Warning: (ae-forgotten-export) The symbol "Constructor" needs to be exported by the entry point main.d.ts
-    //
-    // (undocumented)
-    export function value<C extends Constructor>(constructor: C, context: ClassDecoratorContext): void;
 }
 
 // @public
@@ -38,44 +31,28 @@ export function equals(lhs: unknown, rhs: unknown): boolean;
 
 // @public
 export namespace equals {
-    // (undocumented)
     export function exclude<C, V>(_target: undefined, context: ClassFieldDecoratorContext<C, V>): void;
-    // (undocumented)
     export function include<C, V>(_target: undefined, context: ClassFieldDecoratorContext<C, V>): void;
 }
 
-// @public (undocumented)
+// @public
 export namespace value {
-    // (undocumented)
     export function exclude<C, V>(target: undefined, context: ClassFieldDecoratorContext<C, V>): void;
-    // (undocumented)
     export function include<C, V>(target: undefined, context: ClassFieldDecoratorContext<C, V>): void;
 }
 
-// @public (undocumented)
+// @public
 export class ValueArray<M> extends Array<M> {
-    // (undocumented)
     copyWithin(target: number, start: number, end?: number): this;
-    // (undocumented)
     fill(value: M, start?: number, end?: number): this;
-    // (undocumented)
     includes(needle: M, fromIndex?: number): boolean;
-    // (undocumented)
     indexOf(needle: M, fromIndex?: number): number;
-    // (undocumented)
     lastIndexOf(needle: M, fromIndex?: number): number;
-    // (undocumented)
     splice(start?: number, deleteCount?: number, ...items: M[]): this;
-    // (undocumented)
     toReversed(): this;
-    // (undocumented)
     toSorted(compareFn?: (a: M, b: M) => number): this;
-    // (undocumented)
     toSpliced(start?: number, deleteCount?: number, ...items: M[]): this;
-    // (undocumented)
     with(index: number, value: M): this;
 }
-
-// (No @packageDocumentation comment for this package)
 
 ```

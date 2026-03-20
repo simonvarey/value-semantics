@@ -2,10 +2,18 @@
 // Licensed under the MIT license <LICENSE-MIT or http://opensource.org/licenses/MIT>. 
 // This file may not be copied, modified, or distributed except according to those terms.
 
-// * Value-Semantics: The JavaScript/TypeScript Value Semantics Toolkit *
+/**
+ * * Value-Semantics: The JavaScript/TypeScript Value Semantics Toolkit *
+ *
+ * @remarks
+ * Everything you need to program as if objects in JavaScript had value semantics, including 
+ * comprehensive and highly customizable deep cloning {@link clone} and value equality {@link equals} 
+ * functions, and arrays with value semantics {@link ValueArray}.
+ *
+ * @packageDocumentation
+ */
 
 import { customizeClone, clone } from './clone';
-import { Constructor } from './common';
 import { customizeEquals, equals } from './equals';
 
 export { clone } from './clone';
@@ -19,15 +27,19 @@ export { ValueArray } from './value-array';
 export namespace customize {
   export const clone = customizeClone;
   export const equals = customizeEquals;
-
-  export function value<C extends Constructor>(constructor: C, context: ClassDecoratorContext): void {
-    customize.clone()(constructor, context);
-    customize.equals()(constructor, context);
-  }
 }
 
+/**
+ * Class field decorators which allow fields to be included or excluded from both `equals` and 
+ *   `clone` implementations simultaneously.
+ * @public
+ */
 export namespace value {
 
+  /**
+   * This class field decorator declares a property to be included for both cloning and equality 
+   * comparison.
+   */
   export function include<C, V>(
     target: undefined, context: ClassFieldDecoratorContext<C, V>
   ): void {
@@ -35,6 +47,10 @@ export namespace value {
     equals.include(target, context);
   }
 
+  /**
+   * This class field decorator declares a property to be excluded for both cloning and equality 
+   * comparison.
+   */
   export function exclude<C, V>(
     target: undefined, context: ClassFieldDecoratorContext<C, V>
   ): void {

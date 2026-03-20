@@ -224,16 +224,54 @@ export type IterateCloneOptions = {
 
 // Class Decorator
 
+/**
+ * This decorator can be used to set the clone semantics of the decorated class to the default
+ *   value of 'deep', and to further customize the class' clone semantics.
+ * @param options - Options for how to further customize the deep clone semantics of this class.
+ * @returns A decorator which customizes the decorated class' clone semantics.
+ */
 export function customizeClone<C extends Constructor>(options?: CustomizeCloneOptions): ClassDecorator_<C>
+/**
+ * This decorator can be used to set the clone semantics of the decorated class to 'deep', and 
+ *   to further customize the class' clone semantics.
+ * @param semantics - The kind of clone semantics the class is customized to have, specifically 'deep'.
+ * @param options - Options for how to further customize the clone semantics of this class.
+ * @returns A decorator which customizes the decorated class' clone semantics.
+ */
 export function customizeClone<C extends Constructor>(
   semantics: 'deep', options?: CustomizeCloneOptions
 ): ClassDecorator_<C>
+/**
+ * This decorator can be used to set the clone semantics of the decorated class to 'iterate', and 
+ *   to further customize the class' clone semantics.
+ * @param semantics - The kind of clone semantics the class is customized to have, specifically 
+ *   'iterate'.
+ * @param options - Options for how to further customize the clone semantics of this class.
+ * @returns A decorator which customizes the decorated class' clone semantics.
+ */
 export function customizeClone<C extends Constructor>(
   semantics: 'iterate', options: IterateCloneOptions
 ): ClassDecorator_<C>
+/**
+ * This decorator can be used to set the clone semantics of the decorated class to either 
+ *   'returnOriginal' or 'errorOnClone'.
+ * @param semantics - The kind of clone semantics the class is customized to have, either 
+ *   'returnOriginal' or 'errorOnClone'.
+ * @returns A decorator which customizes the decorated class' clone semantics.
+ */
 export function customizeClone<C extends Constructor>(
   semantics: 'returnOriginal' | 'errorOnClone'
 ): ClassDecorator_<C>
+/**
+ * This decorator can be used to set the clone semantics of the decorated class, and to further 
+ *   customize the class' clone semantics.
+ * @param semanticsOrOpts - Either the kind of clone semantics the class is customized to have 
+ *   (defaulting to 'deep'), or options for how to further customize the clone semantics of this 
+ *   class.
+ * @param options - If semantics is specified as either 'deep' or 'iterate', options for how to 
+ *   further customize the clone semantics of this class.
+ * @returns A decorator which customizes the decorated class' clone semantics.
+ */
 export function customizeClone<C extends Constructor>(
   semanticsOrOpts?: CloneSemantics | CustomizeCloneOptions, options?: CustomizeCloneOptions | IterateCloneOptions
 ): ClassDecorator_<C> {
@@ -308,6 +346,9 @@ export function customizeClone<C extends Constructor>(
  */
 export namespace clone {
 
+  /**
+   * This class field decorator declares a property to be included in cloning.
+   */
   export function include<C, V>(
     _target: undefined, context: ClassFieldDecoratorContext<C, V>
   ): void {
@@ -315,6 +356,9 @@ export namespace clone {
     (context.metadata[CLONE_INCLUDE_PROPS] as Set<PropKey>).add(context.name);
   }
   
+  /**
+   * This class field decorator declares a property to be excluded for cloning.
+   */
   export function exclude<C, V>(
     _target: undefined, context: ClassFieldDecoratorContext<C, V>
   ): void {
@@ -322,6 +366,9 @@ export namespace clone {
     (context.metadata[CLONE_EXCLUDE_PROPS] as Set<PropKey>).add(context.name);
   }
 
+  /**
+   * This class field decorator declares a property to be a parameter of the class' constructor.
+   */
   export function constructorParam<C, V>(
     _target: undefined, context: ClassFieldDecoratorContext<C, V>
   ): void {

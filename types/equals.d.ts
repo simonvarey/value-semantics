@@ -24,7 +24,13 @@ export declare function customizeEquals<C extends Constructor>(semantics: 'itera
  * @public
  */
 export declare namespace equals {
+    /**
+     * This class field decorator declares a property to be included for equality comparisons.
+     */
     function include<C, V>(_target: undefined, context: ClassFieldDecoratorContext<C, V>): void;
+    /**
+     * This class field decorator declares a property to be excluded for equality comparisons.
+     */
     function exclude<C, V>(_target: undefined, context: ClassFieldDecoratorContext<C, V>): void;
 }
 export {};

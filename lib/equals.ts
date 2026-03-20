@@ -523,11 +523,17 @@ export function customizeEquals<C extends Constructor>(
  */
 export namespace equals {
 
+  /**
+   * This class field decorator declares a property to be included for equality comparisons.
+   */
   export function include<C, V>(_target: undefined, context: ClassFieldDecoratorContext<C, V>): void {
     context.metadata[EQUALS_INCLUDE_PROPS] ??= new Set();
     (context.metadata[EQUALS_INCLUDE_PROPS] as Set<PropKey>).add(context.name);
   }
   
+  /**
+   * This class field decorator declares a property to be excluded for equality comparisons.
+   */
   export function exclude<C, V>(_target: undefined, context: ClassFieldDecoratorContext<C, V>): void {
     context.metadata[EQUALS_EXCLUDE_PROPS] ??= new Set();
     (context.metadata[EQUALS_EXCLUDE_PROPS] as Set<PropKey>).add(context.name);
