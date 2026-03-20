@@ -995,3 +995,20 @@ test('Array[]', () => {
   valArrObj[2] = clone(writeObj);
   expectIsClone(valArrObj[2], writeObj);
 })
+
+test('clone(ValueArray)', () => {
+  const valArrObj = new ValueArray<object>({ a: 1 }, { b: 2 });
+  const copyValArrObj = clone(valArrObj);
+  expectIsClone(valArrObj, copyValArrObj);
+  expectIsClone(valArrObj[0], copyValArrObj[0]);
+})
+
+test('equals(ValueArray)', () => {
+  const valArrObj1 = new ValueArray<object>({ a: 1 }, { b: 2 });
+  const valArrObj2 = new ValueArray<object>({ a: 1 }, { b: 2 });
+  expect(equals(valArrObj1, valArrObj1)).toBeTruthy();
+  expect(equals(valArrObj1, valArrObj2)).toBeTruthy();
+  expect(equals(valArrObj1, [{ a: 1 }, { b: 2 }])).toBeFalsy();
+  expect(equals(valArrObj1, {})).toBeFalsy();
+  expect(equals(valArrObj1, 0)).toBeFalsy();
+})
