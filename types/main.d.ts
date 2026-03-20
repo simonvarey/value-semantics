@@ -1,3 +1,13 @@
+/**
+ * * Value-Semantics: The JavaScript/TypeScript Value Semantics Toolkit *
+ *
+ * @remarks
+ * Everything you need to program as if objects in JavaScript had value semantics, including
+ * comprehensive and highly customizable deep cloning {@link clone} and value equality {@link equals}
+ * functions, and arrays with value semantics {@link ValueArray}.
+ *
+ * @packageDocumentation
+ */
 import { customizeClone } from './clone';
 import { customizeEquals } from './equals';
 export { clone } from './clone';

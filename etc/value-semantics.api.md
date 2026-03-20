@@ -55,6 +55,4 @@ export class ValueArray<M> extends Array<M> {
     with(index: number, value: M): this;
 }
 
-// (No @packageDocumentation comment for this package)
-
 ```
