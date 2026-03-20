@@ -346,6 +346,9 @@ export function customizeClone<C extends Constructor>(
  */
 export namespace clone {
 
+  /**
+   * This class field decorator declares a property to be included in cloning.
+   */
   export function include<C, V>(
     _target: undefined, context: ClassFieldDecoratorContext<C, V>
   ): void {
@@ -353,6 +356,9 @@ export namespace clone {
     (context.metadata[CLONE_INCLUDE_PROPS] as Set<PropKey>).add(context.name);
   }
   
+  /**
+   * This class field decorator declares a property to be excluded for cloning.
+   */
   export function exclude<C, V>(
     _target: undefined, context: ClassFieldDecoratorContext<C, V>
   ): void {
@@ -360,6 +366,9 @@ export namespace clone {
     (context.metadata[CLONE_EXCLUDE_PROPS] as Set<PropKey>).add(context.name);
   }
 
+  /**
+   * This class field decorator declares a property to be a parameter of the class' constructor.
+   */
   export function constructorParam<C, V>(
     _target: undefined, context: ClassFieldDecoratorContext<C, V>
   ): void {

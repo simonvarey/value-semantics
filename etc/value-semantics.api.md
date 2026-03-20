@@ -9,11 +9,8 @@ export function clone<T>(source: T): T;
 
 // @public
 export namespace clone {
-    // (undocumented)
     export function constructorParam<C, V>(_target: undefined, context: ClassFieldDecoratorContext<C, V>): void;
-    // (undocumented)
     export function exclude<C, V>(_target: undefined, context: ClassFieldDecoratorContext<C, V>): void;
-    // (undocumented)
     export function include<C, V>(_target: undefined, context: ClassFieldDecoratorContext<C, V>): void;
 }
 

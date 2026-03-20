@@ -53,8 +53,17 @@ export declare function customizeClone<C extends Constructor>(semantics: 'return
  * @public
  */
 export declare namespace clone {
+    /**
+     * This class field decorator declares a property to be included in cloning.
+     */
     function include<C, V>(_target: undefined, context: ClassFieldDecoratorContext<C, V>): void;
+    /**
+     * This class field decorator declares a property to be excluded for cloning.
+     */
     function exclude<C, V>(_target: undefined, context: ClassFieldDecoratorContext<C, V>): void;
+    /**
+     * This class field decorator declares a property to be a parameter of the class' constructor.
+     */
     function constructorParam<C, V>(_target: undefined, context: ClassFieldDecoratorContext<C, V>): void;
 }
 export {};
